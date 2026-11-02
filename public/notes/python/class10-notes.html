@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Notes – Class 10 | SEE Computer Science 2083</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap');
+
+  :root {
+    --bg:        #0f1117;
+    --surface:   #181c27;
+    --card:      #1e2335;
+    --border:    #2a2f45;
+    --accent1:   #5c6ef8;   /* indigo */
+    --accent2:   #38d9a9;   /* teal */
+    --accent3:   #fbbf24;   /* amber */
+    --accent4:   #f87171;   /* red */
+    --accent5:   #a78bfa;   /* violet */
+    --text:      #e2e8f0;
+    --muted:     #7c87a6;
+    --code-bg:   #111827;
+    --code-line: #1f2937;
+    --green:     #4ade80;
+    --orange:    #fb923c;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0f1117 0%, #1a1040 50%, #0f1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 24px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(92,110,248,0.18) 0%, transparent 70%);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(92,110,248,0.15);
+    border: 1px solid rgba(92,110,248,0.4);
+    color: var(--accent1);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 6vw, 3.6rem);
+    font-weight: 900;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #fff 30%, var(--accent1) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 14px;
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .hero-pills {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center;
+    margin-top: 28px;
+  }
+  .pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 14px;
+    border-radius: 100px;
+  }
+
+  /* ── LAYOUT ── */
+  .wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin: 36px 0 48px;
+  }
+  .toc-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 14px;
+  }
+  .toc-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 6px 20px;
+  }
+  .toc-list a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: color 0.2s;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toc-list a::before {
+    content: '→';
+    color: var(--accent1);
+    font-size: 11px;
+  }
+  .toc-list a:hover { color: var(--text); }
+
+  /* ── CHAPTER HEADER ── */
+  .chapter {
+    margin-bottom: 72px;
+  }
+  .chapter-header {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .chapter-num {
+    background: var(--accent1);
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .chapter-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-weight: 700;
+    color: #fff;
+  }
+
+  /* ── SECTION ── */
+  .section { margin-bottom: 40px; }
+  .section-title {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── DEFINITION BOX ── */
+  .def-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent1);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    font-size: 14.5px;
+  }
+  .def-box strong { color: var(--accent1); }
+
+  /* ── INFO CARDS GRID ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .card-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+  .card-label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .card-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* ── COMPARISON TABLE ── */
+  .table-wrap { overflow-x: auto; margin-bottom: 20px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+  thead tr {
+    background: var(--accent1);
+  }
+  thead th {
+    color: #fff;
+    font-weight: 700;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:nth-child(odd) { background: var(--card); }
+  tbody tr:nth-child(even) { background: var(--surface); }
+  tbody td {
+    padding: 10px 14px;
+    color: var(--text);
+  }
+  tbody td:first-child { font-weight: 700; color: var(--accent2); }
+
+  /* ── CODE BLOCK ── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  .code-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .code-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #f87171; }
+  .dot-y { background: #fbbf24; }
+  .dot-g { background: #4ade80; }
+
+  .code-body { padding: 18px 20px; }
+
+  .code-line {
+    display: flex;
+    gap: 16px;
+    padding: 2px 0;
+    border-radius: 4px;
+  }
+  .code-line:hover { background: rgba(255,255,255,0.03); }
+  .ln {
+    color: #374151;
+    min-width: 20px;
+    text-align: right;
+    user-select: none;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .code-content { flex: 1; }
+
+  /* syntax colors */
+  .kw  { color: #818cf8; }   /* keyword */
+  .fn  { color: #38bdf8; }   /* function name */
+  .str { color: #86efac; }   /* string */
+  .num { color: #fb923c; }   /* number */
+  .cm  { color: #4b5563; font-style: italic; } /* comment */
+  .op  { color: #f472b6; }   /* operator */
+  .bi  { color: #fbbf24; }   /* built-in */
+  .var { color: #e2e8f0; }   /* variable */
+  .punc{ color: #94a3b8; }   /* punctuation */
+
+  /* explanation line */
+  .explain {
+    background: rgba(56,217,169,0.07);
+    border-left: 2px solid var(--accent2);
+    padding: 3px 10px 3px 14px;
+    margin: 2px 0;
+    border-radius: 0 6px 6px 0;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .explain .ln { color: #374151; }
+  .exp-text {
+    color: var(--accent2);
+    font-size: 12px;
+    font-style: italic;
+    flex: 1;
+    padding-top: 1px;
+  }
+
+  .output-block {
+    background: #061a0f;
+    border: 1px solid #14532d;
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--green);
+    margin-bottom: 16px;
+  }
+  .output-label {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #166534;
+    margin-bottom: 6px;
+  }
+
+  /* ── ADVANTAGE LIST ── */
+  .adv-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .adv-list li {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .adv-list li::before {
+    content: '✦';
+    color: var(--accent3);
+    font-size: 11px;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  /* ── MISTAKE BOX ── */
+  .mistake-box {
+    background: rgba(248,113,113,0.07);
+    border: 1px solid rgba(248,113,113,0.3);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+  }
+  .mistake-title {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent4);
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .mistake-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .mistake-list li {
+    font-size: 13.5px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .mistake-list li::before {
+    content: '✗';
+    color: var(--accent4);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* ── TIP BOX ── */
+  .tip-box {
+    background: rgba(251,191,36,0.07);
+    border: 1px solid rgba(251,191,36,0.3);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    margin-bottom: 16px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .tip-icon { font-size: 18px; flex-shrink: 0; }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+  }
+  footer span { color: var(--accent1); }
+
+  @media (max-width: 600px) {
+    .cards { grid-template-columns: 1fr 1fr; }
+    .toc-list { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">SEE Computer Science 2083 · CDC Curriculum</div>
+  <h1>Python Programming<br>Final Notes</h1>
+  <p>Complete study guide for Class 10 students — concepts, programs, and line-by-line explanations.</p>
+  <div class="hero-pills">
+    <span class="pill">Unit 4.2 — Functions</span>
+    <span class="pill">Unit 4.3 — Modules</span>
+    <span class="pill">Unit 4.4 — Turtle</span>
+    <span class="pill">Unit 4.5 — Error Handling</span>
+    <span class="pill">Prepared by Deepak Shrestha</span>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">📚 Table of Contents</div>
+    <ul class="toc-list">
+      <li><a href="#ch1">4.2 User-defined Functions</a></li>
+      <li><a href="#ch2">4.3 Modules, Packages & Libraries</a></li>
+      <li><a href="#ch3">4.4 Turtle Graphics</a></li>
+      <li><a href="#ch4">4.5 Error Handling</a></li>
+    </ul>
+  </div>
+
+
+  <!-- ═══════════════════════════════════ CHAPTER 1 ═══ -->
+  <div class="chapter" id="ch1">
+    <div class="chapter-header">
+      <span class="chapter-num">4.2</span>
+      <h2 class="chapter-title">User-Defined Functions in Python</h2>
+    </div>
+
+    <!-- What is a function -->
+    <div class="section">
+      <div class="section-title">What is a Function?</div>
+      <div class="def-box">
+        A <strong>function</strong> is a block of organized, reusable code designed to perform a specific task. Functions help reduce repetition and make programs easier to manage and understand.
+      </div>
+
+      <div class="section-title">Advantages of Functions</div>
+      <ul class="adv-list">
+        <li>Reuse code multiple times without rewriting it.</li>
+        <li>Reduce code duplication across the program.</li>
+        <li>Improve program readability and structure.</li>
+        <li>Make debugging easier — fix once, fixed everywhere.</li>
+        <li>Support <strong>modular programming</strong> — dividing a large program into smaller parts.</li>
+      </ul>
+    </div>
+
+    <!-- Types -->
+    <div class="section">
+      <div class="section-title">Types of Functions in Python</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Feature</th><th>Built-in Function</th><th>User-defined Function</th></tr></thead>
+          <tbody>
+            <tr><td>Creator</td><td>Python Developers</td><td>Programmer</td></tr>
+            <tr><td>Availability</td><td>Available by default</td><td>Must be created</td></tr>
+            <tr><td>Loading</td><td>Loaded automatically</td><td>Loaded when defined</td></tr>
+            <tr><td>Example</td><td>print( ), len( ), sum( )</td><td>add( ), area( )</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title">Common Built-in Functions</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Function</th><th>Purpose</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td>print()</td><td>Displays output</td><td>print("Hello")</td></tr>
+            <tr><td>input()</td><td>Takes input from user</td><td>input("Name: ")</td></tr>
+            <tr><td>len()</td><td>Returns length</td><td>len("Python") → 6</td></tr>
+            <tr><td>int()</td><td>Converts to integer</td><td>int("5") → 5</td></tr>
+            <tr><td>sum()</td><td>Calculates total</td><td>sum([1,2,3]) → 6</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Creating a function -->
+    <div class="section">
+      <div class="section-title">Creating a User-defined Function — Syntax</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Syntax</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">def</span> <span class="fn">function_name</span><span class="punc">(</span><span class="var">parameters</span><span class="punc">):</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">statements</span></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="var">value</span></span></div>
+        </div>
+      </div>
+
+      <!-- Program 1 -->
+      <div class="section-title">Program 1 — Add Two Numbers</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ Define a function named add with two parameters a and b</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">def</span> <span class="fn">add</span><span class="punc">(</span><span class="var">a</span><span class="punc">,</span> <span class="var">b</span><span class="punc">):</span></span></div>
+          <div class="explain"><span class="ln">2</span><span class="exp-text">→ Calculate sum and return it back to the caller</span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="var">a</span> <span class="op">+</span> <span class="var">b</span></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Call the function with arguments 5 and 3, print the result</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="bi">print</span><span class="punc">(</span><span class="fn">add</span><span class="punc">(</span><span class="num">5</span><span class="punc">,</span> <span class="num">3</span><span class="punc">))</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>8</div>
+
+      <!-- Program 2 -->
+      <div class="section-title">Program 2 — Area of Rectangle</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ Define function 'area' that takes length and width as parameters</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">def</span> <span class="fn">area</span><span class="punc">(</span><span class="var">length</span><span class="punc">,</span> <span class="var">width</span><span class="punc">):</span></span></div>
+          <div class="explain"><span class="ln">2</span><span class="exp-text">→ Multiply length × width and return the result</span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="var">length</span> <span class="op">*</span> <span class="var">width</span></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Store returned value in variable 'result'</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">result</span> <span class="op">=</span> <span class="fn">area</span><span class="punc">(</span><span class="num">5</span><span class="punc">,</span> <span class="num">8</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">5</span><span class="exp-text">→ Display the result — 5 × 8 = 40</span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="bi">print</span><span class="punc">(</span><span class="var">result</span><span class="punc">)</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>40</div>
+    </div>
+
+    <!-- Parameters & Arguments -->
+    <div class="section">
+      <div class="section-title">Parameters vs Arguments</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Parameter</th><th>Argument</th></tr></thead>
+          <tbody>
+            <tr><td>Placeholder variable</td><td>Actual value passed</td></tr>
+            <tr><td>Used in definition</td><td>Used in function call</td></tr>
+            <tr><td>Example: x, y in def add(x, y)</td><td>Example: 5, 3 in add(5, 3)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title">Types of Arguments</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Description</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td>Positional</td><td>Passed in same order as parameters</td><td>check(2, 5, 7)</td></tr>
+            <tr><td>Default</td><td>Parameter has a default value</td><td>power(base, exp=2)</td></tr>
+            <tr><td>Keyword</td><td>Passed using parameter name</td><td>student(age=15, name="Ram")</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Program 3 -->
+      <div class="section-title">Program 3 — Default Argument (Power)</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ 'exp=2' is default — if no exp given, it uses 2 automatically</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">def</span> <span class="fn">power</span><span class="punc">(</span><span class="var">base</span><span class="punc">,</span> <span class="var">exp</span><span class="op">=</span><span class="num">2</span><span class="punc">):</span></span></div>
+          <div class="explain"><span class="ln">2</span><span class="exp-text">→ ** is the exponent operator: base raised to the power of exp</span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="var">base</span> <span class="op">**</span> <span class="var">exp</span></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Only base=4 given → uses default exp=2 → 4² = 16</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="bi">print</span><span class="punc">(</span><span class="fn">power</span><span class="punc">(</span><span class="num">4</span><span class="punc">))</span></span></div>
+          <div class="explain"><span class="ln">5</span><span class="exp-text">→ Both given: base=2, exp=3 → 2³ = 8 (default overridden)</span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="bi">print</span><span class="punc">(</span><span class="fn">power</span><span class="punc">(</span><span class="num">2</span><span class="punc">,</span> <span class="num">3</span><span class="punc">))</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>16<br>8</div>
+
+      <!-- Program 4 -->
+      <div class="section-title">Program 4 — Keyword Argument</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ Function defined with parameters: name and age</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">def</span> <span class="fn">student</span><span class="punc">(</span><span class="var">name</span><span class="punc">,</span> <span class="var">age</span><span class="punc">):</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span><span class="punc">(</span><span class="var">name</span><span class="punc">,</span> <span class="var">age</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Keyword args: order doesn't matter because names are given</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="fn">student</span><span class="punc">(</span><span class="var">age</span><span class="op">=</span><span class="num">15</span><span class="punc">,</span> <span class="var">name</span><span class="op">=</span><span class="str">"Ram"</span><span class="punc">)</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>Ram 15</div>
+    </div>
+
+    <!-- Scope -->
+    <div class="section">
+      <div class="section-title">Scope of Variables</div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">🔒</div>
+          <div class="card-label">Local Scope</div>
+          <div class="card-value">Declared inside a function — only accessible within that function.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🌐</div>
+          <div class="card-label">Global Scope</div>
+          <div class="card-value">Declared outside all functions — accessible throughout the program.</div>
+        </div>
+      </div>
+
+      <!-- Program 5 -->
+      <div class="section-title">Program 5 — Local & Global Variable</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ x=10 is GLOBAL — exists outside the function, available everywhere</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="var">x</span> <span class="op">=</span> <span class="num">10</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="kw">def</span> <span class="fn">show</span><span class="punc">():</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ y=5 is LOCAL — only exists inside show(), not outside</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">y</span> <span class="op">=</span> <span class="num">5</span></span></div>
+          <div class="explain"><span class="ln">5</span><span class="exp-text">→ Accessing global x from inside the function — works fine!</span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span><span class="punc">(</span><span class="var">x</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">6</span><span class="exp-text">→ Printing local y — outputs 5</span></div>
+          <div class="code-line"><span class="ln">6</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span><span class="punc">(</span><span class="var">y</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">7</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">8</span><span class="exp-text">→ Call the function — executes lines 4 to 6</span></div>
+          <div class="code-line"><span class="ln">8</span><span class="code-content"><span class="fn">show</span><span class="punc">()</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>10<br>5</div>
+    </div>
+
+    <!-- Void vs Non-Void -->
+    <div class="section">
+      <div class="section-title">Void vs Non-Void Functions</div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">🔇</div>
+          <div class="card-label">Void Function</div>
+          <div class="card-value">Does NOT return a value. Python returns None automatically.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔊</div>
+          <div class="card-label">Non-Void Function</div>
+          <div class="card-value">Returns a value using the return statement.</div>
+        </div>
+      </div>
+
+      <div class="section-title">Program 6 — Returning Multiple Values</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ Function takes 3 values and returns all 3 squares at once</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">def</span> <span class="fn">squared</span><span class="punc">(</span><span class="var">x</span><span class="punc">,</span> <span class="var">y</span><span class="punc">,</span> <span class="var">z</span><span class="punc">):</span></span></div>
+          <div class="explain"><span class="ln">2</span><span class="exp-text">→ Returns a tuple of 3 values: x², y², z²</span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> <span class="var">x</span><span class="op">*</span><span class="var">x</span><span class="punc">,</span> <span class="var">y</span><span class="op">*</span><span class="var">y</span><span class="punc">,</span> <span class="var">z</span><span class="op">*</span><span class="var">z</span></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Unpack returned values into 3 separate variables a, b, c</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">a</span><span class="punc">,</span> <span class="var">b</span><span class="punc">,</span> <span class="var">c</span> <span class="op">=</span> <span class="fn">squared</span><span class="punc">(</span><span class="num">2</span><span class="punc">,</span> <span class="num">3</span><span class="punc">,</span> <span class="num">4</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">5</span><span class="exp-text">→ Print all three values: 4, 9, 16</span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="bi">print</span><span class="punc">(</span><span class="var">a</span><span class="punc">,</span> <span class="var">b</span><span class="punc">,</span> <span class="var">c</span><span class="punc">)</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>4 9 16</div>
+    </div>
+
+    <div class="mistake-box">
+      <div class="mistake-title">⚠ Common Exam Mistakes — Functions</div>
+      <ul class="mistake-list">
+        <li>Forgetting the colon <code>:</code> after function definition</li>
+        <li>Wrong indentation inside the function body</li>
+        <li>Confusing parameter (placeholder) and argument (actual value)</li>
+        <li>Writing default arguments BEFORE required arguments</li>
+        <li>Defining the function but forgetting to call it</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════ CHAPTER 2 ═══ -->
+  <div class="chapter" id="ch2">
+    <div class="chapter-header">
+      <span class="chapter-num" style="background:var(--accent2);color:#0f1117;">4.3</span>
+      <h2 class="chapter-title">Module, Package and Library</h2>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Easy Memory Trick</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Term</th><th>Think of it as</th><th>Meaning</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td>Module</td><td>📖 Book</td><td>Single Python file (.py)</td><td>math.py</td></tr>
+            <tr><td>Package</td><td>🚪 Room</td><td>Folder containing modules</td><td>numpy.random</td></tr>
+            <tr><td>Library</td><td>🏠 House</td><td>Collection of packages & modules</td><td>NumPy, Pandas</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tip-box">
+        <span class="tip-icon">💡</span>
+        <span>Easy analogy: A <strong>Library</strong> is a House → contains <strong>Packages</strong> (Rooms) → which contain <strong>Modules</strong> (Books). Library → Packages → Modules.</span>
+      </div>
+
+      <div class="section-title">Importing Modules — 4 Methods</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Method</th><th>Syntax</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td>Import entire module</td><td>import math</td><td>print(math.sqrt(25))</td></tr>
+            <tr><td>Import specific function</td><td>from math import sqrt</td><td>print(sqrt(49))</td></tr>
+            <tr><td>Import with alias</td><td>import math as m</td><td>print(m.sqrt(64))</td></tr>
+            <tr><td>Import all functions</td><td>from math import *</td><td>print(sqrt(25))</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Program 7 -->
+      <div class="section-title">Program 7 — Using the math Module</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ Import the entire math module — gives access to all math functions</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">math</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ math.sqrt() finds square root of 25 → output: 5.0</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="bi">print</span><span class="punc">(</span><span class="bi">math</span><span class="punc">.</span><span class="fn">sqrt</span><span class="punc">(</span><span class="num">25</span><span class="punc">))</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ math.factorial(5) = 5×4×3×2×1 = 120</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="bi">print</span><span class="punc">(</span><span class="bi">math</span><span class="punc">.</span><span class="fn">factorial</span><span class="punc">(</span><span class="num">5</span><span class="punc">))</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>5.0<br>120</div>
+
+      <!-- Program 8 -->
+      <div class="section-title">Program 8 — Import with Alias</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ 'as m' creates alias — now write 'm' instead of 'math'</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">math</span> <span class="kw">as</span> <span class="var">m</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ Use alias 'm' instead of full module name 'math'</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="bi">print</span><span class="punc">(</span><span class="var">m</span><span class="punc">.</span><span class="fn">sqrt</span><span class="punc">(</span><span class="num">64</span><span class="punc">))</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>8.0</div>
+
+      <div class="section-title">Popular Python Libraries</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Library</th><th>Main Use</th></tr></thead>
+          <tbody>
+            <tr><td>NumPy</td><td>Numerical Computing</td></tr>
+            <tr><td>Pandas</td><td>Data Analysis</td></tr>
+            <tr><td>Matplotlib</td><td>Data Visualization</td></tr>
+            <tr><td>TensorFlow</td><td>Machine Learning</td></tr>
+            <tr><td>OpenCV</td><td>Computer Vision</td></tr>
+            <tr><td>Django</td><td>Web Development</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title">pip — Package Manager</div>
+      <div class="def-box">
+        <strong>pip</strong> is Python's package manager used to install, update, and remove external packages and libraries.
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td>pip install numpy</td><td>Installs the NumPy library</td></tr>
+            <tr><td>pip uninstall numpy</td><td>Removes NumPy from system</td></tr>
+            <tr><td>pip list</td><td>Shows all installed packages</td></tr>
+            <tr><td>pip --version</td><td>Shows the pip version</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="mistake-box">
+      <div class="mistake-title">⚠ Common Exam Mistakes — Modules</div>
+      <ul class="mistake-list">
+        <li>Confusing module (single file) and package (folder)</li>
+        <li>Forgetting the .py extension in module name definition</li>
+        <li>Writing pip as a library instead of a package manager</li>
+        <li>Writing package as a single file — it is always a folder</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════ CHAPTER 3 ═══ -->
+  <div class="chapter" id="ch3">
+    <div class="chapter-header">
+      <span class="chapter-num" style="background:var(--accent3);color:#0f1117;">4.4</span>
+      <h2 class="chapter-title">Graphics in Python using Turtle</h2>
+    </div>
+
+    <div class="section">
+      <div class="def-box">
+        <strong>Turtle</strong> is a Python module used to draw shapes, patterns, and pictures on screen by moving a virtual pen (called a turtle). The center of the screen is at coordinate <strong>(0, 0)</strong>.
+      </div>
+
+      <div class="section-title">Essential Turtle Statements</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Statement</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td>import turtle</td><td>Loads the turtle module</td></tr>
+            <tr><td>screen = turtle.Screen()</td><td>Creates the drawing window</td></tr>
+            <tr><td>pen = turtle.Turtle()</td><td>Creates the turtle object (pen)</td></tr>
+            <tr><td>turtle.done()</td><td>Keeps window open until closed manually</td></tr>
+            <tr><td>turtle.mainloop()</td><td>Keeps window open, waits for user actions</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title">Important Turtle Commands</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Command</th><th>Shortcut</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td>forward(d)</td><td>fd(d)</td><td>Move forward by distance d</td></tr>
+            <tr><td>backward(d)</td><td>bk(d) / back(d)</td><td>Move backward by distance d</td></tr>
+            <tr><td>right(a)</td><td>rt(a)</td><td>Turn clockwise by angle a</td></tr>
+            <tr><td>left(a)</td><td>lt(a)</td><td>Turn anticlockwise by angle a</td></tr>
+            <tr><td>circle(r)</td><td>—</td><td>Draw circle with radius r</td></tr>
+            <tr><td>penup()</td><td>pu() / up()</td><td>Lift pen — stop drawing</td></tr>
+            <tr><td>pendown()</td><td>pd() / down()</td><td>Put pen — start drawing</td></tr>
+            <tr><td>color(c)</td><td>—</td><td>Set pen color</td></tr>
+            <tr><td>fillcolor(c)</td><td>—</td><td>Set fill color</td></tr>
+            <tr><td>begin_fill()</td><td>—</td><td>Start filling shape</td></tr>
+            <tr><td>end_fill()</td><td>—</td><td>End filling shape</td></tr>
+            <tr><td>goto(x, y)</td><td>—</td><td>Move to coordinate (x, y)</td></tr>
+            <tr><td>write(text)</td><td>—</td><td>Write text on screen</td></tr>
+            <tr><td>speed(v)</td><td>—</td><td>Set drawing speed (0=fastest)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Program 9 -->
+      <div class="section-title">Program 9 — Draw a Square</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ Load the turtle graphics module</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">turtle</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ Create the drawing window (canvas)</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="var">screen</span> <span class="op">=</span> <span class="bi">turtle</span><span class="punc">.</span><span class="fn">Screen</span><span class="punc">()</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Create turtle object and name it 'pen'</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">pen</span> <span class="op">=</span> <span class="bi">turtle</span><span class="punc">.</span><span class="fn">Turtle</span><span class="punc">()</span></span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">6</span><span class="exp-text">→ Loop runs 4 times — once for each side of the square</span></div>
+          <div class="code-line"><span class="ln">6</span><span class="code-content"><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span><span class="punc">(</span><span class="num">4</span><span class="punc">):</span></span></div>
+          <div class="explain"><span class="ln">7</span><span class="exp-text">→ Move forward 100 pixels to draw one side</span></div>
+          <div class="code-line"><span class="ln">7</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">forward</span><span class="punc">(</span><span class="num">100</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">8</span><span class="exp-text">→ Turn right 90° to prepare for the next side</span></div>
+          <div class="code-line"><span class="ln">8</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">right</span><span class="punc">(</span><span class="num">90</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">9</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">10</span><span class="exp-text">→ Keep the window open so we can see the drawing</span></div>
+          <div class="code-line"><span class="ln">10</span><span class="code-content"><span class="bi">turtle</span><span class="punc">.</span><span class="fn">done</span><span class="punc">()</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>Draws a square with 4 sides of 100 pixels each on screen.</div>
+
+      <!-- Program 10 -->
+      <div class="section-title">Program 10 — Filled Colored Square</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">turtle</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"><span class="var">pen</span> <span class="op">=</span> <span class="bi">turtle</span><span class="punc">.</span><span class="fn">Turtle</span><span class="punc">()</span></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Set the fill color to yellow</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">fillcolor</span><span class="punc">(</span><span class="str">"yellow"</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">5</span><span class="exp-text">→ Tell Python we are about to start a shape that will be filled</span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">begin_fill</span><span class="punc">()</span></span></div>
+          <div class="code-line"><span class="ln">6</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">7</span><span class="exp-text">→ Draw 4 sides of the square</span></div>
+          <div class="code-line"><span class="ln">7</span><span class="code-content"><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span><span class="punc">(</span><span class="num">4</span><span class="punc">):</span></span></div>
+          <div class="code-line"><span class="ln">8</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">forward</span><span class="punc">(</span><span class="num">100</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">9</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">right</span><span class="punc">(</span><span class="num">90</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">10</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">11</span><span class="exp-text">→ Apply the fill color inside the closed square shape</span></div>
+          <div class="code-line"><span class="ln">11</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">end_fill</span><span class="punc">()</span></span></div>
+          <div class="code-line"><span class="ln">12</span><span class="code-content"><span class="bi">turtle</span><span class="punc">.</span><span class="fn">done</span><span class="punc">()</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>Draws a yellow-filled square on screen.</div>
+
+      <!-- Program 11 -->
+      <div class="section-title">Program 11 — Draw a Circle</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">turtle</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"><span class="var">pen</span> <span class="op">=</span> <span class="bi">turtle</span><span class="punc">.</span><span class="fn">Turtle</span><span class="punc">()</span></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ Set pen color to blue — the circle outline will be blue</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">color</span><span class="punc">(</span><span class="str">"blue"</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Draw a circle with radius 50 pixels</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">circle</span><span class="punc">(</span><span class="num">50</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="bi">turtle</span><span class="punc">.</span><span class="fn">done</span><span class="punc">()</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>Draws a blue circle with radius 50 on screen.</div>
+    </div>
+
+    <!-- EXTRA TURTLE EXAMPLES -->
+    <div class="section">
+      <div class="section-title">Extra Examples — Turtle Library</div>
+
+      <!-- Program 12 — Triangle -->
+      <div class="section-title">Program 12 — Draw a Triangle</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ Load the turtle module</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">turtle</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"><span class="var">pen</span> <span class="op">=</span> <span class="bi">turtle</span><span class="punc">.</span><span class="fn">Turtle</span><span class="punc">()</span></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Set pen color to green for the triangle outline</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">color</span><span class="punc">(</span><span class="str">"green"</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">5</span><span class="exp-text">→ Loop runs 3 times — once for each side of the triangle</span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span><span class="punc">(</span><span class="num">3</span><span class="punc">):</span></span></div>
+          <div class="explain"><span class="ln">6</span><span class="exp-text">→ Move forward 120 pixels to draw one side</span></div>
+          <div class="code-line"><span class="ln">6</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">forward</span><span class="punc">(</span><span class="num">120</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">7</span><span class="exp-text">→ Turn left 120° — exterior angle of equilateral triangle (360°÷3=120°)</span></div>
+          <div class="code-line"><span class="ln">7</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">left</span><span class="punc">(</span><span class="num">120</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">8</span><span class="code-content"></span></div>
+          <div class="code-line"><span class="ln">9</span><span class="code-content"><span class="bi">turtle</span><span class="punc">.</span><span class="fn">done</span><span class="punc">()</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>Draws a green equilateral triangle with each side 120 pixels.</div>
+
+      <!-- Program 13 — Star -->
+      <div class="section-title">Program 13 — Draw a Star ⭐</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">turtle</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"><span class="var">pen</span> <span class="op">=</span> <span class="bi">turtle</span><span class="punc">.</span><span class="fn">Turtle</span><span class="punc">()</span></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ Set pen color to gold for a star appearance</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">color</span><span class="punc">(</span><span class="str">"gold"</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Set pen thickness so star looks bold</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">pensize</span><span class="punc">(</span><span class="num">3</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">5</span><span class="exp-text">→ A star has 5 points — loop runs 5 times</span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span><span class="punc">(</span><span class="num">5</span><span class="punc">):</span></span></div>
+          <div class="explain"><span class="ln">6</span><span class="exp-text">→ Draw one arm of the star (150 pixels long)</span></div>
+          <div class="code-line"><span class="ln">6</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">forward</span><span class="punc">(</span><span class="num">150</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">7</span><span class="exp-text">→ Turn right 144° — exterior angle of a 5-point star (360°×2÷5=144°)</span></div>
+          <div class="code-line"><span class="ln">7</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">right</span><span class="punc">(</span><span class="num">144</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">8</span><span class="code-content"></span></div>
+          <div class="code-line"><span class="ln">9</span><span class="code-content"><span class="bi">turtle</span><span class="punc">.</span><span class="fn">done</span><span class="punc">()</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>Draws a 5-pointed gold star on screen. Key: a star needs 144° turn each time.</div>
+
+      <!-- Program 14 — Spiral -->
+      <div class="section-title">Program 14 — Draw a Colorful Spiral</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">turtle</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"><span class="var">pen</span> <span class="op">=</span> <span class="bi">turtle</span><span class="punc">.</span><span class="fn">Turtle</span><span class="punc">()</span></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ Speed 0 = fastest drawing — spiral has many steps</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">speed</span><span class="punc">(</span><span class="num">0</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ List of colors that will rotate as spiral grows</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">colors</span> <span class="op">=</span> <span class="punc">[</span><span class="str">"red"</span><span class="punc">,</span> <span class="str">"blue"</span><span class="punc">,</span> <span class="str">"green"</span><span class="punc">,</span> <span class="str">"orange"</span><span class="punc">]</span></span></div>
+          <div class="explain"><span class="ln">5</span><span class="exp-text">→ Loop runs 40 times — each step draws one segment of the spiral</span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span><span class="punc">(</span><span class="num">40</span><span class="punc">):</span></span></div>
+          <div class="explain"><span class="ln">6</span><span class="exp-text">→ i % 4 gives 0,1,2,3,0,1,2,3... cycling through colors list</span></div>
+          <div class="code-line"><span class="ln">6</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">color</span><span class="punc">(</span><span class="var">colors</span><span class="punc">[</span><span class="var">i</span> <span class="op">%</span> <span class="num">4</span><span class="punc">])</span></span></div>
+          <div class="explain"><span class="ln">7</span><span class="exp-text">→ Each step is longer than the last: i*5 grows from 0 to 195</span></div>
+          <div class="code-line"><span class="ln">7</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">forward</span><span class="punc">(</span><span class="var">i</span> <span class="op">*</span> <span class="num">5</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">8</span><span class="exp-text">→ Turn 90° each time — creates the outward spiral shape</span></div>
+          <div class="code-line"><span class="ln">8</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">right</span><span class="punc">(</span><span class="num">90</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">9</span><span class="code-content"></span></div>
+          <div class="code-line"><span class="ln">10</span><span class="code-content"><span class="bi">turtle</span><span class="punc">.</span><span class="fn">done</span><span class="punc">()</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>Draws a growing square spiral with rotating colors: red, blue, green, orange.</div>
+
+      <!-- Program 15 — Concentric circles -->
+      <div class="section-title">Program 15 — Concentric Circles (Circles inside Circles)</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">turtle</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"><span class="var">pen</span> <span class="op">=</span> <span class="bi">turtle</span><span class="punc">.</span><span class="fn">Turtle</span><span class="punc">()</span></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ Hide the turtle cursor so only the drawing is visible</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">hideturtle</span><span class="punc">()</span></span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">speed</span><span class="punc">(</span><span class="num">0</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">5</span><span class="exp-text">→ Colors for each circle — 5 different colors</span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="var">colors</span> <span class="op">=</span> <span class="punc">[</span><span class="str">"red"</span><span class="punc">,</span><span class="str">"orange"</span><span class="punc">,</span><span class="str">"yellow"</span><span class="punc">,</span><span class="str">"green"</span><span class="punc">,</span><span class="str">"blue"</span><span class="punc">]</span></span></div>
+          <div class="explain"><span class="ln">6</span><span class="exp-text">→ Loop for 5 circles with radius 20, 40, 60, 80, 100</span></div>
+          <div class="code-line"><span class="ln">6</span><span class="code-content"><span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="bi">range</span><span class="punc">(</span><span class="num">5</span><span class="punc">):</span></span></div>
+          <div class="explain"><span class="ln">7</span><span class="exp-text">→ Set a different color for each circle</span></div>
+          <div class="code-line"><span class="ln">7</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">color</span><span class="punc">(</span><span class="var">colors</span><span class="punc">[</span><span class="var">i</span><span class="punc">])</span></span></div>
+          <div class="explain"><span class="ln">8</span><span class="exp-text">→ Radius grows: 20, 40, 60, 80, 100 — each circle larger than last</span></div>
+          <div class="code-line"><span class="ln">8</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">circle</span><span class="punc">((</span><span class="var">i</span><span class="op">+</span><span class="num">1</span><span class="punc">)</span> <span class="op">*</span> <span class="num">20</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">9</span><span class="exp-text">→ Lift pen, move down to align bottom of circles, put pen back</span></div>
+          <div class="code-line"><span class="ln">9</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">penup</span><span class="punc">()</span></span></div>
+          <div class="code-line"><span class="ln">10</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">goto</span><span class="punc">(</span><span class="num">0</span><span class="punc">,</span> <span class="op">-</span><span class="punc">(</span><span class="var">i</span><span class="op">+</span><span class="num">1</span><span class="punc">)</span> <span class="op">*</span> <span class="num">20</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">11</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">pen</span><span class="punc">.</span><span class="fn">pendown</span><span class="punc">()</span></span></div>
+          <div class="code-line"><span class="ln">12</span><span class="code-content"></span></div>
+          <div class="code-line"><span class="ln">13</span><span class="code-content"><span class="bi">turtle</span><span class="punc">.</span><span class="fn">done</span><span class="punc">()</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>Draws 5 concentric circles in red, orange, yellow, green, and blue — like a target board.</div>
+
+      <!-- Program 16 — Write text -->
+      <div class="section-title">Program 16 — Write Text on Screen</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">turtle</span></span></div>
+          <div class="explain"><span class="ln">2</span><span class="exp-text">→ Create screen and set background color to black</span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"><span class="var">screen</span> <span class="op">=</span> <span class="bi">turtle</span><span class="punc">.</span><span class="fn">Screen</span><span class="punc">()</span></span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="var">screen</span><span class="punc">.</span><span class="fn">bgcolor</span><span class="punc">(</span><span class="str">"black"</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Set window title shown in the title bar</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">screen</span><span class="punc">.</span><span class="fn">title</span><span class="punc">(</span><span class="str">"My Turtle Program"</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="var">pen</span> <span class="op">=</span> <span class="bi">turtle</span><span class="punc">.</span><span class="fn">Turtle</span><span class="punc">()</span></span></div>
+          <div class="explain"><span class="ln">6</span><span class="exp-text">→ Set text color to cyan so it stands out on black background</span></div>
+          <div class="code-line"><span class="ln">6</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">color</span><span class="punc">(</span><span class="str">"cyan"</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">7</span><span class="exp-text">→ Move pen up to avoid drawing a line while moving</span></div>
+          <div class="code-line"><span class="ln">7</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">penup</span><span class="punc">()</span></span></div>
+          <div class="explain"><span class="ln">8</span><span class="exp-text">→ Go to position (-120, 0) — center-left of screen</span></div>
+          <div class="code-line"><span class="ln">8</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">goto</span><span class="punc">(</span><span class="op">-</span><span class="num">120</span><span class="punc">,</span> <span class="num">0</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">9</span><span class="exp-text">→ write() draws text — font size 24, bold Arial</span></div>
+          <div class="code-line"><span class="ln">9</span><span class="code-content"><span class="var">pen</span><span class="punc">.</span><span class="fn">write</span><span class="punc">(</span><span class="str">"Hello, Class 10!"</span><span class="punc">,</span> <span class="var">font</span><span class="op">=</span><span class="punc">(</span><span class="str">"Arial"</span><span class="punc">,</span> <span class="num">24</span><span class="punc">,</span> <span class="str">"bold"</span><span class="punc">))</span></span></div>
+          <div class="code-line"><span class="ln">10</span><span class="code-content"><span class="bi">turtle</span><span class="punc">.</span><span class="fn">done</span><span class="punc">()</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>Displays "Hello, Class 10!" in bold cyan Arial font on a black screen.</div>
+    </div>
+
+    <!-- MATPLOTLIB PIE CHART SECTION -->
+    <div class="section">
+      <div class="section-title" style="color:var(--accent5);">Bonus — Matplotlib: Pie Chart</div>
+      <div class="def-box" style="border-left-color:var(--accent5);">
+        <strong style="color:var(--accent5);">Matplotlib</strong> is a popular Python library used for <strong>data visualization</strong> — it can create bar charts, line graphs, pie charts, and more. Install it using: <code style="color:var(--accent3);">pip install matplotlib</code>
+      </div>
+
+      <div class="section-title">Program 17 — Simple Pie Chart (Favourite Subjects)</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ Import matplotlib's pyplot module and give it alias 'plt'</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">matplotlib</span><span class="punc">.</span><span class="bi">pyplot</span> <span class="kw">as</span> <span class="var">plt</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ List of subject names (labels for each slice)</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="var">subjects</span> <span class="op">=</span> <span class="punc">[</span><span class="str">"Maths"</span><span class="punc">,</span> <span class="str">"Science"</span><span class="punc">,</span> <span class="str">"English"</span><span class="punc">,</span> <span class="str">"Computer"</span><span class="punc">,</span> <span class="str">"Nepali"</span><span class="punc">]</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Number of students who like each subject — must add up to 100%</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">votes</span> <span class="op">=</span> <span class="punc">[</span><span class="num">30</span><span class="punc">,</span> <span class="num">25</span><span class="punc">,</span> <span class="num">20</span><span class="punc">,</span> <span class="num">15</span><span class="punc">,</span> <span class="num">10</span><span class="punc">]</span></span></div>
+          <div class="explain"><span class="ln">5</span><span class="exp-text">→ Colors for each pie slice</span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="var">colors</span> <span class="op">=</span> <span class="punc">[</span><span class="str">"#5c6ef8"</span><span class="punc">,</span><span class="str">"#38d9a9"</span><span class="punc">,</span><span class="str">"#fbbf24"</span><span class="punc">,</span><span class="str">"#f87171"</span><span class="punc">,</span><span class="str">"#a78bfa"</span><span class="punc">]</span></span></div>
+          <div class="explain"><span class="ln">6</span><span class="exp-text">→ explode separates slices slightly — 0.1 means 10% gap for Computer</span></div>
+          <div class="code-line"><span class="ln">6</span><span class="code-content"><span class="var">explode</span> <span class="op">=</span> <span class="punc">(</span><span class="num">0</span><span class="punc">,</span> <span class="num">0</span><span class="punc">,</span> <span class="num">0</span><span class="punc">,</span> <span class="num">0.1</span><span class="punc">,</span> <span class="num">0</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">7</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">8</span><span class="exp-text">→ plt.pie() creates the pie chart with all the settings</span></div>
+          <div class="code-line"><span class="ln">8</span><span class="code-content"><span class="var">plt</span><span class="punc">.</span><span class="fn">pie</span><span class="punc">(</span><span class="var">votes</span><span class="punc">,</span></span></div>
+          <div class="explain"><span class="ln">9</span><span class="exp-text">→ labels: show subject name on each slice</span></div>
+          <div class="code-line"><span class="ln">9</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">labels</span><span class="op">=</span><span class="var">subjects</span><span class="punc">,</span></span></div>
+          <div class="explain"><span class="ln">10</span><span class="exp-text">→ autopct shows percentage inside each slice e.g. "30.0%"</span></div>
+          <div class="code-line"><span class="ln">10</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">autopct</span><span class="op">=</span><span class="str">"%1.1f%%"</span><span class="punc">,</span></span></div>
+          <div class="code-line"><span class="ln">11</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">colors</span><span class="op">=</span><span class="var">colors</span><span class="punc">,</span></span></div>
+          <div class="code-line"><span class="ln">12</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">explode</span><span class="op">=</span><span class="var">explode</span><span class="punc">,</span></span></div>
+          <div class="explain"><span class="ln">13</span><span class="exp-text">→ shadow=True adds a drop shadow for visual depth</span></div>
+          <div class="code-line"><span class="ln">13</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">shadow</span><span class="op">=</span><span class="kw">True</span><span class="punc">)</span></span></div>
+          <div class="code-line"><span class="ln">14</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">15</span><span class="exp-text">→ Add a title at the top of the chart</span></div>
+          <div class="code-line"><span class="ln">15</span><span class="code-content"><span class="var">plt</span><span class="punc">.</span><span class="fn">title</span><span class="punc">(</span><span class="str">"Favourite Subjects of Class 10 Students"</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">16</span><span class="exp-text">→ Display the finished chart on screen</span></div>
+          <div class="code-line"><span class="ln">16</span><span class="code-content"><span class="var">plt</span><span class="punc">.</span><span class="fn">show</span><span class="punc">()</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>A pie chart with 5 colored slices labeled Maths (30%), Science (25%), English (20%), Computer (15% — slightly pulled out), Nepali (10%), with percentages shown inside each slice.</div>
+
+      <div class="section-title">Program 18 — Pie Chart with Legend (School Budget)</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">import</span> <span class="bi">matplotlib</span><span class="punc">.</span><span class="bi">pyplot</span> <span class="kw">as</span> <span class="var">plt</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ Categories of school budget spending</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="var">categories</span> <span class="op">=</span> <span class="punc">[</span><span class="str">"Teachers"</span><span class="punc">,</span> <span class="str">"Books"</span><span class="punc">,</span> <span class="str">"Sports"</span><span class="punc">,</span> <span class="str">"Lab"</span><span class="punc">,</span> <span class="str">"Events"</span><span class="punc">]</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Budget values in thousands (Rs.) for each category</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content"><span class="var">budget</span> <span class="op">=</span> <span class="punc">[</span><span class="num">50</span><span class="punc">,</span> <span class="num">20</span><span class="punc">,</span> <span class="num">15</span><span class="punc">,</span> <span class="num">10</span><span class="punc">,</span> <span class="num">5</span><span class="punc">]</span></span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"></span></div>
+          <div class="explain"><span class="ln">6</span><span class="exp-text">→ Create pie chart — startangle=90 starts slices from the top</span></div>
+          <div class="code-line"><span class="ln">6</span><span class="code-content"><span class="var">plt</span><span class="punc">.</span><span class="fn">pie</span><span class="punc">(</span><span class="var">budget</span><span class="punc">,</span> <span class="var">labels</span><span class="op">=</span><span class="var">categories</span><span class="punc">,</span> <span class="var">autopct</span><span class="op">=</span><span class="str">"%1.1f%%"</span><span class="punc">,</span> <span class="var">startangle</span><span class="op">=</span><span class="num">90</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">7</span><span class="exp-text">→ legend() adds a color key box beside the chart</span></div>
+          <div class="code-line"><span class="ln">7</span><span class="code-content"><span class="var">plt</span><span class="punc">.</span><span class="fn">legend</span><span class="punc">(</span><span class="var">title</span><span class="op">=</span><span class="str">"Categories"</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">8</span><span class="exp-text">→ Title of the chart</span></div>
+          <div class="code-line"><span class="ln">8</span><span class="code-content"><span class="var">plt</span><span class="punc">.</span><span class="fn">title</span><span class="punc">(</span><span class="str">"School Annual Budget Distribution"</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">9</span><span class="exp-text">→ axis('equal') makes pie circular instead of oval</span></div>
+          <div class="code-line"><span class="ln">9</span><span class="code-content"><span class="var">plt</span><span class="punc">.</span><span class="fn">axis</span><span class="punc">(</span><span class="str">"equal"</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">10</span><span class="exp-text">→ Show the completed chart</span></div>
+          <div class="code-line"><span class="ln">10</span><span class="code-content"><span class="var">plt</span><span class="punc">.</span><span class="fn">show</span><span class="punc">()</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>A circular pie chart showing school budget split: Teachers 50%, Books 20%, Sports 15%, Lab 10%, Events 5% — with a legend box showing category colors.</div>
+
+      <div class="tip-box">
+        <span class="tip-icon">💡</span>
+        <div>
+          <strong>Key Matplotlib Pie Chart Parameters:</strong><br>
+          <code style="color:var(--accent3);">labels</code> — names on each slice &nbsp;|&nbsp;
+          <code style="color:var(--accent3);">autopct</code> — show % inside slices &nbsp;|&nbsp;
+          <code style="color:var(--accent3);">explode</code> — pull a slice out &nbsp;|&nbsp;
+          <code style="color:var(--accent3);">shadow</code> — add drop shadow &nbsp;|&nbsp;
+          <code style="color:var(--accent3);">startangle</code> — rotate the chart &nbsp;|&nbsp;
+          <code style="color:var(--accent3);">colors</code> — custom slice colors
+        </div>
+      </div>
+    </div>
+
+    <div class="mistake-box">
+      <div class="mistake-title">⚠ Common Exam Mistakes — Turtle</div>
+      <ul class="mistake-list">
+        <li>Forgetting to write <code>import turtle</code> at the top</li>
+        <li>Forgetting parentheses in commands — e.g. writing <code>forward</code> instead of <code>forward()</code></li>
+        <li>Confusing <code>penup()</code> and <code>pendown()</code> — up lifts pen, down puts it back</li>
+        <li>Forgetting <code>turtle.done()</code> — window closes immediately</li>
+        <li>Wrong indentation inside for loops</li>
+        <li>Confusing angle (degrees to turn) with distance (pixels to move)</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════ CHAPTER 4 ═══ -->
+  <div class="chapter" id="ch4">
+    <div class="chapter-header">
+      <span class="chapter-num" style="background:var(--accent4);">4.5</span>
+      <h2 class="chapter-title">Error Handling in Python</h2>
+    </div>
+
+    <div class="section">
+      <div class="def-box">
+        <strong>Error handling</strong> is the process of detecting and managing errors during program execution using <strong>try, except, else,</strong> and <strong>finally</strong> blocks so the program does not stop suddenly.
+      </div>
+
+      <div class="section-title">Types of Errors</div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">✍️</div>
+          <div class="card-label">Syntax Error</div>
+          <div class="card-value">Rules of Python are broken while writing code. Detected BEFORE the program runs.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚡</div>
+          <div class="card-label">Runtime Error</div>
+          <div class="card-value">Occurs DURING execution. Called an Exception. Example: dividing by zero.</div>
+        </div>
+        <div class="card">
+          <div class="card-icon">🧠</div>
+          <div class="card-label">Logical Error</div>
+          <div class="card-value">Program runs but gives wrong output. No error message — hardest to find!</div>
+        </div>
+      </div>
+
+      <div class="section-title">Components of Exception Handling</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Block</th><th>When it runs</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td>try</td><td>Always (first)</td><td>Contains risky code that might cause an error</td></tr>
+            <tr><td>except</td><td>Only if error occurs</td><td>Handles the error — prevents program crash</td></tr>
+            <tr><td>else</td><td>Only if NO error</td><td>Runs when try block succeeds without error</td></tr>
+            <tr><td>finally</td><td>Always (last)</td><td>Cleanup code — runs no matter what happens</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title">Common Exception Types</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Exception</th><th>Cause</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><td>ZeroDivisionError</td><td>Dividing a number by zero</td><td>10 / 0</td></tr>
+            <tr><td>NameError</td><td>Variable/function not defined</td><td>print(name)</td></tr>
+            <tr><td>TypeError</td><td>Wrong data type used</td><td>"5" + 2</td></tr>
+            <tr><td>ValueError</td><td>Wrong value for correct type</td><td>int("abc")</td></tr>
+            <tr><td>IndexError</td><td>Invalid list index</td><td>list1[5] (only 3 items)</td></tr>
+            <tr><td>FileNotFoundError</td><td>File does not exist</td><td>open("data.txt")</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Program 12 -->
+      <div class="section-title">Program 12 — Basic try / except</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="explain"><span class="ln">1</span><span class="exp-text">→ 'try' block contains risky code — here division by zero</span></div>
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">try</span><span class="punc">:</span></span></div>
+          <div class="explain"><span class="ln">2</span><span class="exp-text">→ This line will cause ZeroDivisionError — cannot divide by 0</span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">a</span> <span class="op">=</span> <span class="num">10</span> <span class="op">/</span> <span class="num">0</span></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ Python jumps here when ZeroDivisionError happens</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="kw">except</span> <span class="bi">ZeroDivisionError</span><span class="punc">:</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Print a friendly message instead of crashing</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span><span class="punc">(</span><span class="str">"Cannot divide by zero"</span><span class="punc">)</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>Cannot divide by zero</div>
+
+      <!-- Program 13 -->
+      <div class="section-title">Program 13 — try / except / else / finally (Complete)</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">try</span><span class="punc">:</span></span></div>
+          <div class="explain"><span class="ln">2</span><span class="exp-text">→ Take numerator as integer input from user</span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">num</span> <span class="op">=</span> <span class="bi">int</span><span class="punc">(</span><span class="bi">input</span><span class="punc">(</span><span class="str">"Enter numerator: "</span><span class="punc">))</span></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ Take denominator as integer input from user</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">den</span> <span class="op">=</span> <span class="bi">int</span><span class="punc">(</span><span class="bi">input</span><span class="punc">(</span><span class="str">"Enter denominator: "</span><span class="punc">))</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Perform division — risky if den = 0</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">result</span> <span class="op">=</span> <span class="var">num</span> <span class="op">/</span> <span class="var">den</span></span></div>
+          <div class="explain"><span class="ln">5</span><span class="exp-text">→ Catches ONLY ZeroDivisionError</span></div>
+          <div class="code-line"><span class="ln">5</span><span class="code-content"><span class="kw">except</span> <span class="bi">ZeroDivisionError</span><span class="punc">:</span></span></div>
+          <div class="code-line"><span class="ln">6</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span><span class="punc">(</span><span class="str">"Cannot divide by zero"</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">7</span><span class="exp-text">→ else runs ONLY when no error occurred in try</span></div>
+          <div class="code-line"><span class="ln">7</span><span class="code-content"><span class="kw">else</span><span class="punc">:</span></span></div>
+          <div class="code-line"><span class="ln">8</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span><span class="punc">(</span><span class="str">"Result:"</span><span class="punc">,</span> <span class="var">result</span><span class="punc">)</span></span></div>
+          <div class="explain"><span class="ln">9</span><span class="exp-text">→ finally ALWAYS runs — error or no error</span></div>
+          <div class="code-line"><span class="ln">9</span><span class="code-content"><span class="kw">finally</span><span class="punc">:</span></span></div>
+          <div class="code-line"><span class="ln">10</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span><span class="punc">(</span><span class="str">"Program execution completed"</span><span class="punc">)</span></span></div>
+        </div>
+      </div>
+      <div class="output-block">
+        <div class="output-label">Output (when denominator = 0)</div>
+        Enter numerator: 10<br>
+        Enter denominator: 0<br>
+        Cannot divide by zero<br>
+        Program execution completed
+      </div>
+      <div class="output-block">
+        <div class="output-label">Output (when denominator = 2)</div>
+        Enter numerator: 10<br>
+        Enter denominator: 2<br>
+        Result: 5.0<br>
+        Program execution completed
+      </div>
+
+      <!-- Program 14 -->
+      <div class="section-title">Program 14 — Exception as e (Display Error Message)</div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Python Program</span>
+          <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        </div>
+        <div class="code-body">
+          <div class="code-line"><span class="ln">1</span><span class="code-content"><span class="kw">try</span><span class="punc">:</span></span></div>
+          <div class="code-line"><span class="ln">2</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">a</span> <span class="op">=</span> <span class="num">10</span> <span class="op">/</span> <span class="num">0</span></span></div>
+          <div class="explain"><span class="ln">3</span><span class="exp-text">→ 'Exception as e' captures the actual error object in variable 'e'</span></div>
+          <div class="code-line"><span class="ln">3</span><span class="code-content"><span class="kw">except</span> <span class="bi">Exception</span> <span class="kw">as</span> <span class="var">e</span><span class="punc">:</span></span></div>
+          <div class="explain"><span class="ln">4</span><span class="exp-text">→ Print the actual error message stored in e</span></div>
+          <div class="code-line"><span class="ln">4</span><span class="code-content">&nbsp;&nbsp;&nbsp;&nbsp;<span class="bi">print</span><span class="punc">(</span><span class="var">e</span><span class="punc">)</span></span></div>
+        </div>
+      </div>
+      <div class="output-block"><div class="output-label">Output</div>division by zero</div>
+    </div>
+
+    <div class="mistake-box">
+      <div class="mistake-title">⚠ Common Exam Mistakes — Error Handling</div>
+      <ul class="mistake-list">
+        <li>Writing <code>expect</code> instead of <code>except</code></li>
+        <li>Forgetting colon <code>:</code> after try and except</li>
+        <li>Wrong indentation inside try/except blocks</li>
+        <li>Confusing syntax error (before running) and logical error (wrong output)</li>
+        <li>Forgetting that <code>finally</code> ALWAYS runs — even if no error</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- /wrapper -->
+
+<footer>
+  SEE Computer Science 2083 · CDC Curriculum · Class 10<br>
+  Prepared by <span>Deepak Shrestha</span> · Notes compiled for exam preparation · 2083 B.S.
+</footer>
+
+</body>
+</html>

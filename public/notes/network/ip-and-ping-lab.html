@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 10 Computer Networking Interactive Lab</title>
+<style>
+:root{
+  --bg:#f5f7fb;
+  --panel:#ffffff;
+  --text:#172033;
+  --muted:#637083;
+  --border:#dce3ee;
+  --client:#2468d3;
+  --server:#7938b8;
+  --router:#d97706;
+  --ip:#2468d3;
+  --mac:#087f5b;
+  --request:#d97706;
+  --response:#15803d;
+  --internet:#2563eb;
+  --intranet:#0f766e;
+  --extranet:#7c3aed;
+  --danger:#b42318;
+  --warn:#b7791f;
+  --good:#137a52;
+  --accent:#135dca;
+  --shadow:0 12px 30px rgba(21,37,67,.09);
+  --radius:18px;
+  --font:clamp(16px,1.05vw,23px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--text);
+  background:var(--bg);
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:var(--font);
+  line-height:1.48;
+  overflow-x:hidden;
+}
+button,input,select{font:inherit}
+button,select,input{
+  min-height:48px;
+  border-radius:12px;
+}
+button{
+  border:1px solid var(--border);
+  padding:.7rem 1rem;
+  background:#fff;
+  color:var(--text);
+  font-weight:800;
+  cursor:pointer;
+}
+button:hover{filter:brightness(.985)}
+button:focus-visible,input:focus-visible,select:focus-visible{
+  outline:4px solid rgba(19,93,202,.2);
+  outline-offset:2px;
+}
+button.primary{background:var(--accent);color:white;border-color:transparent}
+button.good{background:#e9f8f0;color:#0f6546;border-color:#b8dfcd}
+button.warn{background:#fff7e8;color:#855000;border-color:#ead2a6}
+button.danger{background:#fff0ee;color:#8e1f15;border-color:#efc5bf}
+button.purple{background:#f2ebff;color:#5b2491;border-color:#d6c2ef}
+button.active-choice{background:#eaf2ff;border-color:#8db1e8;color:#0e4c9d}
+button:disabled{opacity:.55;cursor:not-allowed}
+select,input{
+  border:1px solid var(--border);
+  padding:.65rem .75rem;
+  background:#fff;
+  color:var(--text);
+}
+.topbar{
+  position:sticky;top:0;z-index:100;
+  display:flex;gap:.65rem;align-items:center;justify-content:space-between;
+  padding:.65rem clamp(.65rem,2vw,1.5rem);
+  background:rgba(245,247,251,.97);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(10px);
+}
+.brand{font-weight:950;letter-spacing:-.02em}
+.top-actions{display:flex;gap:.45rem;flex-wrap:wrap;justify-content:flex-end}
+.top-actions button{min-height:44px;padding:.5rem .75rem;font-size:.88em}
+nav.jumpbar{
+  width:min(1600px,100%);
+  margin:.55rem auto 0;
+  padding:0 clamp(.6rem,2vw,1.3rem);
+  display:flex;gap:.45rem;overflow-x:auto;scrollbar-width:thin;
+}
+nav.jumpbar button{white-space:nowrap;min-height:44px;padding:.45rem .7rem;font-size:.86em}
+main{width:min(1600px,100%);margin:auto;padding:clamp(.65rem,2vw,1.4rem)}
+section{
+  margin:1rem 0 1.4rem;
+  padding:clamp(.9rem,2vw,1.5rem);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--panel);
+  box-shadow:var(--shadow);
+}
+h1,h2,h3{line-height:1.13;letter-spacing:-.025em;margin:.15em 0 .5em}
+h1{font-size:clamp(2rem,4vw,4rem)}
+h2{font-size:clamp(1.45rem,2.4vw,2.5rem)}
+h3{font-size:clamp(1.1rem,1.5vw,1.5rem)}
+p{margin:.4rem 0 .75rem}
+small,.muted{color:var(--muted)}
+.hero{
+  text-align:center;
+  padding:clamp(1.4rem,4vw,3.2rem);
+  background:linear-gradient(180deg,#fff,#f2f7ff);
+}
+.hero p{max-width:900px;margin:.5rem auto 1rem}
+.hero-actions{display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap}
+.topic-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:.7rem;margin-top:1rem
+}
+.topic-card{
+  min-height:120px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;border:2px solid var(--border);border-radius:16px;background:#fff
+}
+.topic-card .icon{font-size:2rem}
+.topic-card:hover{border-color:#99b7e8;transform:translateY(-1px)}
+.grid-2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,.8fr);gap:1rem}
+.grid-2.equal{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+.card{
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:#fbfcfe;
+  padding:1rem;
+}
+.label{font-size:.85em;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#536176}
+.callout{
+  padding:.75rem .9rem;border-left:5px solid var(--accent);border-radius:10px;background:#f4f8ff
+}
+.remember{
+  padding:.85rem 1rem;border-radius:14px;background:#172033;color:white;font-weight:950;text-align:center
+}
+.toolbar{display:flex;gap:.55rem;flex-wrap:wrap;align-items:center}
+.toolbar label{font-weight:800;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.sim{
+  position:relative;overflow:hidden;min-height:330px;
+  border:1px solid var(--border);border-radius:16px;
+  background:radial-gradient(circle at 50% 45%,rgba(19,93,202,.05),transparent 34%),linear-gradient(#fff,#f8fbff)
+}
+.sim-title{
+  position:absolute;z-index:3;left:.6rem;top:.55rem;
+  padding:.3rem .55rem;background:rgba(255,255,255,.92);border:1px solid var(--border);border-radius:9px;
+  font-size:.85em;font-weight:900
+}
+svg.net{display:block;width:100%;height:auto;min-height:320px;aspect-ratio:16/9}
+.edge{stroke:#acb7c5;stroke-width:2.6;stroke-dasharray:6 6}
+.edge.active{stroke:var(--request);stroke-width:4;stroke-dasharray:none}
+.node .box{stroke-width:3}
+.node.client .box{fill:#eef4ff;stroke:var(--client)}
+.node.server .box{fill:#f5ecff;stroke:var(--server)}
+.node.router .box{fill:#fff5e8;stroke:var(--router)}
+.node.peer .box{fill:#ebfaf5;stroke:#0f8a6e}
+.node.internet .box{fill:#edf4ff;stroke:var(--internet)}
+.node.intranet .box{fill:#edfafa;stroke:var(--intranet)}
+.node.extranet .box{fill:#f5efff;stroke:var(--extranet)}
+.node.active .box{stroke-width:5;filter:drop-shadow(0 0 8px rgba(19,93,202,.28))}
+.node.offline .box{stroke:var(--danger);fill:#fff1ef}
+.node text{fill:var(--text);font-size:17px;font-weight:900;text-anchor:middle}
+.node .small{font-size:13px;fill:var(--muted);font-weight:700}
+.packet{filter:drop-shadow(0 4px 6px rgba(0,0,0,.16))}
+.packet rect{rx:10;ry:10;stroke-width:2.5}
+.packet.req rect{fill:#fff4df;stroke:var(--request)}
+.packet.res rect{fill:#eaf8ef;stroke:var(--response)}
+.packet.info rect{fill:#eef4ff;stroke:var(--ip)}
+.packet text{fill:var(--text);font-size:13px;font-weight:950;text-anchor:middle}
+.status{
+  min-height:58px;margin-top:.65rem;padding:.75rem .9rem;border-radius:11px;background:#f4f7fb;border-left:5px solid var(--accent)
+}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.5rem;margin-top:.6rem}
+.step{padding:.65rem;border-radius:11px;border:1px solid var(--border);background:#fafbfd;font-weight:800;font-size:.9em}
+.step.active{background:#eaf2ff;border-color:#87ace6;color:#0d478f}
+.feature-grid,.example-grid,.memory-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.6rem
+}
+.feature-grid button,.example-grid button{text-align:left;min-height:64px}
+.ip-device-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.6rem
+}
+.ip-device{
+  border:2px solid var(--border);border-radius:14px;padding:.75rem;text-align:center;background:#fff;cursor:pointer
+}
+.ip-device.selected{border-color:#88ace4;background:#f0f5ff}
+.ip-device .device-icon{font-size:2rem}
+.address{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:900;word-break:break-word}
+.octets{display:flex;align-items:center;gap:.35rem;flex-wrap:wrap}
+.octets input{width:90px;text-align:center;font-family:ui-monospace,monospace;font-weight:900}
+.dot{font-size:1.4em;font-weight:950}
+.valid{color:var(--good);font-weight:900}
+.invalid{color:var(--danger);font-weight:900}
+.ipv6-groups{display:grid;grid-template-columns:repeat(8,minmax(70px,1fr));gap:.35rem}
+.ipv6-group{
+  text-align:center;padding:.65rem .35rem;border-radius:10px;border:1px solid var(--border);background:#fbfcfe;
+  font-family:ui-monospace,monospace;font-weight:900
+}
+.terminal{
+  min-height:240px;background:#0d1117;color:#e6edf3;border-radius:14px;padding:1rem;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  white-space:pre-wrap;overflow-wrap:anywhere;font-size:.88em
+}
+.switch{display:inline-flex;align-items:center;gap:.5rem;font-weight:900}
+.switch input{width:24px;height:24px}
+.access-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem
+}
+.zone{
+  min-height:260px;padding:1rem;border-radius:16px;border:2px solid var(--border);background:#fff
+}
+.zone.internet{border-color:#aac2ea;background:#f5f8ff}
+.zone.intranet{border-color:#a9d8d1;background:#f4fbfa}
+.zone.extranet{border-color:#d0bcea;background:#faf6ff}
+.access-row{
+  display:grid;grid-template-columns:1fr repeat(3,minmax(90px,.55fr));gap:.4rem;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--border)
+}
+.access-cell{text-align:center;font-weight:900}
+.yes{color:var(--good)} .no{color:var(--danger)}
+.quiz-question{font-size:1.25em;font-weight:950;min-height:72px}
+.option-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.6rem}
+.feedback{min-height:62px;padding:.7rem;border-radius:11px;background:#f5f7fa;margin-top:.6rem}
+.match-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+.match-column{display:grid;gap:.5rem}
+.match-item{text-align:left}
+.match-item.selected{background:#eaf2ff;border-color:#8eafe3}
+.trouble-path{display:flex;align-items:center;justify-content:center;gap:.7rem;flex-wrap:wrap;font-weight:950;font-size:1.05em}
+.teacher-panel{
+  display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;
+  padding:.75rem;border:1px solid var(--border);border-radius:14px;background:#fafbfd
+}
+.teacher-caption{
+  margin-top:.6rem;padding:.7rem;border-radius:10px;background:#fff8e8;border:1px solid #e8d1a3;font-weight:800
+}
+.hidden{display:none!important}
+.memory-card{
+  padding:.8rem;border:1px solid var(--border);border-radius:14px;background:#fbfcfe
+}
+.memory-card strong{display:block;margin-bottom:.25rem}
+.big-memory{
+  margin-top:1rem;padding:1rem;border-radius:16px;background:#172033;color:white;font-weight:950;text-align:center;font-size:clamp(1.15rem,1.8vw,1.7rem)
+}
+body.presentation{--font:clamp(18px,1.32vw,27px)}
+body.presentation button,body.presentation select,body.presentation input{min-height:56px}
+body.presentation .nonessential{display:none!important}
+body.presentation .node text{font-size:20px}
+body.presentation .node .small{font-size:15px}
+@media(max-width:1050px){
+  .grid-2,.grid-2.equal,.grid-3,.access-grid{grid-template-columns:1fr}
+  .ipv6-groups{grid-template-columns:repeat(4,minmax(70px,1fr))}
+  .topbar{align-items:flex-start}
+}
+@media(max-width:650px){
+  main{padding:.55rem}
+  section{padding:.8rem;border-radius:14px}
+  .topbar{padding:.5rem}
+  .brand{font-size:.92em}
+  .top-actions button{font-size:.78em}
+  .ipv6-groups{grid-template-columns:repeat(2,minmax(70px,1fr))}
+  .match-grid{grid-template-columns:1fr}
+  .access-row{grid-template-columns:1fr}
+  .access-cell{text-align:left}
+  svg.net{min-height:280px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">🌐 Grade 10 Computer Networking Lab</div>
+  <div class="top-actions">
+    <button id="presentationBtn" type="button">Presentation Mode</button>
+    <button id="fullscreenBtn" type="button">Full Screen</button>
+    <button id="globalResetBtn" class="danger" type="button">Reset All</button>
+  </div>
+</header>
+
+<nav class="jumpbar" aria-label="Jump to topic">
+  <button data-jump="home">Home</button>
+  <button data-jump="clientServer">Client–Server</button>
+  <button data-jump="ipLab">IP Address</button>
+  <button data-jump="ipv4Lab">IPv4</button>
+  <button data-jump="ipv6Lab">IPv6</button>
+  <button data-jump="pingLab">Ping</button>
+  <button data-jump="macLab">MAC</button>
+  <button data-jump="accessLab">Internet/Intranet/Extranet</button>
+  <button data-jump="packetJourney">Packet Journey</button>
+  <button data-jump="games">Games</button>
+  <button data-jump="troubleshooting">Troubleshooting</button>
+  <button data-jump="memoryWall">Memory Wall</button>
+</nav>
+
+<main>
+<section class="hero" id="home">
+  <div class="label">Interactive classroom laboratory</div>
+  <h1>GRADE 10 COMPUTER NETWORKING LAB</h1>
+  <p>Learn networking by seeing how computers communicate.</p>
+  <div class="hero-actions">
+    <button class="primary" data-jump="clientServer" type="button">▶ Start Learning</button>
+    <button data-jump="games" type="button">🎯 Go to Quiz Challenge</button>
+  </div>
+  <div class="topic-grid">
+    <button class="topic-card" data-jump="ipLab"><span class="icon">🌐</span><strong>IP Address</strong></button>
+    <button class="topic-card" data-jump="ipv4Lab"><span class="icon">4️⃣</span><strong>IPv4</strong></button>
+    <button class="topic-card" data-jump="ipv6Lab"><span class="icon">6️⃣</span><strong>IPv6</strong></button>
+    <button class="topic-card" data-jump="pingLab"><span class="icon">📡</span><strong>Ping</strong></button>
+    <button class="topic-card" data-jump="macLab"><span class="icon">🪪</span><strong>MAC Address</strong></button>
+    <button class="topic-card" data-jump="accessLab"><span class="icon">🌍</span><strong>Internet</strong></button>
+    <button class="topic-card" data-jump="accessLab"><span class="icon">🏫</span><strong>Intranet</strong></button>
+    <button class="topic-card" data-jump="accessLab"><span class="icon">🤝</span><strong>Extranet</strong></button>
+    <button class="topic-card" data-jump="clientServer"><span class="icon">🗄️</span><strong>Client–Server</strong></button>
+    <button class="topic-card" data-jump="games"><span class="icon">🎯</span><strong>Quiz Challenge</strong></button>
+  </div>
+</section>
+
+<section id="teacherControls">
+  <h2>Teacher Controls</h2>
+  <div class="teacher-panel">
+    <button id="playBtn" class="primary">▶ Play</button>
+    <button id="pauseBtn">⏸ Pause</button>
+    <button id="prevBtn">⏮ Previous Step</button>
+    <button id="nextBtn">Next Step ⏭</button>
+    <button id="replayBtn">↻ Replay</button>
+    <button id="resetBtn" class="danger">⟳ Reset</button>
+    <label>Speed
+      <select id="speedSelect">
+        <option value=".5">0.5×</option>
+        <option value="1" selected>1×</option>
+        <option value="1.5">1.5×</option>
+        <option value="2">2×</option>
+      </select>
+    </label>
+    <label class="switch"><input type="checkbox" id="autoDemo"> Auto Demo</label>
+    <label class="switch"><input type="checkbox" id="teacherMode"> Teacher Explanation Mode</label>
+  </div>
+  <div id="teacherCaption" class="teacher-caption hidden" aria-live="polite"></div>
+</section>
+
+<section id="clientServer">
+  <div class="label">1. Client–Server Network</div>
+  <h2>Clients ask. The server provides.</h2>
+  <div class="grid-2">
+    <div>
+      <div class="sim">
+        <div class="sim-title">CLIENT → SERVER → CLIENT</div>
+        <svg id="csSvg" class="net" viewBox="0 0 900 520" role="img" aria-label="Client server network">
+          <g id="csEdges"></g><g id="csNodes"></g><g id="csPackets"></g>
+        </svg>
+      </div>
+      <div class="toolbar" style="margin-top:.65rem">
+        <button id="sendRequestBtn" class="primary">▶ Send Request</button>
+        <label>Example
+          <select id="csExample"></select>
+        </label>
+        <button id="serverToggleBtn" class="warn">Turn Server OFF</button>
+      </div>
+      <div id="csStatus" class="status" aria-live="polite">Ready. Press “Send Request”.</div>
+      <div id="csSteps" class="steps"></div>
+    </div>
+    <aside class="grid-2 equal" style="grid-template-columns:1fr">
+      <div class="card">
+        <h3>Advantages</h3>
+        <div id="advGrid" class="feature-grid"></div>
+        <div id="advInfo" class="status">Tap an advantage.</div>
+      </div>
+      <div class="card">
+        <h3>Limitations</h3>
+        <div id="limitGrid" class="feature-grid"></div>
+        <div id="limitInfo" class="status">Tap a limitation.</div>
+      </div>
+    </aside>
+  </div>
+  <div class="remember">REMEMBER: CLIENT–SERVER = CLIENTS REQUEST SERVICES FROM A CENTRAL SERVER</div>
+</section>
+
+<section id="ipLab">
+  <div class="label">2. IP Address</div>
+  <h2>WHAT IS AN IP ADDRESS?</h2>
+  <p>An IP address is a logical address used to identify a device on a network.</p>
+  <div class="callout">🏠 Think of it like a house address. It helps network data know where to go.</div>
+
+  <div class="grid-2" style="margin-top:1rem">
+    <div class="card">
+      <h3>TRY IT — Send a Message</h3>
+      <div id="ipDevices" class="ip-device-grid"></div>
+      <div class="toolbar" style="margin-top:.65rem">
+        <label>From <select id="ipFrom"></select></label>
+        <label>To <select id="ipTo"></select></label>
+        <button id="ipSendBtn" class="primary">▶ Send Message</button>
+      </div>
+      <div class="sim" style="margin-top:.65rem;min-height:260px">
+        <svg id="ipSvg" class="net" viewBox="0 0 800 380" aria-label="IP address message route"></svg>
+      </div>
+      <div id="ipStatus" class="status">The destination IP address helps the network identify where the packet should go.</div>
+    </div>
+    <div class="card">
+      <h3>Private vs Public IP</h3>
+      <div class="grid-2 equal">
+        <div class="zone intranet">
+          <strong>🏠 PRIVATE NETWORK</strong>
+          <p class="address">Laptop: 192.168.1.10</p>
+          <p class="address">Phone: 192.168.1.11</p>
+          <p class="address">Router: 192.168.1.1</p>
+          <small>Common inside homes, schools and offices.</small>
+        </div>
+        <div class="zone internet">
+          <strong>🌍 INTERNET</strong>
+          <p class="address">Public example: 222.32.101.111</p>
+          <small>A public IP can be used when communicating over the Internet.</small>
+        </div>
+      </div>
+      <div class="status">Laptop 192.168.1.10 → Router → Public connection → Internet → Website Server</div>
+    </div>
+  </div>
+
+  <div class="grid-2 equal" style="margin-top:1rem">
+    <div class="card">
+      <h3>Static IP</h3>
+      <p class="address">School Server: 192.168.1.20</p>
+      <p>Static means the address stays manually configured until it is changed.</p>
+    </div>
+    <div class="card">
+      <h3>Dynamic IP (DHCP)</h3>
+      <p>DHCP can automatically give network settings to a device.</p>
+      <p>Current laptop IP: <strong id="dhcpIp" class="address">192.168.1.25</strong></p>
+      <button id="dhcpBtn" class="primary">▶ Reconnect Device</button>
+      <div id="dhcpStatus" class="status">Reconnect to see another example dynamic address.</div>
+    </div>
+  </div>
+  <div class="remember">REMEMBER: IP ADDRESS = LOGICAL NETWORK ADDRESS</div>
+</section>
+
+<section id="ipv4Lab">
+  <div class="label">3. IPv4</div>
+  <h2>IPv4 – Internet Protocol Version 4</h2>
+  <p>IPv4 uses 32 bits and is normally written as four decimal numbers separated by dots.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>SEE IT — Four Octets</h3>
+      <div class="octets" id="ipv4Builder">
+        <input class="octet" type="number" min="0" max="999" value="192" aria-label="IPv4 octet 1"><span class="dot">.</span>
+        <input class="octet" type="number" min="0" max="999" value="168" aria-label="IPv4 octet 2"><span class="dot">.</span>
+        <input class="octet" type="number" min="0" max="999" value="1" aria-label="IPv4 octet 3"><span class="dot">.</span>
+        <input class="octet" type="number" min="0" max="999" value="10" aria-label="IPv4 octet 4">
+      </div>
+      <div id="ipv4Validation" class="status">Each octet must be a whole number from 0 to 255.</div>
+      <button id="validateIpv4Btn" class="primary">✓ Validate IPv4</button>
+    </div>
+    <div class="card">
+      <h3>IPv4 Examples</h3>
+      <div id="ipv4Examples" class="example-grid"></div>
+      <div id="ipv4ExampleInfo" class="status">Tap an address to learn about it.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem">
+    <h3>IP Address Challenge — VALID or INVALID?</h3>
+    <div class="toolbar">
+      <strong id="ipv4ChallengeAddress" class="address"></strong>
+      <button id="ipv4ValidBtn" class="good">✓ Valid</button>
+      <button id="ipv4InvalidBtn" class="danger">✕ Invalid</button>
+      <button id="ipv4NextBtn">Next</button>
+    </div>
+    <div id="ipv4ChallengeFeedback" class="feedback">Choose Valid or Invalid.</div>
+  </div>
+  <div class="remember">REMEMBER: IPv4 = 32 BITS + FOUR DECIMAL OCTETS + DOTS</div>
+</section>
+
+<section id="ipv6Lab">
+  <div class="label">4. IPv6</div>
+  <h2>WHY IPv6?</h2>
+  <p>More phones, laptops, watches, TVs, cars, cameras and other devices need addresses. IPv6 provides a much larger address space.</p>
+  <div class="grid-2 equal">
+    <div class="card">
+      <h3>IPv4</h3>
+      <div style="font-size:2rem">📱 💻 ⌚ 📺 🚗 🎮</div>
+      <p><strong>32 bits</strong></p>
+      <p>Smaller address space.</p>
+    </div>
+    <div class="card">
+      <h3>IPv6</h3>
+      <div style="font-size:2rem">📱 💻 ⌚ 📺 🚗 🎮 📷 🏠</div>
+      <p><strong>128 bits</strong></p>
+      <p>Extremely large address space.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem">
+    <h3>IPv6 Format</h3>
+    <div id="ipv6Groups" class="ipv6-groups"></div>
+    <p>IPv6 uses hexadecimal characters: <strong>0–9 and A–F</strong>, separated by colons.</p>
+  </div>
+
+  <div class="card" style="margin-top:1rem">
+    <h3>IPv6 Zero Compression</h3>
+    <div id="ipv6Address" class="address" style="font-size:1.15em">2001:0db8:0000:0000:0000:ff00:0042:8329</div>
+    <div class="toolbar" style="margin-top:.65rem">
+      <button id="compressIpv6Btn" class="primary">▶ Compress Address</button>
+      <button id="expandIpv6Btn">Show Full Address</button>
+    </div>
+    <div id="ipv6Status" class="status">IPv6 allows some zeros to be shortened so the address is easier to write.</div>
+  </div>
+
+  <div class="grid-2 equal" style="margin-top:1rem">
+    <div class="card">
+      <h3>IPv4</h3>
+      <p>Version 4</p><p>32 bits</p><p>Decimal numbers + dots</p><p class="address">192.168.1.1</p><p>Smaller address space</p>
+    </div>
+    <div class="card">
+      <h3>IPv6</h3>
+      <p>Version 6</p><p>128 bits</p><p>Hexadecimal groups + colons</p><p class="address">2001:db8::42:8329</p><p>Much larger address space</p>
+    </div>
+  </div>
+  <div class="remember">REMEMBER: IPv6 = 128 BITS + HEXADECIMAL GROUPS + COLONS</div>
+</section>
+
+<section id="pingLab">
+  <div class="label">5. Ping</div>
+  <h2>PING LAB</h2>
+  <p>Ping checks whether another network device can be reached and measures how long a reply takes.</p>
+  <div class="grid-2">
+    <div>
+      <div class="sim">
+        <div class="sim-title">Computer → Network → Destination</div>
+        <svg id="pingSvg" class="net" viewBox="0 0 800 380" aria-label="Ping packet animation"></svg>
+      </div>
+      <div class="toolbar" style="margin-top:.65rem">
+        <label>Destination
+          <select id="pingDestination">
+            <option>google.com</option>
+            <option>8.8.8.8</option>
+            <option>192.168.1.1</option>
+            <option>School Server</option>
+          </select>
+        </label>
+        <label class="switch"><input type="checkbox" id="pingOffline"> Destination Offline</label>
+        <label>Latency
+          <select id="pingLatency">
+            <option value="10">Near — 10 ms</option>
+            <option value="45" selected>Medium — 45 ms</option>
+            <option value="120">Far — 120 ms</option>
+          </select>
+        </label>
+        <button id="runPingBtn" class="primary">▶ Run Ping</button>
+      </div>
+      <div class="status">Lower ping usually means the reply comes back faster. Network traffic and routing can also affect response time.</div>
+    </div>
+    <div>
+      <div id="terminal" class="terminal" aria-live="polite">C:\&gt; Ready for ping...</div>
+    </div>
+  </div>
+  <div class="remember">REMEMBER: PING = CHECK REACHABILITY + RESPONSE TIME</div>
+</section>
+
+<section id="macLab">
+  <div class="label">6. MAC Address</div>
+  <h2>MAC ADDRESS</h2>
+  <p>A MAC address is an identifier associated with a network interface.</p>
+
+  <div class="grid-2 equal">
+    <div class="card">
+      <h3>View Network Identity</h3>
+      <div style="font-size:3rem">💻</div>
+      <button id="viewIdentityBtn" class="primary">View Network Identity</button>
+      <div id="identityBox" class="status">Tap the button to reveal the device's IP and MAC address.</div>
+    </div>
+    <div class="card">
+      <h3>IP Address vs MAC Address</h3>
+      <div class="grid-2 equal">
+        <div>
+          <strong>IP ADDRESS</strong>
+          <p class="address">192.168.1.10</p>
+          <p>Helps identify where data should be delivered logically on a network.</p>
+          <p>Can change depending on network settings.</p>
+        </div>
+        <div>
+          <strong>MAC ADDRESS</strong>
+          <p class="address">48-3F-0A-91-00-BC</p>
+          <p>Identifies a network interface on the local network.</p>
+          <p>Often described as a physical or hardware address in school-level networking.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1rem">
+    <h3>SEE IT — Local Network Delivery</h3>
+    <div class="sim">
+      <svg id="macIpSvg" class="net" viewBox="0 0 800 360" aria-label="IP and MAC local network animation"></svg>
+    </div>
+    <div class="toolbar" style="margin-top:.65rem">
+      <button id="macIpDemoBtn" class="primary">▶ Show IP + MAC Journey</button>
+      <button id="arpDemoBtn" class="purple">▶ ARP Demo</button>
+    </div>
+    <div id="macStatus" class="status">IP helps identify the logical destination. MAC helps local delivery between network interfaces.</div>
+  </div>
+  <div class="remember">REMEMBER: MAC = NETWORK INTERFACE IDENTIFIER</div>
+</section>
+
+<section id="accessLab">
+  <div class="label">7. Internet, Intranet and Extranet</div>
+  <h2>Who can access what?</h2>
+  <div class="access-grid">
+    <article class="zone internet">
+      <h3>🌍 INTERNET</h3>
+      <p>A worldwide network of connected networks.</p>
+      <p><strong>Example:</strong> Visiting a public website.</p>
+      <button class="accessDemoBtn" data-demo="internet">▶ Open Website</button>
+    </article>
+    <article class="zone intranet">
+      <h3>🏫 INTRANET</h3>
+      <p>A private network used inside an organization.</p>
+      <p><strong>Example:</strong> Teachers viewing internal school notices.</p>
+      <button class="accessDemoBtn" data-demo="intranet">▶ Try School Intranet</button>
+    </article>
+    <article class="zone extranet">
+      <h3>🤝 EXTRANET</h3>
+      <p>Controlled private access for selected people outside an organization.</p>
+      <p><strong>Example:</strong> A parent viewing a child's attendance.</p>
+      <button class="accessDemoBtn" data-demo="extranet">▶ Try Parent Portal</button>
+    </article>
+  </div>
+
+  <div class="sim" style="margin-top:1rem">
+    <div class="sim-title">Access Demonstration</div>
+    <svg id="accessSvg" class="net" viewBox="0 0 1000 500" aria-label="Internet intranet extranet access demonstration"></svg>
+  </div>
+  <div id="accessStatus" class="status">Choose a demonstration above.</div>
+
+  <div class="card" style="margin-top:1rem">
+    <h3>Compare Access</h3>
+    <button id="compareAccessBtn" class="primary">▶ Compare Access</button>
+    <div class="access-row"><strong>User</strong><strong>Internet</strong><strong>Intranet</strong><strong>Extranet</strong></div>
+    <div class="access-row"><span>General Public</span><span class="access-cell yes">✅</span><span class="access-cell no">❌</span><span class="access-cell no">❌</span></div>
+    <div class="access-row"><span>Employee / Teacher</span><span class="access-cell yes">✅</span><span class="access-cell yes">✅</span><span class="access-cell yes">✅ if allowed</span></div>
+    <div class="access-row"><span>Authorized Parent</span><span class="access-cell yes">✅</span><span class="access-cell no">❌</span><span class="access-cell yes">✅ selected data</span></div>
+  </div>
+  <div class="remember">INTERNET = GLOBAL • INTRANET = INTERNAL • EXTRANET = SELECTED OUTSIDERS</div>
+</section>
+
+<section id="packetJourney">
+  <div class="label">8. Packet Journey Lab</div>
+  <h2>FOLLOW THE PACKET</h2>
+  <p>Watch one packet travel from a student laptop to a school website server and back.</p>
+  <div class="sim">
+    <div class="sim-title">Student Laptop → Router → Internet → School Website Server</div>
+    <svg id="journeySvg" class="net" viewBox="0 0 1000 430" aria-label="Packet journey lab"></svg>
+  </div>
+  <div class="toolbar" style="margin-top:.65rem">
+    <button id="journeyPlayBtn" class="primary">▶ Start Journey</button>
+    <button id="journeyPrevBtn">⏮ Previous</button>
+    <button id="journeyNextBtn">Next ⏭</button>
+    <button id="journeyReplayBtn">↻ Replay</button>
+  </div>
+  <div id="journeySteps" class="steps"></div>
+  <div id="journeyStatus" class="status">Ready to follow the packet.</div>
+</section>
+
+<section id="schoolExamples">
+  <div class="label">9. Real-Life School Examples</div>
+  <h2>Where do we use these?</h2>
+  <div class="memory-grid">
+    <div class="memory-card"><strong>IP Address</strong>Laptop connecting to school Wi-Fi.</div>
+    <div class="memory-card"><strong>MAC Address</strong>Router communicating with a device's network interface.</div>
+    <div class="memory-card"><strong>Ping</strong>Checking whether the school router can be reached.</div>
+    <div class="memory-card"><strong>Internet</strong>YouTube, websites and email.</div>
+    <div class="memory-card"><strong>Intranet</strong>Internal staff notice system.</div>
+    <div class="memory-card"><strong>Extranet</strong>Parent portal.</div>
+    <div class="memory-card"><strong>IPv4</strong>Still widely used on modern networks.</div>
+    <div class="memory-card"><strong>IPv6</strong>Provides a much larger address space.</div>
+  </div>
+</section>
+
+<section id="games">
+  <div class="label">10. Interactive Games</div>
+  <h2>WHAT AM I?</h2>
+  <div class="grid-2 equal">
+    <div class="card">
+      <div class="toolbar" style="justify-content:space-between">
+        <strong id="quizProgress">Question 1 / 12</strong>
+        <strong id="quizScore">Score: 0 / 0</strong>
+      </div>
+      <div id="quizQuestion" class="quiz-question"></div>
+      <div id="quizOptions" class="option-grid"></div>
+      <div id="quizFeedback" class="feedback">Choose an answer.</div>
+      <div class="toolbar" style="margin-top:.6rem">
+        <button id="quizNextBtn">Next Question</button>
+        <button id="quizRestartBtn">Restart Quiz</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Match the Concept</h3>
+      <p>Tap one item on the left, then tap its matching concept on the right.</p>
+      <div class="match-grid">
+        <div id="matchLeft" class="match-column"></div>
+        <div id="matchRight" class="match-column"></div>
+      </div>
+      <div id="matchStatus" class="feedback">Start matching.</div>
+      <button id="matchResetBtn">Reset Matching Game</button>
+    </div>
+  </div>
+</section>
+
+<section id="troubleshooting">
+  <div class="label">11. Network Troubleshooting Challenge</div>
+  <h2>Student computer cannot open the school website.</h2>
+  <div class="trouble-path">💻 Student Laptop → 📡 Router → 🗄️ School Server</div>
+  <div class="toolbar" style="margin-top:1rem">
+    <button class="troubleBtn" data-test="ip">1. Check IP</button>
+    <button class="troubleBtn" data-test="router">2. Ping Router</button>
+    <button class="troubleBtn" data-test="server">3. Ping Server</button>
+    <button class="troubleBtn" data-test="status">4. Check Server Status</button>
+    <button id="newTroubleBtn" class="primary">New Scenario</button>
+  </div>
+  <div id="troubleStatus" class="status">Run the checks to find the problem.</div>
+</section>
+
+<section id="memoryWall">
+  <div class="label">12. Final Memory Wall</div>
+  <h2>Quick Revision</h2>
+  <div class="memory-grid">
+    <div class="memory-card"><strong>IP ADDRESS</strong>Logical network address</div>
+    <div class="memory-card"><strong>IPv4</strong>32-bit IP addressing</div>
+    <div class="memory-card"><strong>IPv6</strong>128-bit IP addressing</div>
+    <div class="memory-card"><strong>PING</strong>Check reachability and response time</div>
+    <div class="memory-card"><strong>MAC ADDRESS</strong>Network interface identifier</div>
+    <div class="memory-card"><strong>INTERNET</strong>Global network of networks</div>
+    <div class="memory-card"><strong>INTRANET</strong>Private organizational network</div>
+    <div class="memory-card"><strong>EXTRANET</strong>Controlled private access for selected outsiders</div>
+    <div class="memory-card"><strong>CLIENT–SERVER</strong>Clients request services from a server</div>
+  </div>
+  <div class="big-memory">
+    IPv4 → dots<br>
+    IPv6 → colons<br>
+    MAC → network interface identifier<br>
+    Ping → test connection<br>
+    Internet → global<br>
+    Intranet → internal organization<br>
+    Extranet → selected outsiders
+  </div>
+</section>
+</main>
+
+<script>
+(() => {
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const NS="http://www.w3.org/2000/svg";
+
+let speed=1, paused=false, timers=[], currentTopic="clientServer", teacherMode=false;
+let currentStep=0, serverOnline=true, journeyStep=0;
+let quizIndex=0,quizScore=0,quizAnswered=0,quizLocked=false;
+let ipv4ChallengeIndex=0;
+let selectedMatchLeft=null, selectedMatchRight=null, matchedPairs=new Set();
+let troubleIndex=0;
+
+const csExamples=[
+  {name:"School Management System",client:"Teacher Computer",request:"Please send my student result",server:"School Server",response:"Student result received"},
+  {name:"Online Banking",client:"Mobile Banking App",request:"Check my balance",server:"Bank Server",response:"Account balance received"},
+  {name:"YouTube",client:"Student Phone",request:"Play video",server:"Streaming Server",response:"Video data received"},
+  {name:"Website",client:"Web Browser",request:"Send homepage",server:"Web Server",response:"Webpage received"},
+  {name:"Email",client:"Email App",request:"Show new messages",server:"Mail Server",response:"Messages received"},
+  {name:"Online Shopping",client:"Customer Browser",request:"Search for laptop",server:"Shop Server",response:"Product list received"}
+];
+
+const csClients=[
+  {x:130,y:115,label:"Student Laptop",icon:"💻"},
+  {x:765,y:115,label:"Mobile Phone",icon:"📱"},
+  {x:130,y:400,label:"Teacher Computer",icon:"🖥️"},
+  {x:765,y:400,label:"Office Computer",icon:"💻"}
+];
+const csServer={x:450,y:260,label:"SERVER",icon:"🗄️"};
+
+const advantages={
+  "✓ Centralized management":"Important resources and controls can be managed from one central place.",
+  "✓ Better security control":"The administrator can control access from the server. Example: only authorized teachers may open student records.",
+  "✓ Easier backup":"Important files can be backed up centrally.",
+  "✓ Can serve many computers":"A well-designed server can provide services to many clients.",
+  "✓ Central software/data":"Software or resources can be managed centrally instead of separately on every computer."
+};
+const limitations={
+  "⚠ Server can be expensive":"Powerful server computers and network equipment may cost more.",
+  "⚠ Needs trained administrator":"A person with networking knowledge may be needed to manage the server.",
+  "⚠ Clients depend on server":"If the server is unavailable, clients may lose access to its services."
+};
+
+const ipv4Examples={
+  "10.0.0.1":"Example address often used inside private networks.",
+  "127.0.0.1":"This is the IPv4 loopback address. It refers to your own computer.",
+  "192.168.0.1":"This is commonly used as an example local router address.",
+  "222.32.101.111":"This can be used as an example of public IPv4 formatting.",
+  "21.168.52.167":"This is an example of valid IPv4 formatting."
+};
+
+const ipv4Challenge=[
+  ["192.168.1.10",true,"Four octets, and every octet is between 0 and 255."],
+  ["10.0.0.1",true,"This has four valid octets."],
+  ["256.1.1.1",false,"256 is too large. An IPv4 octet must be 0–255."],
+  ["192.168.1",false,"IPv4 needs four octets."],
+  ["300.10.20.30",false,"300 is too large for an IPv4 octet."],
+  ["172.16.5.20",true,"This has four valid octets."]
+];
+
+const quiz=[
+  ["I am written like 192.168.1.1. What am I?",["IPv4","IPv6","MAC Address"],"IPv4","IPv4 normally uses four decimal octets separated by dots."],
+  ["I use 128 bits.",["IPv4","IPv6","Ping"],"IPv6","IPv6 uses 128 bits."],
+  ["I test whether another device can be reached.",["Ping","MAC Address","Intranet"],"Ping","Ping sends test packets and waits for replies."],
+  ["I look like 48-3F-0A-91-00-BC.",["IPv4","MAC Address","Extranet"],"MAC Address","That is a common MAC address format."],
+  ["I am a worldwide network of connected networks.",["Internet","Intranet","Extranet"],"Internet","The Internet is global."],
+  ["I am a private network inside an organization.",["Internet","Intranet","IPv6"],"Intranet","An intranet is mainly for internal organizational use."],
+  ["I provide controlled private access to selected external users.",["Extranet","Internet","Ping"],"Extranet","An extranet gives selected outsiders controlled access."],
+  ["I normally use dots between four decimal numbers.",["IPv4","IPv6","MAC Address"],"IPv4","IPv4 is usually written with dots."],
+  ["I normally use hexadecimal groups and colons.",["IPv4","IPv6","Ping"],"IPv6","IPv6 uses hexadecimal groups separated by colons."],
+  ["I am a logical network address.",["IP Address","MAC Address","Ping"],"IP Address","An IP address is used logically on a network."],
+  ["I identify a network interface on the local network.",["MAC Address","Internet","IPv4"],"MAC Address","MAC identifies a network interface."],
+  ["Clients request services from me in a client–server network.",["Server","Router","Peer"],"Server","A server provides services to clients."]
+];
+
+const matchPairs=[
+  ["192.168.1.1","IPv4"],
+  ["2001:db8::1","IPv6"],
+  ["48-3F-0A-91-00-BC","MAC Address"],
+  ["ping google.com","Ping Command"],
+  ["Worldwide public network","Internet"],
+  ["Private school network","Intranet"],
+  ["Controlled partner access","Extranet"]
+];
+
+const troubleScenarios=[
+  {name:"Server offline",ip:"✅ Valid IP: 192.168.1.20",router:"✅ Router replies",server:"❌ Request timed out",status:"🔴 Server is offline",conclusion:"The computer can reach the router, but the school server is unavailable."},
+  {name:"Router problem",ip:"✅ Valid IP: 192.168.1.22",router:"❌ Router does not reply",server:"❌ Server cannot be reached",status:"🟢 Server is online",conclusion:"The local connection or router may have a problem."},
+  {name:"IP configuration problem",ip:"❌ IP configuration is incorrect",router:"❌ Router cannot be reached",server:"❌ Server cannot be reached",status:"🟢 Server is online",conclusion:"Fix the computer's network settings first."}
+];
+
+const journeySteps=[
+  "Laptop creates data",
+  "Packet gets source and destination network information",
+  "Packet goes to the router",
+  "Packet travels through the network",
+  "School website server receives the packet",
+  "Server sends a response back"
+];
+
+function later(fn,ms){
+  const id=setTimeout(()=>{ if(!paused) fn(); else later(fn,100); },ms/speed);
+  timers.push(id); return id;
+}
+function clearTimers(){timers.forEach(clearTimeout);timers=[];}
+function svgEl(tag,attrs={}){
+  const el=document.createElementNS(NS,tag);
+  Object.entries(attrs).forEach(([k,v])=>el.setAttribute(k,v));
+  return el;
+}
+function point(a,b,t){return{x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t}}
+function node(layer,n,type,label=n.label,sub=""){
+  const g=svgEl("g",{class:`node ${type}`});
+  const w=type==="server"?170:150,h=type==="server"?105:88;
+  const r=svgEl("rect",{class:"box",x:n.x-w/2,y:n.y-h/2,width:w,height:h,rx:18});
+  const ti=svgEl("text",{x:n.x,y:n.y-9});ti.textContent=n.icon||"💻";ti.setAttribute("font-size",type==="server"?"33":"27");
+  const tl=svgEl("text",{x:n.x,y:n.y+20});tl.textContent=label;
+  const ts=svgEl("text",{x:n.x,y:n.y+40,class:"small"});ts.textContent=sub;
+  g.append(r,ti,tl,ts);layer.appendChild(g);return g;
+}
+function edge(layer,a,b,cls="edge"){
+  const l=svgEl("line",{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:cls});layer.appendChild(l);return l;
+}
+function animatePacket(layer,a,b,label,kind="info",duration=1000,done){
+  const g=svgEl("g",{class:`packet ${kind}`});
+  const r=svgEl("rect",{x:-48,y:-18,width:96,height:36});
+  const t=svgEl("text",{x:0,y:5});t.textContent=label;
+  g.append(r,t);layer.appendChild(g);
+  const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const start=performance.now();
+  function frame(now){
+    if(paused){requestAnimationFrame(frame);return}
+    const d=reduced?1:duration/speed;
+    const p=point(a,b,Math.min(1,(now-start)/d));
+    g.setAttribute("transform",`translate(${p.x} ${p.y})`);
+    if((now-start)<d)requestAnimationFrame(frame);
+    else{setTimeout(()=>g.remove(),150);if(done)done();}
+  }
+  requestAnimationFrame(frame);
+}
+function teacher(text){
+  if(!teacherMode)return;
+  $("#teacherCaption").textContent=text;$("#teacherCaption").classList.remove("hidden");
+}
+function jump(id){document.getElementById(id)?.scrollIntoView({behavior:"smooth",block:"start"});currentTopic=id;}
+$$("[data-jump]").forEach(b=>b.addEventListener("click",()=>jump(b.dataset.jump)));
+
+function setStatus(id,text){$(id).textContent=text;}
+
+function renderCs(){
+  const e=$("#csEdges"),n=$("#csNodes");e.innerHTML="";n.innerHTML="";
+  csClients.forEach(c=>edge(e,c,csServer));
+  csClients.forEach(c=>node(n,c,"client",c.label,"CLIENT"));
+  const s=node(n,csServer,"server",csExamples[$("#csExample").selectedIndex||0].server,"SERVER");
+  if(!serverOnline)s.classList.add("offline");
+}
+function buildCsExamples(){
+  csExamples.forEach((x,i)=>{const o=document.createElement("option");o.textContent=x.name;o.value=i;$("#csExample").appendChild(o);});
+  $("#csExample").addEventListener("change",()=>{renderCs();setStatus("#csStatus","Example changed. Press “Send Request”.");});
+}
+function renderSteps(rootId,arr){
+  const root=$(rootId);root.innerHTML="";
+  arr.forEach((s,i)=>{const d=document.createElement("div");d.className="step";d.textContent=`Step ${i+1}: ${s}`;root.appendChild(d);});
+}
+function highlightStep(rootId,i){
+  $(`${rootId} .step`) && $$(rootId+" .step").forEach((el,idx)=>el.classList.toggle("active",idx===i));
+  currentStep=i;
+}
+function runCs(){
+  clearTimers();paused=false;$("#csPackets").innerHTML="";
+  currentTopic="clientServer";
+  const ex=csExamples[Number($("#csExample").value)||0];
+  if(!serverOnline){
+    setStatus("#csStatus","❌ Cannot connect to server. The server is OFFLINE.");
+    teacher("This shows why clients may be affected when the central server fails.");
+    return;
+  }
+  const client=csClients[2],srv=csServer,layer=$("#csPackets");
+  const nodes=$$("#csNodes .node");
+  nodes.forEach(x=>x.classList.remove("active"));
+  highlightStep("#csSteps",0);setStatus("#csStatus",`${ex.client} sends: “${ex.request}”`);nodes[2]?.classList.add("active");
+  teacher("The client is asking the server for a service.");
+  later(()=>{highlightStep("#csSteps",1);animatePacket(layer,client,srv,"REQUEST","req",1100);setStatus("#csStatus","📦 REQUEST is travelling to the server.");},500);
+  later(()=>{highlightStep("#csSteps",2);nodes[4]?.classList.add("active");setStatus("#csStatus","Server received the request.");},1800);
+  later(()=>{highlightStep("#csSteps",3);setStatus("#csStatus","Server is processing the request…");},2500);
+  later(()=>{highlightStep("#csSteps",4);animatePacket(layer,srv,client,"RESPONSE","res",1100);setStatus("#csStatus",`${ex.server} sends a RESPONSE.`);},3300);
+  later(()=>{highlightStep("#csSteps",5);setStatus("#csStatus",`✅ ${ex.response}`);teacher("The server processed the request and sent the result back to the client.");},4600);
+}
+function setupFeatures(){
+  Object.entries(advantages).forEach(([k,v])=>{const b=document.createElement("button");b.textContent=k;b.addEventListener("click",()=>setStatus("#advInfo",v));$("#advGrid").appendChild(b);});
+  Object.entries(limitations).forEach(([k,v])=>{const b=document.createElement("button");b.textContent=k;b.addEventListener("click",()=>setStatus("#limitInfo",v));$("#limitGrid").appendChild(b);});
+}
+$("#serverToggleBtn").addEventListener("click",()=>{
+  serverOnline=!serverOnline;renderCs();
+  $("#serverToggleBtn").textContent=serverOnline?"Turn Server OFF":"Turn Server ON";
+  $("#serverToggleBtn").className=serverOnline?"warn":"good";
+  setStatus("#csStatus",serverOnline?"🟢 Server is ONLINE. Clients can connect.":"🔴 Server is OFFLINE. Try sending a request.");
+});
+
+const ipDevices=[
+  ["Laptop","💻","192.168.0.10"],
+  ["Phone","📱","192.168.0.11"],
+  ["Tablet","▣","192.168.0.12"],
+  ["Smart TV","📺","192.168.0.13"]
+];
+function setupIp(){
+  ipDevices.forEach(([name,icon,ip],i)=>{
+    const d=document.createElement("div");d.className="ip-device";d.innerHTML=`<div class="device-icon">${icon}</div><strong>${name}</strong><div class="address">${ip}</div>`;$("#ipDevices").appendChild(d);
+    [$("#ipFrom"),$("#ipTo")].forEach(sel=>{const o=document.createElement("option");o.value=i;o.textContent=`${name} — ${ip}`;sel.appendChild(o);});
+  });
+  $("#ipTo").value="1";
+  drawIpRoute();
+}
+function drawIpRoute(){
+  const svg=$("#ipSvg");svg.innerHTML="";
+  const from=ipDevices[Number($("#ipFrom").value)||0],to=ipDevices[Number($("#ipTo").value)||1];
+  const a={x:120,y:190,label:from[0],icon:from[1]},r={x:400,y:190,label:"Router",icon:"📡"},b={x:680,y:190,label:to[0],icon:to[1]};
+  edge(svg,a,r);edge(svg,r,b);
+  node(svg,a,"client",from[0],from[2]);node(svg,r,"router","Router","192.168.0.1");node(svg,b,"client",to[0],to[2]);
+}
+$("#ipFrom").addEventListener("change",drawIpRoute);$("#ipTo").addEventListener("change",drawIpRoute);
+$("#ipSendBtn").addEventListener("click",()=>{
+  clearTimers();drawIpRoute();const svg=$("#ipSvg");
+  const f=Number($("#ipFrom").value),t=Number($("#ipTo").value);
+  if(f===t){setStatus("#ipStatus","Choose two different devices.");return}
+  const a={x:120,y:190},r={x:400,y:190},b={x:680,y:190};
+  animatePacket(svg,a,r,"DATA","info",850,()=>animatePacket(svg,r,b,"DATA","info",850));
+  setStatus("#ipStatus",`Packet destination: ${ipDevices[t][0]} at ${ipDevices[t][2]}. The destination IP helps identify where the packet should go.`);
+  teacher("An IP address helps identify a device's logical network location.");
+});
+const dhcpPool=["192.168.1.25","192.168.1.31","192.168.1.44","192.168.1.52","192.168.1.60"];let dhcpIndex=0;
+$("#dhcpBtn").addEventListener("click",()=>{dhcpIndex=(dhcpIndex+1)%dhcpPool.length;$("#dhcpIp").textContent=dhcpPool[dhcpIndex];setStatus("#dhcpStatus",`DHCP automatically assigned ${dhcpPool[dhcpIndex]} after reconnecting.`);});
+
+function isValidIPv4String(s){
+  const parts=s.split(".");
+  if(parts.length!==4)return false;
+  return parts.every(p=>/^\d+$/.test(p)&&Number(p)>=0&&Number(p)<=255);
+}
+$("#validateIpv4Btn").addEventListener("click",()=>{
+  const vals=$$(".octet").map(x=>x.value.trim());
+  const good=vals.length===4&&vals.every(v=>/^\d+$/.test(v)&&Number(v)>=0&&Number(v)<=255);
+  const addr=vals.join(".");
+  $("#ipv4Validation").innerHTML=good?`<span class="valid">✅ ${addr} is a valid IPv4 format.</span> Each octet is between 0 and 255.`:`<span class="invalid">❌ ${addr} is not valid IPv4 formatting.</span> Every octet must be a whole number from 0 to 255.`;
+  teacher("IPv4 contains four decimal octets. Each octet must be between 0 and 255.");
+});
+function setupIpv4Examples(){
+  Object.entries(ipv4Examples).forEach(([k,v])=>{const b=document.createElement("button");b.textContent=k;b.className="address";b.addEventListener("click",()=>setStatus("#ipv4ExampleInfo",v));$("#ipv4Examples").appendChild(b);});
+}
+function showIpv4Challenge(){
+  const [a]=ipv4Challenge[ipv4ChallengeIndex];$("#ipv4ChallengeAddress").textContent=a;$("#ipv4ChallengeFeedback").textContent="Choose Valid or Invalid.";
+}
+function answerIpv4Challenge(ans){
+  const [a,valid,why]=ipv4Challenge[ipv4ChallengeIndex];
+  const ok=ans===valid;$("#ipv4ChallengeFeedback").textContent=(ok?"✅ Correct! ":"❌ Not quite. ")+why;
+}
+$("#ipv4ValidBtn").addEventListener("click",()=>answerIpv4Challenge(true));
+$("#ipv4InvalidBtn").addEventListener("click",()=>answerIpv4Challenge(false));
+$("#ipv4NextBtn").addEventListener("click",()=>{ipv4ChallengeIndex=(ipv4ChallengeIndex+1)%ipv4Challenge.length;showIpv4Challenge();});
+
+function setupIpv6(){
+  const groups=["2001","0db8","85a3","0000","0000","8a2e","0370","7334"];
+  groups.forEach(g=>{const d=document.createElement("div");d.className="ipv6-group";d.textContent=g;$("#ipv6Groups").appendChild(d);});
+}
+$("#compressIpv6Btn").addEventListener("click",()=>{$("#ipv6Address").textContent="2001:db8::ff00:42:8329";setStatus("#ipv6Status","Leading zeros were shortened, and consecutive zero groups were compressed with ::.");teacher("IPv6 uses a much larger 128-bit address space.");});
+$("#expandIpv6Btn").addEventListener("click",()=>{$("#ipv6Address").textContent="2001:0db8:0000:0000:0000:ff00:0042:8329";setStatus("#ipv6Status","Full form restored.");});
+
+function drawPing(){
+  const svg=$("#pingSvg");svg.innerHTML="";
+  const a={x:120,y:190,label:"Computer",icon:"💻"},m={x:400,y:190,label:"Network",icon:"🌐"},b={x:680,y:190,label:"Destination",icon:"🗄️"};
+  edge(svg,a,m);edge(svg,m,b);node(svg,a,"client","Computer","SOURCE");node(svg,m,"internet","Network","PATH");const nd=node(svg,b,"server","Destination","TARGET");if($("#pingOffline").checked)nd.classList.add("offline");
+}
+function terminalWrite(lines){$("#terminal").textContent=lines.join("\n");}
+$("#pingOffline").addEventListener("change",drawPing);
+$("#runPingBtn").addEventListener("click",()=>{
+  clearTimers();paused=false;drawPing();
+  const dest=$("#pingDestination").value,offline=$("#pingOffline").checked,base=Number($("#pingLatency").value)||45;
+  const svg=$("#pingSvg"),a={x:120,y:190},m={x:400,y:190},b={x:680,y:190};
+  const lines=[`C:\\> ping ${dest}`,``];terminalWrite(lines);
+  teacher("Ping sends test packets and waits for replies.");
+  for(let i=0;i<4;i++){
+    later(()=>{
+      animatePacket(svg,a,m,"PING","req",350,()=>animatePacket(svg,m,b,"PING","req",350));
+      if(offline){
+        lines.push("Request timed out.");terminalWrite(lines);
+      }else{
+        const jitter=[0,-3,4,1][i];const ms=Math.max(1,base+jitter);
+        later(()=>{animatePacket(svg,b,m,"REPLY","res",300,()=>animatePacket(svg,m,a,"REPLY","res",300));lines.push(`Reply from ${dest}: bytes=32 time=${ms}ms`);terminalWrite(lines);},500);
+      }
+    },i*950);
+  }
+  later(()=>{
+    if(offline){
+      lines.push("","Packets: Sent = 4, Received = 0, Lost = 4","Request timed out means the device did not reply.","Possible reasons: device offline, network problem, packet blocked, or destination unreachable.");
+    }else{
+      lines.push("","Packets: Sent = 4, Received = 4, Lost = 0",`Average time ≈ ${base}ms`);
+    }
+    terminalWrite(lines);
+  },4100);
+});
+
+$("#viewIdentityBtn").addEventListener("click",()=>{
+  $("#identityBox").innerHTML=`<strong>Device:</strong> Student Laptop<br><strong>IP Address:</strong> <span class="address">192.168.1.10</span><br><strong>MAC Address:</strong> <span class="address">48-3F-0A-91-00-BC</span><br><small>A MAC address is commonly shown using 12 hexadecimal digits.</small>`;
+});
+function drawMacIp(){
+  const svg=$("#macIpSvg");svg.innerHTML="";
+  const a={x:120,y:180,label:"Laptop",icon:"💻"},r={x:400,y:180,label:"Router",icon:"📡"},b={x:680,y:180,label:"Local Device",icon:"🖥️"};
+  edge(svg,a,r);edge(svg,r,b);node(svg,a,"client","Laptop","IP 192.168.1.10");node(svg,r,"router","Router","LOCAL NETWORK");node(svg,b,"client","Device B","IP 192.168.1.20");
+}
+$("#macIpDemoBtn").addEventListener("click",()=>{
+  clearTimers();drawMacIp();const svg=$("#macIpSvg"),a={x:120,y:180},r={x:400,y:180},b={x:680,y:180};
+  animatePacket(svg,a,r,"IP+MAC","info",850,()=>animatePacket(svg,r,b,"IP+MAC","info",850));
+  setStatus("#macStatus","IP identifies the logical destination. MAC information helps local network interfaces deliver frames on the local link.");
+  teacher("A MAC address identifies a network interface.");
+});
+$("#arpDemoBtn").addEventListener("click",()=>{
+  clearTimers();drawMacIp();const svg=$("#macIpSvg"),a={x:120,y:180},r={x:400,y:180},b={x:680,y:180};
+  setStatus("#macStatus","Computer A asks: “Who has 192.168.1.20?”");
+  animatePacket(svg,a,r,"ARP?","req",600,()=>animatePacket(svg,r,b,"ARP?","req",600));
+  later(()=>{setStatus("#macStatus","Computer B answers: “I do. My MAC address is 48-3F-0A-91-00-BC.”");animatePacket(svg,b,r,"MAC","res",600,()=>animatePacket(svg,r,a,"MAC","res",600));},1500);
+  later(()=>setStatus("#macStatus","ARP helps devices find the MAC address associated with an IPv4 address on the local network."),2900);
+});
+
+function drawAccess(){
+  const svg=$("#accessSvg");svg.innerHTML="";
+  const publicU={x:120,y:100,label:"General Public",icon:"👤"},teacherU={x:120,y:250,label:"Teacher",icon:"👩‍🏫"},parent={x:120,y:400,label:"Parent",icon:"👨‍👩‍👧"};
+  const internet={x:500,y:100,label:"Internet",icon:"🌍"},intranet={x:500,y:250,label:"School Intranet",icon:"🏫"},extranet={x:500,y:400,label:"Parent Portal",icon:"🤝"};
+  const server={x:850,y:250,label:"School Server",icon:"🗄️"};
+  [publicU,teacherU,parent].forEach(u=>edge(svg,u,server));
+  [internet,intranet,extranet].forEach(z=>edge(svg,z,server));
+  node(svg,publicU,"client","General Public","USER");node(svg,teacherU,"client","Teacher","AUTHORIZED");node(svg,parent,"client","Parent","SELECTED OUTSIDER");
+  node(svg,internet,"internet","Internet","GLOBAL");node(svg,intranet,"intranet","Intranet","INTERNAL");node(svg,extranet,"extranet","Extranet","CONTROLLED");
+  node(svg,server,"server","School Server","RESOURCES");
+}
+function accessDemo(type){
+  clearTimers();drawAccess();const svg=$("#accessSvg");
+  const users={internet:{x:120,y:100},intranet:{x:120,y:250},extranet:{x:120,y:400}};
+  const zones={internet:{x:500,y:100},intranet:{x:500,y:250},extranet:{x:500,y:400}};
+  const srv={x:850,y:250};
+  if(type==="internet"){
+    animatePacket(svg,users.internet,zones.internet,"WEB","info",650,()=>animatePacket(svg,zones.internet,srv,"WEB","info",650));
+    setStatus("#accessStatus","🌍 Internet: the general public can visit a public website.");
+  }else if(type==="intranet"){
+    animatePacket(svg,users.intranet,zones.intranet,"LOGIN","info",650,()=>animatePacket(svg,zones.intranet,srv,"NOTICE","res",650));
+    setStatus("#accessStatus","🏫 Intranet: an authorized teacher can view internal school notices. An outside user is restricted.");
+  }else{
+    animatePacket(svg,users.extranet,zones.extranet,"LOGIN","info",650,()=>animatePacket(svg,zones.extranet,srv,"ATTENDANCE","res",650));
+    setStatus("#accessStatus","🤝 Extranet: a parent can view selected data such as attendance, but not private staff records.");
+  }
+}
+$$(".accessDemoBtn").forEach(b=>b.addEventListener("click",()=>accessDemo(b.dataset.demo)));
+$("#compareAccessBtn").addEventListener("click",()=>{accessDemo("internet");later(()=>accessDemo("intranet"),1700);later(()=>accessDemo("extranet"),3400);teacher("The Internet is global. An intranet is internal to an organization. An extranet gives selected outsiders controlled access.");});
+
+function drawJourney(){
+  const svg=$("#journeySvg");svg.innerHTML="";
+  const nodes=[
+    {x:100,y:220,label:"Student Laptop",icon:"💻",type:"client",sub:"192.168.1.10"},
+    {x:330,y:220,label:"Router",icon:"📡",type:"router",sub:"GATEWAY"},
+    {x:570,y:220,label:"Internet",icon:"🌍",type:"internet",sub:"NETWORKS"},
+    {x:850,y:220,label:"School Website",icon:"🗄️",type:"server",sub:"SERVER"}
+  ];
+  for(let i=0;i<nodes.length-1;i++)edge(svg,nodes[i],nodes[i+1]);
+  nodes.forEach(n=>node(svg,n,n.type,n.label,n.sub));
+}
+function setJourneyStep(i){
+  journeyStep=Math.max(0,Math.min(journeySteps.length-1,i));
+  $$("#journeySteps .step").forEach((s,idx)=>s.classList.toggle("active",idx===journeyStep));
+  setStatus("#journeyStatus",`Step ${journeyStep+1}: ${journeySteps[journeyStep]}`);
+}
+function runJourney(){
+  clearTimers();paused=false;drawJourney();setJourneyStep(0);
+  const svg=$("#journeySvg"),a={x:100,y:220},r={x:330,y:220},net={x:570,y:220},srv={x:850,y:220};
+  later(()=>{setJourneyStep(1);teacher("The packet contains information about where it came from and where it should go.");},600);
+  later(()=>{setJourneyStep(2);animatePacket(svg,a,r,"PACKET","info",800);},1300);
+  later(()=>{setJourneyStep(3);animatePacket(svg,r,net,"PACKET","info",800,()=>animatePacket(svg,net,srv,"PACKET","info",900));},2300);
+  later(()=>{setJourneyStep(4);},4200);
+  later(()=>{setJourneyStep(5);animatePacket(svg,srv,net,"RESPONSE","res",700,()=>animatePacket(svg,net,r,"RESPONSE","res",700,()=>animatePacket(svg,r,a,"RESPONSE","res",700)));},5000);
+}
+$("#journeyPlayBtn").addEventListener("click",runJourney);
+$("#journeyReplayBtn").addEventListener("click",runJourney);
+$("#journeyPrevBtn").addEventListener("click",()=>setJourneyStep(journeyStep-1));
+$("#journeyNextBtn").addEventListener("click",()=>setJourneyStep(journeyStep+1));
+
+function renderQuiz(){
+  const [q,opts]=quiz[quizIndex];
+  $("#quizQuestion").textContent=q;$("#quizProgress").textContent=`Question ${quizIndex+1} / ${quiz.length}`;$("#quizScore").textContent=`Score: ${quizScore} / ${quizAnswered}`;$("#quizFeedback").textContent="Choose an answer.";$("#quizOptions").innerHTML="";quizLocked=false;
+  opts.forEach(o=>{const b=document.createElement("button");b.textContent=o;b.addEventListener("click",()=>answerQuiz(o));$("#quizOptions").appendChild(b);});
+}
+function answerQuiz(ans){
+  if(quizLocked)return;quizLocked=true;quizAnswered++;
+  const [, ,correct,why]=quiz[quizIndex];
+  if(ans===correct){quizScore++;$("#quizFeedback").textContent=`✅ Correct! ${why}`;}else{$("#quizFeedback").textContent=`❌ Not quite. Correct answer: ${correct}. ${why}`;}
+  $("#quizScore").textContent=`Score: ${quizScore} / ${quizAnswered}`;
+}
+$("#quizNextBtn").addEventListener("click",()=>{quizIndex=(quizIndex+1)%quiz.length;renderQuiz();});
+$("#quizRestartBtn").addEventListener("click",()=>{quizIndex=0;quizScore=0;quizAnswered=0;renderQuiz();});
+
+function shuffle(arr){return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);}
+function renderMatch(){
+  matchedPairs.clear();selectedMatchLeft=null;selectedMatchRight=null;$("#matchLeft").innerHTML="";$("#matchRight").innerHTML="";$("#matchStatus").textContent="Start matching.";
+  matchPairs.forEach(([left],i)=>{const b=document.createElement("button");b.className="match-item";b.dataset.pair=i;b.dataset.side="left";b.textContent=left;b.addEventListener("click",()=>selectMatch(b));$("#matchLeft").appendChild(b);});
+  shuffle(matchPairs.map((p,i)=>[p[1],i])).forEach(([right,i])=>{const b=document.createElement("button");b.className="match-item";b.dataset.pair=i;b.dataset.side="right";b.textContent=right;b.addEventListener("click",()=>selectMatch(b));$("#matchRight").appendChild(b);});
+}
+function selectMatch(btn){
+  if(btn.disabled)return;
+  if(btn.dataset.side==="left"){selectedMatchLeft=btn;$$('#matchLeft .match-item').forEach(x=>x.classList.toggle("selected",x===btn));}
+  else{selectedMatchRight=btn;$$('#matchRight .match-item').forEach(x=>x.classList.toggle("selected",x===btn));}
+  if(selectedMatchLeft&&selectedMatchRight){
+    if(selectedMatchLeft.dataset.pair===selectedMatchRight.dataset.pair){
+      selectedMatchLeft.disabled=true;selectedMatchRight.disabled=true;selectedMatchLeft.classList.remove("selected");selectedMatchRight.classList.remove("selected");matchedPairs.add(selectedMatchLeft.dataset.pair);$("#matchStatus").textContent=`✅ Correct match! ${matchedPairs.size} / ${matchPairs.length}`;
+    }else{$("#matchStatus").textContent="❌ Not a match. Try again.";selectedMatchLeft.classList.remove("selected");selectedMatchRight.classList.remove("selected");}
+    selectedMatchLeft=null;selectedMatchRight=null;
+  }
+}
+$("#matchResetBtn").addEventListener("click",renderMatch);
+
+function troubleTest(type){
+  const s=troubleScenarios[troubleIndex];
+  const text={ip:s.ip,router:s.router,server:s.server,status:s.status}[type];
+  setStatus("#troubleStatus",`${text} ${type==="status"?" — "+s.conclusion:""}`);
+}
+$$(".troubleBtn").forEach(b=>b.addEventListener("click",()=>troubleTest(b.dataset.test)));
+$("#newTroubleBtn").addEventListener("click",()=>{troubleIndex=(troubleIndex+1)%troubleScenarios.length;setStatus("#troubleStatus",`New scenario loaded: ${troubleScenarios[troubleIndex].name}. Run the checks.`);});
+
+function teacherPlay(){
+  if(currentTopic==="clientServer"||currentTopic==="home")runCs();
+  else if(currentTopic==="packetJourney")runJourney();
+  else if(currentTopic==="pingLab")$("#runPingBtn").click();
+  else if(currentTopic==="accessLab")accessDemo("internet");
+}
+$("#playBtn").addEventListener("click",teacherPlay);
+$("#replayBtn").addEventListener("click",teacherPlay);
+$("#pauseBtn").addEventListener("click",()=>{paused=!paused;$("#pauseBtn").textContent=paused?"▶ Resume":"⏸ Pause";});
+$("#prevBtn").addEventListener("click",()=>{if(currentTopic==="packetJourney")setJourneyStep(journeyStep-1);else highlightStep("#csSteps",Math.max(0,currentStep-1));});
+$("#nextBtn").addEventListener("click",()=>{if(currentTopic==="packetJourney")setJourneyStep(journeyStep+1);else highlightStep("#csSteps",Math.min(5,currentStep+1));});
+$("#speedSelect").addEventListener("change",e=>speed=Number(e.target.value)||1);
+$("#teacherMode").addEventListener("change",e=>{teacherMode=e.target.checked;if(!teacherMode)$("#teacherCaption").classList.add("hidden");else teacher("Teacher Explanation Mode is ON. Short teaching captions will appear during demonstrations.");});
+$("#autoDemo").addEventListener("change",e=>{if(e.target.checked){teacherPlay();later(()=>{if($("#autoDemo").checked){jump("ipLab");$("#ipSendBtn").click();}},6500);later(()=>{if($("#autoDemo").checked){jump("pingLab");$("#runPingBtn").click();}},10000);}else clearTimers();});
+
+function resetAll(){
+  clearTimers();paused=false;currentStep=0;serverOnline=true;journeyStep=0;
+  $("#serverToggleBtn").textContent="Turn Server OFF";$("#serverToggleBtn").className="warn";
+  renderCs();setStatus("#csStatus","Ready. Press “Send Request”.");highlightStep("#csSteps",0);
+  drawIpRoute();$("#dhcpIp").textContent="192.168.1.25";dhcpIndex=0;
+  $$(".octet").forEach((x,i)=>x.value=[192,168,1,10][i]);setStatus("#ipv4Validation","Each octet must be a whole number from 0 to 255.");
+  $("#ipv6Address").textContent="2001:0db8:0000:0000:0000:ff00:0042:8329";drawPing();terminalWrite(["C:\\> Ready for ping..."]);
+  drawMacIp();drawAccess();drawJourney();setJourneyStep(0);
+  quizIndex=0;quizScore=0;quizAnswered=0;renderQuiz();renderMatch();ipv4ChallengeIndex=0;showIpv4Challenge();
+  troubleIndex=0;setStatus("#troubleStatus","Run the checks to find the problem.");
+}
+$("#resetBtn").addEventListener("click",resetAll);$("#globalResetBtn").addEventListener("click",resetAll);
+
+$("#presentationBtn").addEventListener("click",()=>{
+  document.body.classList.toggle("presentation");
+  $("#presentationBtn").textContent=document.body.classList.contains("presentation")?"Normal Mode":"Presentation Mode";
+});
+$("#fullscreenBtn").addEventListener("click",async()=>{
+  try{
+    if(!document.fullscreenElement&&document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();
+    else if(document.exitFullscreen)await document.exitFullscreen();
+  }catch(e){$("#fullscreenBtn").textContent="Full Screen Unavailable";}
+});
+document.addEventListener("fullscreenchange",()=>$("#fullscreenBtn").textContent=document.fullscreenElement?"Exit Full Screen":"Full Screen");
+
+buildCsExamples();
+setupFeatures();
+renderSteps("#csSteps",["Client sends request","Request travels through network","Server receives request","Server processes request","Server sends response","Client receives data"]);
+renderSteps("#journeySteps",journeySteps);
+renderCs();
+setupIp();
+setupIpv4Examples();
+showIpv4Challenge();
+setupIpv6();
+drawPing();
+drawMacIp();
+drawAccess();
+drawJourney();
+setJourneyStep(0);
+renderQuiz();
+renderMatch();
+})();
+</script>
+</body>
+</html>

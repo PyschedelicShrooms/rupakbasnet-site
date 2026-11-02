@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 10 Smart Board: Bandwidth, Throughput, Congestion, 3G 4G 5G</title>
+<style>
+:root{--blue:#2563eb;--purple:#7c3aed;--green:#16a34a;--orange:#f97316;--red:#dc2626;--ink:#172033}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#dbeafe,#f5f3ff,#fff7ed);color:var(--ink)}
+.app{display:grid;grid-template-columns:290px 1fr;min-height:100vh}
+.side{background:linear-gradient(180deg,#073b79,#061d43);color:white;padding:18px;position:sticky;top:0;height:100vh;overflow:auto}
+.side h1{font-size:30px;margin:0}.side p{font-size:17px;color:#dbeafe}
+.menu button{display:block;width:100%;text-align:left;margin:8px 0;background:rgba(255,255,255,.13);border:0;border-radius:14px;color:white;padding:14px;font-size:17px;font-weight:800;cursor:pointer}
+.menu button.active{background:linear-gradient(90deg,#7c3aed,#2563eb)}
+.main{padding:22px;max-width:1500px;width:100%;margin:auto}
+.top,.card{background:rgba(255,255,255,.98);border-radius:24px;padding:24px;margin:16px 0;box-shadow:0 10px 28px rgba(15,23,42,.15)}
+.step{display:none}.step.active{display:block}
+h2{font-size:clamp(34px,4vw,56px);margin-top:0;color:#1d4ed8}
+h3{font-size:28px;color:#334155}
+p,li{font-size:24px;line-height:1.55}
+.definition{background:#ecfdf5;border-left:10px solid var(--green);border-radius:18px;padding:20px;font-size:27px;font-weight:900;line-height:1.45}
+.copybox{background:#f8fafc;border:4px solid #bfdbfe;border-radius:20px;padding:20px;margin:16px 0}
+.teacher{background:#fff7ed;border:4px solid #fed7aa;border-radius:20px;padding:20px;margin:16px 0}
+.note{background:#eff6ff;border-left:8px solid var(--blue);border-radius:16px;padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.box{background:#f8fafc;border:4px solid #dbeafe;border-radius:22px;padding:16px;text-align:center;min-height:170px;transition:.2s}
+.box:hover{transform:translateY(-4px);background:#e0f2fe}
+.box.active{background:#dcfce7;border-color:var(--green);transform:scale(1.02)}
+.icon{font-size:60px}
+.btn{border:0;border-radius:18px;padding:17px 22px;margin:8px;font-size:22px;font-weight:900;background:var(--blue);color:white;cursor:pointer}
+.btn:hover{filter:brightness(1.1);transform:scale(1.02)}
+.green{background:var(--green)}.orange{background:var(--orange)}.gray{background:#475569}.red{background:var(--red)}
+.nav{position:sticky;bottom:0;background:rgba(255,255,255,.96);display:flex;justify-content:space-between;gap:12px;padding:14px;border-radius:22px;box-shadow:0 -6px 22px rgba(0,0,0,.14);z-index:5}
+.progress{height:28px;background:#dbeafe;border-radius:22px;overflow:hidden}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--blue),var(--purple));transition:.3s}
+.slider{width:100%;height:35px;accent-color:var(--purple)}
+.bar{height:40px;background:#dbeafe;border-radius:24px;overflow:hidden;margin:14px 0}.barfill{height:100%;width:30%;background:linear-gradient(90deg,#60a5fa,#7c3aed);transition:.35s}
+.signal{background:#0f172a;color:#22c55e;border-radius:22px;padding:22px;text-align:center;font-family:monospace;font-size:28px;min-height:90px;overflow:hidden}
+.road{height:155px;background:#334155;border-radius:22px;margin:18px 0;overflow:hidden}
+.lane{height:52px;border-bottom:4px dashed white;position:relative}
+.car{position:absolute;font-size:40px;animation:drive 4s linear infinite}.fast{animation-duration:1.5s}.mid{animation-duration:2.7s}.slow{animation-duration:5.2s}
+@keyframes drive{from{left:-55px}to{left:105%}}
+.pipe{height:120px;background:#e0f2fe;border:7px solid #38bdf8;border-radius:70px;position:relative;overflow:hidden;margin:22px 0}
+.packet{position:absolute;font-size:38px;animation:flow 3s linear infinite}@keyframes flow{from{left:-60px}to{left:105%}}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+table{width:100%;border-collapse:collapse;background:white;border-radius:16px;overflow:hidden}
+th,td{border:3px solid #dbeafe;padding:16px;text-align:center;font-size:22px}th{background:#dbeafe;color:#1e3a8a}
+.drag{background:#e0f2fe;border:3px solid #38bdf8;border-radius:16px;padding:16px;margin:10px;font-size:22px;font-weight:900;cursor:grab}
+.drop{background:white;border:4px dashed #94a3b8;border-radius:16px;padding:16px;margin:10px;min-height:84px;font-size:22px}
+.correct{background:#dcfce7!important;border-color:#16a34a!important}.wrong{background:#fee2e2!important;border-color:#dc2626!important}
+.quizBtn{display:block;width:100%;text-align:left;background:#eef2ff;color:#1e293b;border:3px solid #c7d2fe;border-radius:16px;padding:18px;margin:10px 0;font-size:24px;font-weight:800;cursor:pointer}
+.feedback{font-size:26px;font-weight:900}
+.phone{max-width:390px;margin:auto;background:#111827;border-radius:42px;padding:18px;border:8px solid #334155}
+.screen{background:white;border-radius:28px;padding:18px;min-height:360px;text-align:center}
+.hidden{display:none}
+@media(max-width:980px){.app{grid-template-columns:1fr}.side{position:relative;height:auto}.compare{grid-template-columns:1fr}.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}.menu button{margin:4px}.main{padding:12px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+<h1>📶 Class 10</h1>
+<p>Smart Board Network Simulation</p>
+<div class="menu" id="menu"></div>
+<div class="copybox" style="color:#172033"><b>Use:</b><p style="font-size:18px">Touch buttons, sliders, cards, quiz and drag-drop activities.</p></div>
+</aside>
+
+<main class="main">
+<div class="top">
+<h2>Bandwidth, Throughput, Congestion, 3G, 4G and 5G</h2>
+<div class="progress"><div id="progressFill" class="fill"></div></div>
+<p><b id="progressText"></b> | <b>Score:</b> <span id="score">0</span></p>
+</div>
+
+<section class="card step active" data-title="Start">
+<h2>1. Lesson Start 🎯</h2>
+<div class="definition">This lesson explains why network speed changes, why throughput happens, what congestion is, and how 3G, 4G and 5G changed mobile communication.</div>
+<div class="grid">
+<div class="box"><div class="icon">🚰</div><b>Bandwidth</b><p>Maximum capacity</p></div>
+<div class="box"><div class="icon">📦</div><b>Throughput</b><p>Actual successful data</p></div>
+<div class="box"><div class="icon">🚦</div><b>Congestion</b><p>Network traffic jam</p></div>
+<div class="box"><div class="icon">📱</div><b>3G/4G/5G</b><p>Mobile network generations</p></div>
+</div>
+</section>
+
+<section class="card step" data-title="Bandwidth">
+<h2>2. Bandwidth 🚰</h2>
+<div class="definition">Bandwidth is the maximum amount of data that can be transmitted through a communication channel in a given period of time.</div>
+<div class="copybox"><h3>Write in Copy</h3><ul><li>Bandwidth is the maximum capacity of a network channel.</li><li>It is measured in bps, Kbps, Mbps or Gbps.</li><li>Higher bandwidth means more data can pass at the same time.</li><li>It is a theoretical or maximum value.</li></ul></div>
+<input id="bandSlider" class="slider" type="range" min="1" max="10" value="4">
+<div class="bar"><div id="bandFill" class="barfill"></div></div>
+<div id="bandText" class="signal"></div>
+<div id="pipe" class="pipe"></div>
+</section>
+
+<section class="card step" data-title="Throughput">
+<h2>3. Why Throughput Happens 📦</h2>
+<div class="definition">Throughput happens because real networks do not always deliver data at the maximum possible capacity. Throughput is the actual data successfully delivered to the user.</div>
+<div class="copybox"><h3>Why throughput is lower than bandwidth</h3>
+<ul><li><b>Congestion:</b> too many users or packets use the same network.</li><li><b>Latency:</b> delay while data travels from sender to receiver.</li><li><b>Packet loss:</b> some data packets do not reach the destination.</li><li><b>Errors:</b> damaged packets must be sent again.</li><li><b>Distance:</b> longer distance may increase delay.</li></ul></div>
+<div class="teacher"><h3>Teacher Explanation</h3><p>Say: “Your road may hold 100 cars per minute, but during traffic jam only 50 cars pass. The road capacity is bandwidth; actual cars passing is throughput.”</p></div>
+</section>
+
+<section class="card step" data-title="Congestion">
+<h2>4. What is Congestion? 🚦</h2>
+<div class="definition">Network congestion means a condition where too much data traffic is trying to pass through a network at the same time, causing delay, packet loss and lower throughput.</div>
+<div class="grid">
+<div class="box"><div class="icon">🛣️</div><b>Road Example</b><p>Too many vehicles create traffic jam.</p></div>
+<div class="box"><div class="icon">🏫</div><b>School Gate Example</b><p>Too many students leaving at once slows movement.</p></div>
+<div class="box"><div class="icon">🚰</div><b>Water Pipe Example</b><p>Too much water demand reduces pressure.</p></div>
+<div class="box"><div class="icon">📶</div><b>Wi-Fi Example</b><p>Many users streaming make Internet slow.</p></div>
+</div>
+<div class="copybox"><h3>Write in Copy</h3><p>Congestion is heavy traffic in a network. It occurs when many users or data packets use the same network path at the same time. It reduces throughput and increases delay.</p></div>
+</section>
+
+<section class="card step" data-title="Congestion Simulation">
+<h2>5. Congestion and Throughput Simulation 🚦📦</h2>
+<p>Bandwidth stays 100 Mbps. Increase congestion and see actual throughput decrease.</p>
+<input id="trafficSlider" class="slider" type="range" min="0" max="90" value="20">
+<div class="grid">
+<div class="box"><div class="icon">🚰</div><b>Bandwidth</b><p>100 Mbps</p></div>
+<div class="box"><div class="icon">🚦</div><b>Congestion</b><p id="cgValue">20%</p></div>
+<div class="box active"><div class="icon">📦</div><b>Throughput</b><p id="tpValue">80 Mbps</p></div>
+</div>
+<div class="bar"><div id="tpFill" class="barfill"></div></div>
+<div class="signal" id="packetJourney"></div>
+<div class="road"><div class="lane"><span id="jam1" class="car fast">📦</span></div><div class="lane"><span id="jam2" class="car mid">📦</span></div><div class="lane"><span id="jam3" class="car slow">📦</span></div></div>
+<p id="trafficExplain" class="note"></p>
+</section>
+
+<section class="card step" data-title="Graph">
+<h2>6. Bandwidth vs Throughput Graph 📈</h2>
+<input id="graphSlider" class="slider" type="range" min="0" max="90" value="30">
+<canvas id="graphCanvas" width="1000" height="360" style="width:100%;background:white;border:4px solid #dbeafe;border-radius:20px"></canvas>
+<div class="copybox"><h3>Exam Difference</h3><table><tr><th>Bandwidth</th><th>Throughput</th></tr><tr><td>Maximum capacity</td><td>Actual successful data</td></tr><tr><td>Theoretical value</td><td>Practical real-time value</td></tr><tr><td>Fixed by channel</td><td>Affected by congestion, latency, errors and packet loss</td></tr></table></div>
+</section>
+
+<section class="card step" data-title="3G 4G 5G History">
+<h2>7. 3G, 4G and 5G: When and Who? 🕰️</h2>
+<div class="definition">3G, 4G and 5G were not invented by one single person. They were developed by international telecommunication organizations, engineers, companies and standards bodies.</div>
+<div class="grid">
+<div class="box"><div class="icon">3️⃣</div><b>3G</b><p>Around 2001<br>Standardized by ITU and 3GPP groups</p></div>
+<div class="box"><div class="icon">4️⃣</div><b>4G</b><p>Around 2009–2010<br>Developed through LTE/WiMAX standards</p></div>
+<div class="box"><div class="icon">5️⃣</div><b>5G</b><p>Around 2019–2020<br>Developed mainly through 3GPP 5G standards</p></div>
+</div>
+<div class="teacher"><h3>Teacher Note</h3><p>Do not say one person invented 3G/4G/5G. Explain that they are global standards created by many engineers, telecom companies and organizations.</p></div>
+</section>
+
+<section class="card step" data-title="Speed Comparison">
+<h2>8. 3G vs 4G vs 5G Speed Dashboard 🎚️</h2>
+<div class="grid" id="genCards">
+<div class="box active" onclick="selectGen(0)"><div class="icon">3️⃣</div><b>3G</b><p>384 Kbps<br>Basic Internet</p></div>
+<div class="box" onclick="selectGen(1)"><div class="icon">4️⃣</div><b>4G</b><p>100 Mbps<br>HD Streaming</p></div>
+<div class="box" onclick="selectGen(2)"><div class="icon">5️⃣</div><b>5G</b><p>10 Gbps<br>Smart Devices</p></div>
+</div>
+<svg viewBox="0 0 520 270" style="width:100%;max-width:760px;display:block;margin:auto">
+<path d="M80 225 A180 180 0 0 1 440 225" stroke="#dbeafe" stroke-width="38" fill="none"/>
+<line id="needle" x1="260" y1="225" x2="125" y2="185" stroke="#dc2626" stroke-width="9" stroke-linecap="round"/>
+<circle cx="260" cy="225" r="16" fill="#1e293b"/>
+<text id="meterLabel" x="260" y="70" text-anchor="middle" font-size="38" font-weight="bold">3G</text>
+<text id="meterSpeed" x="260" y="120" text-anchor="middle" font-size="26">384 Kbps</text>
+</svg>
+<input id="genSlider" class="slider" type="range" min="0" max="2" value="0">
+<div class="copybox"><h3 id="genTitle">3G</h3><p id="genText"></p></div>
+<button class="btn green" onclick="startRace()">▶ Start 100 MB Download Race</button>
+<div class="copybox">
+<b>3G Download</b><div class="bar"><div id="race3g" class="barfill" style="width:0%;background:#f97316"></div></div>
+<b>4G Download</b><div class="bar"><div id="race4g" class="barfill" style="width:0%;background:#2563eb"></div></div>
+<b>5G Download</b><div class="bar"><div id="race5g" class="barfill" style="width:0%;background:#16a34a"></div></div>
+</div>
+<div id="raceStatus" class="signal">Click Start Race.</div>
+</section>
+
+<section class="card step" data-title="How They Work">
+<h2>9. How Do 3G, 4G and 5G Networks Work? 📡</h2>
+<div class="definition">A mobile phone sends and receives data as radio signals through a nearby mobile tower. The tower connects to the operator’s core network and then to the Internet.</div>
+<div class="grid" id="workCards">
+<div class="box active" onclick="workStep(0)"><div class="icon">📱</div><b>Phone</b><p>Sends request</p></div>
+<div class="box" onclick="workStep(1)"><div class="icon">📡</div><b>Tower</b><p>Receives signal</p></div>
+<div class="box" onclick="workStep(2)"><div class="icon">🏢</div><b>Core Network</b><p>Routes data</p></div>
+<div class="box" onclick="workStep(3)"><div class="icon">🌐</div><b>Internet Server</b><p>Finds content</p></div>
+<div class="box" onclick="workStep(4)"><div class="icon">📲</div><b>Back to Phone</b><p>Shows result</p></div>
+</div>
+<div id="workBoard" class="signal"></div>
+<div class="bar"><div id="workFlow" class="barfill"></div></div>
+<button class="btn green" onclick="autoWork()">▶ Auto Play</button>
+<div class="copybox"><h3>Write in Copy</h3><p>3G, 4G and 5G work by connecting mobile phones to nearby towers using radio signals. The tower sends data through the core network to the Internet server. Newer generations use better technology, more bandwidth and lower latency.</p></div>
+</section>
+
+<section class="card step" data-title="No Networks">
+<h2>10. What If There Were No 3G, 4G and 5G? ❌📱</h2>
+<div class="grid">
+<div class="box"><div class="icon">🌐</div><b>No Mobile Internet</b><p>Browsing outside home would be difficult.</p></div>
+<div class="box"><div class="icon">🎥</div><b>No Video Calls</b><p>Online meetings and classes would be limited.</p></div>
+<div class="box"><div class="icon">🚑</div><b>Slow Emergency Communication</b><p>Location sharing and alerts would be slower.</p></div>
+<div class="box"><div class="icon">🏙️</div><b>No Smart City Services</b><p>IoT, smart vehicles and sensors would be limited.</p></div>
+</div>
+<div class="copybox"><h3>Short Answer</h3><p>Without 3G, 4G and 5G, people would depend mostly on wired Internet, telephone and SMS. Mobile Internet, online classes, map navigation, video calling, mobile banking and smart devices would be much less developed.</p></div>
+</section>
+
+<section class="card step" data-title="Drawbacks">
+<h2>11. Drawbacks of 3G, 4G and 5G ⚠️</h2>
+<table>
+<tr><th>Network</th><th>Drawbacks</th></tr>
+<tr><td>3G</td><td>Slow speed, high latency, not suitable for HD streaming and modern apps.</td></tr>
+<tr><td>4G</td><td>Can become congested in crowded areas; uses more battery than older networks.</td></tr>
+<tr><td>5G</td><td>Requires many towers and modern devices; coverage may be limited in rural areas; setup cost is high.</td></tr>
+</table>
+<div class="teacher"><h3>Teacher Discussion Question</h3><p>Ask students: “Which is more important: very high speed or wider coverage? Why?”</p></div>
+</section>
+
+<section class="card step" data-title="Website Simulation">
+<h2>12. Website Opening Simulation 🌐</h2>
+<div class="compare">
+<div><h3>Choose Website</h3><select id="websiteSelect" style="width:100%;padding:18px;border-radius:16px;font-size:22px"><option value="search">🔍 Search Page - small</option><option value="school">🏫 School Portal - medium</option><option value="video">🎥 Video Page - heavy</option></select></div>
+<div><h3>Choose Network</h3><select id="networkSelect" style="width:100%;padding:18px;border-radius:16px;font-size:22px"><option>3G</option><option>4G</option><option>5G</option></select></div>
+</div>
+<div id="siteStatus" class="signal">Click Open Website.</div>
+<button class="btn green" onclick="openWebsite()">🌐 Open Website</button>
+<button class="btn orange" onclick="compareNetworks()">Compare Networks</button>
+<div class="phone"><div id="phoneScreen" class="screen"><div class="icon">📱</div><h3>Website not loaded</h3></div></div>
+</section>
+
+<section class="card step" data-title="Activities">
+<h2>13. Activities 🧲</h2>
+<div class="compare">
+<div><div class="drag" draggable="true" data-match="capacity">Bandwidth</div><div class="drag" draggable="true" data-match="actual">Throughput</div><div class="drag" draggable="true" data-match="traffic">Congestion</div><div class="drag" draggable="true" data-match="smart">5G</div></div>
+<div><div class="drop" data-match="capacity">Maximum capacity</div><div class="drop" data-match="actual">Actual data transferred</div><div class="drop" data-match="traffic">Network traffic jam</div><div class="drop" data-match="smart">Smart devices and IoT</div></div>
+</div>
+<p id="dragFeedback" class="feedback"></p>
+</section>
+
+<section class="card step" data-title="Quiz">
+<h2>14. Quiz ✅</h2>
+<div id="quizBox"></div><p id="quizFeedback" class="feedback"></p>
+</section>
+
+<section class="card step" data-title="Summary">
+<h2>15. Final Summary 📝</h2>
+<div class="copybox"><h3>Revision Notes</h3><ul><li>Bandwidth is maximum network capacity.</li><li>Throughput is actual successful data transfer.</li><li>Congestion is heavy traffic in a network.</li><li>3G gave mobile Internet, 4G improved streaming and gaming, 5G supports high-speed low-latency smart services.</li><li>3G/4G/5G were developed by global telecom standards bodies and many engineers, not one single inventor.</li></ul></div>
+<h3>Exam Questions</h3><ol><li>Define bandwidth.</li><li>Define throughput.</li><li>What is congestion?</li><li>Why is throughput lower than bandwidth?</li><li>Compare 3G, 4G and 5G.</li><li>Write drawbacks of 3G, 4G and 5G.</li></ol>
+</section>
+
+<div class="nav">
+<button class="btn gray" onclick="prevStep()">⬅ Back</button><button class="btn orange" onclick="readCurrent()">🔊 Read</button><button class="btn" onclick="nextStep()">Next ➡</button>
+</div>
+</main>
+</div>
+
+<script>
+let current=0,score=0,quizIndex=0,dragged=null;
+const steps=[...document.querySelectorAll('.step')], menu=document.getElementById('menu');
+steps.forEach((s,i)=>{let b=document.createElement('button');b.textContent=(i+1)+'. '+s.dataset.title;b.onclick=()=>{current=i;updateProgress();scrollTo(0,0)};menu.appendChild(b)});
+function updateProgress(){steps.forEach((s,i)=>s.classList.toggle('active',i===current));[...menu.children].forEach((b,i)=>b.classList.toggle('active',i===current));document.getElementById('progressText').textContent='Step '+(current+1)+' of '+steps.length;document.getElementById('progressFill').style.width=((current+1)/steps.length*100)+'%';document.getElementById('score').textContent=score}
+function nextStep(){if(current<steps.length-1){current++;updateProgress();scrollTo(0,0)}}function prevStep(){if(current>0){current--;updateProgress();scrollTo(0,0)}}function readCurrent(){if('speechSynthesis'in window){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(steps[current].innerText);u.rate=.85;speechSynthesis.speak(u)}}
+function updateBandwidth(){let v=+bandSlider.value;bandFill.style.width=(v*10)+'%';bandText.textContent='Bandwidth Level '+v+'/10: '+(v<4?'Low':v<8?'Medium':'High')+' capacity';pipe.innerHTML='';for(let i=0;i<v;i++){let p=document.createElement('span');p.className='packet';p.textContent='📦';p.style.top=(18+(i%3)*30)+'px';p.style.animationDelay=(i*.22)+'s';p.style.animationDuration=(4-v*.25)+'s';pipe.appendChild(p)}}
+function updateThroughput(){let c=+trafficSlider.value,tp=100-c;cgValue.textContent=c+'%';tpValue.textContent=tp+' Mbps';tpFill.style.width=tp+'%';packetJourney.textContent='Sender 📦📦📦📦📦📦📦📦📦📦 → Congestion '+('🚦'.repeat(Math.max(1,Math.ceil(c/25))))+' → Receiver '+('📦'.repeat(Math.max(1,Math.round(tp/10))))+(' ❌'.repeat(Math.round(c/10)));trafficExplain.textContent='Bandwidth remains 100 Mbps, but throughput is '+tp+' Mbps because congestion causes delay, packet loss or retransmission.';[jam1,jam2,jam3].forEach(x=>x.style.animationDuration=(1.3+c/18)+'s')}
+function drawGraph(){let c=+graphSlider.value,tp=100-c,ctx=graphCanvas.getContext('2d');ctx.clearRect(0,0,1000,360);ctx.fillStyle='white';ctx.fillRect(0,0,1000,360);ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2;for(let i=0;i<10;i++){ctx.beginPath();ctx.moveTo(70,35+i*30);ctx.lineTo(930,35+i*30);ctx.stroke()}ctx.font='24px Arial';ctx.fillStyle='#1e293b';ctx.fillText('Bandwidth = 100 Mbps',80,55);ctx.fillText('Throughput = '+tp+' Mbps',80,90);ctx.strokeStyle='#2563eb';ctx.lineWidth=9;ctx.beginPath();ctx.moveTo(110,135);ctx.lineTo(900,135);ctx.stroke();ctx.strokeStyle='#16a34a';ctx.beginPath();ctx.moveTo(110,160);ctx.lineTo(900,160+c*1.8);ctx.stroke();ctx.fillStyle='#2563eb';ctx.fillText('Blue: bandwidth stays same',560,55);ctx.fillStyle='#16a34a';ctx.fillText('Green: throughput drops',560,90)}
+const gens=[['3G: Third Generation','Introduced around 2001. 3G enabled mobile Internet, web browsing, email, video calls and multimedia communication.','3G','384 Kbps',-70],['4G: Fourth Generation','Introduced around 2009–2010. 4G provides faster Internet, HD streaming, online gaming and better connectivity.','4G','100 Mbps',0],['5G: Fifth Generation','Introduced around 2019–2020. 5G gives very high speed, very low latency and supports IoT and smart city services.','5G','10 Gbps',70]];
+function selectGen(i){genTitle.textContent=gens[i][0];genText.textContent=gens[i][1];meterLabel.textContent=gens[i][2];meterSpeed.textContent=gens[i][3];needle.setAttribute('transform','rotate('+gens[i][4]+' 260 225)');genSlider.value=i;document.querySelectorAll('#genCards .box').forEach(c=>c.classList.remove('active'));document.querySelectorAll('#genCards .box')[i].classList.add('active')}
+function startRace(){race3g.style.width=race4g.style.width=race5g.style.width='0%';let a=0,b=0,c=0;clearInterval(window.raceTimer);raceStatus.textContent='Race started...';window.raceTimer=setInterval(()=>{a=Math.min(100,a+3);b=Math.min(100,b+12);c=Math.min(100,c+35);race3g.style.width=a+'%';race4g.style.width=b+'%';race5g.style.width=c+'%';if(c===100&&b<100)raceStatus.textContent='5G finished first!';if(b===100&&a<100)raceStatus.textContent='4G finished. 3G is still downloading.';if(a===100){raceStatus.textContent='Race complete: 5G fastest, then 4G, then 3G.';clearInterval(window.raceTimer)}},350)}
+const workSteps=['📱 Phone sends request using radio signal.','📡 Mobile tower receives the signal.','🏢 Core network routes the data.','🌐 Internet server finds the website or video.','📲 Data returns and phone displays the result.'];
+function workStep(i){workBoard.textContent=workSteps[i];workFlow.style.width=((i+1)*20)+'%';document.querySelectorAll('#workCards .box').forEach(c=>c.classList.remove('active'));document.querySelectorAll('#workCards .box')[i].classList.add('active')}function autoWork(){let i=0;workStep(0);clearInterval(window.workTimer);window.workTimer=setInterval(()=>{i++;if(i>=workSteps.length)clearInterval(window.workTimer);else workStep(i)},1200)}
+function openWebsite(){let net=networkSelect.value,web=websiteSelect.value;let base=web==='search'?350:web==='school'?650:1000;let d=net==='3G'?base*2.2:net==='4G'?base:base*.45;siteStatus.textContent='Loading on '+net+'...';phoneScreen.innerHTML='<div class="icon">⏳</div><h3>Loading...</h3>';setTimeout(()=>siteStatus.textContent='Phone → tower → core network...',d);setTimeout(()=>siteStatus.textContent='Server sends data back...',d*2);setTimeout(()=>{siteStatus.textContent='Website loaded on '+net;let content=web==='search'?'🔍 Search Page<br><input placeholder="Computer network" style="padding:12px;width:90%;font-size:18px">':web==='school'?'🏫 School Portal<br><p>Login and notices loaded.</p>':'🎥 Video Page<br><div style="background:#111827;color:white;padding:30px;border-radius:12px">▶ Educational Video</div>';phoneScreen.innerHTML='<h3>'+content+'</h3><p><b>Loaded using '+net+'</b></p>'},d*3)}
+function compareNetworks(){siteStatus.innerHTML='3G: slow loading ⏳<br>4G: fast loading ⚡<br>5G: very fast loading 🚀'}
+document.querySelectorAll('.drag').forEach(i=>i.addEventListener('dragstart',e=>dragged=e.target));document.querySelectorAll('.drop').forEach(box=>{box.addEventListener('dragover',e=>e.preventDefault());box.addEventListener('drop',e=>{e.preventDefault();let fb=dragFeedback;if(dragged&&dragged.dataset.match===box.dataset.match){box.classList.add('correct');box.appendChild(dragged);fb.textContent='Correct!';fb.style.color='#16a34a';score+=5}else{box.classList.add('wrong');fb.textContent='Try again.';fb.style.color='#dc2626';setTimeout(()=>box.classList.remove('wrong'),800)}updateProgress()})});
+const quiz=[{q:'What is congestion?',a:'Network traffic jam',o:['Network traffic jam','Maximum capacity','Phone screen']},{q:'Why is throughput lower than bandwidth?',a:'Due to congestion, errors, latency or packet loss',o:['Due to congestion, errors, latency or packet loss','Because bandwidth disappears','Because phone is off']},{q:'Who invented 3G, 4G and 5G?',a:'Many engineers and standards organizations',o:['One single person','Many engineers and standards organizations','A school']},{q:'5G is useful for:',a:'IoT and low latency services',o:['IoT and low latency services','Only SMS','Only radio']}];
+function loadQuiz(){let q=quiz[quizIndex];quizBox.innerHTML='<h3>Question '+(quizIndex+1)+': '+q.q+'</h3>';q.o.forEach(opt=>{let b=document.createElement('button');b.className='quizBtn';b.textContent=opt;b.onclick=()=>answerQuiz(opt);quizBox.appendChild(b)})}
+function answerQuiz(ans){let q=quiz[quizIndex];if(ans===q.a){quizFeedback.textContent='Correct ✅';quizFeedback.style.color='#16a34a';score+=5}else{quizFeedback.textContent='Correct answer: '+q.a;quizFeedback.style.color='#dc2626'}quizIndex=(quizIndex+1)%quiz.length;setTimeout(()=>{quizFeedback.textContent='';loadQuiz();updateProgress()},1200);updateProgress()}
+bandSlider.addEventListener('input',updateBandwidth);trafficSlider.addEventListener('input',updateThroughput);graphSlider.addEventListener('input',drawGraph);genSlider.addEventListener('input',e=>selectGen(+e.target.value));
+updateBandwidth();updateThroughput();drawGraph();selectGen(0);workStep(0);loadQuiz();updateProgress();
+</script>
+</body>
+</html>

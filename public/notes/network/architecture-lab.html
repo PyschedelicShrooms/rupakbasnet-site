@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Network Architecture Interactive Lab – Client–Server vs Peer-to-Peer (P2P)</title>
+<style>
+:root{
+  --bg:#f5f7fb;
+  --panel:#ffffff;
+  --text:#162033;
+  --muted:#5f6b7a;
+  --border:#d9e0ea;
+  --client:#2366d1;
+  --server:#7b2cbf;
+  --peer:#008a74;
+  --request:#d97706;
+  --response:#0f8f4e;
+  --danger:#b42318;
+  --accent:#0b5bd3;
+  --accent2:#0a7d67;
+  --shadow:0 10px 28px rgba(25,45,80,.10);
+  --radius:18px;
+  --base:clamp(16px,1.05vw,22px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  font-size:var(--base);
+  line-height:1.5;
+  overflow-x:hidden;
+}
+button,select,input{font:inherit}
+button,select{
+  min-height:48px;
+  border-radius:12px;
+  border:1px solid var(--border);
+}
+button{
+  cursor:pointer;
+  padding:.75rem 1rem;
+  background:var(--panel);
+  color:var(--text);
+  font-weight:700;
+}
+button:hover{filter:brightness(.98)}
+button:focus-visible, select:focus-visible, input:focus-visible{
+  outline:4px solid rgba(11,91,211,.22);
+  outline-offset:2px;
+}
+button.primary{background:var(--accent);color:white;border-color:transparent}
+button.secondary{background:#e9f1ff;border-color:#bdd0f4;color:#123a78}
+button.success{background:#e8f8f2;border-color:#b9e6d5;color:#075b47}
+button.warn{background:#fff3df;border-color:#f2d09a;color:#7a4700}
+button.danger{background:#fff0ee;border-color:#efc5c0;color:#8b1d13}
+button:disabled{opacity:.55;cursor:not-allowed}
+.topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;gap:.5rem;align-items:center;justify-content:space-between;
+  padding:.65rem clamp(.7rem,2vw,1.5rem);
+  background:rgba(245,247,251,.96);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.topbar .brand{font-weight:900;letter-spacing:-.02em}
+.topbar .actions{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:flex-end}
+.topbar button{min-height:44px;padding:.55rem .8rem;font-size:.92em}
+main{width:min(1500px,100%);margin:auto;padding:clamp(.8rem,2vw,1.5rem)}
+section{
+  margin:1rem 0 1.5rem;
+  padding:clamp(1rem,2vw,1.5rem);
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+h1,h2,h3{line-height:1.15;margin:.2em 0 .55em;letter-spacing:-.025em}
+h1{font-size:clamp(2rem,4vw,4.2rem)}
+h2{font-size:clamp(1.55rem,2.4vw,2.5rem)}
+h3{font-size:clamp(1.15rem,1.5vw,1.45rem)}
+p{margin:.45rem 0 .85rem}
+.muted{color:var(--muted)}
+.hero{
+  text-align:center;
+  padding:clamp(1.4rem,4vw,3rem);
+  background:linear-gradient(180deg,#ffffff,#f4f8ff);
+}
+.hero p{max-width:900px;margin:.5rem auto 1.2rem}
+.big-choice-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:1rem;
+  margin-top:1.3rem;
+}
+.choice-card{
+  min-height:150px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;padding:1rem;border:2px solid var(--border);
+  border-radius:18px;background:#fff;
+}
+.choice-card strong{font-size:1.15em}
+.choice-card span{font-size:2rem;margin-bottom:.35rem}
+.choice-card:hover{border-color:#9db8e7;transform:translateY(-1px)}
+.grid-2{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.8fr);gap:1rem}
+.grid-2.equal{grid-template-columns:repeat(2,minmax(0,1fr))}
+.stack{display:grid;gap:.8rem}
+.card{
+  border:1px solid var(--border);
+  background:#fbfcfe;
+  border-radius:14px;padding:1rem;
+}
+.pill-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:.35rem;padding:.45rem .65rem;border-radius:999px;background:#f1f4f8;border:1px solid var(--border);font-weight:700;font-size:.88em}
+.legend{display:flex;gap:.7rem;flex-wrap:wrap;padding:.8rem 0}
+.toolbar{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.toolbar label{font-weight:700}
+.toolbar select{padding:.6rem .75rem;background:white}
+.sim-wrap{
+  position:relative;
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(11,91,211,.05), transparent 35%),
+    linear-gradient(#fff,#f8fbff);
+  min-height:390px;
+}
+.sim-title{
+  position:absolute;left:.7rem;top:.5rem;z-index:3;
+  background:rgba(255,255,255,.9);padding:.3rem .55rem;border-radius:9px;
+  border:1px solid var(--border);font-weight:900;font-size:.9em
+}
+svg.network{display:block;width:100%;height:auto;aspect-ratio:16/9;min-height:360px}
+.edge{stroke:#a7b4c4;stroke-width:2.5;stroke-dasharray:6 6}
+.edge.active{stroke:var(--request);stroke-width:4;stroke-dasharray:none}
+.node .nodebox{stroke-width:3}
+.node.client .nodebox{fill:#edf4ff;stroke:var(--client)}
+.node.server .nodebox{fill:#f4ebff;stroke:var(--server)}
+.node.peer .nodebox{fill:#e9fbf6;stroke:var(--peer)}
+.node.active .nodebox{filter:drop-shadow(0 0 9px rgba(11,91,211,.35));stroke-width:5}
+.node.sender .nodebox{stroke:var(--request);stroke-width:5}
+.node.receiver .nodebox{stroke:var(--response);stroke-width:5}
+.node text{fill:var(--text);font-weight:800;font-size:18px;text-anchor:middle}
+.node .small{font-size:14px;font-weight:600;fill:var(--muted)}
+.packet{filter:drop-shadow(0 4px 6px rgba(0,0,0,.18))}
+.packet rect{rx:10;ry:10;stroke-width:2.5}
+.packet.request rect{fill:#fff3df;stroke:var(--request)}
+.packet.response rect{fill:#e9f8ef;stroke:var(--response)}
+.packet text{font-size:14px;font-weight:900;fill:var(--text);text-anchor:middle}
+.status{
+  margin-top:.8rem;padding:.8rem 1rem;border-left:5px solid var(--accent);
+  background:#f3f7ff;border-radius:10px;min-height:54px
+}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem}
+.step{
+  padding:.7rem;border-radius:12px;border:1px solid var(--border);
+  background:#fafbfd;font-weight:700;font-size:.92em
+}
+.step.active{background:#eaf2ff;border-color:#88aee9;color:#0b418f}
+.server-flow{display:grid;gap:.4rem}
+.server-flow .flow-step{
+  padding:.65rem;border-radius:11px;border:1px solid var(--border);background:#fafbfd;
+  text-align:center;font-weight:750
+}
+.server-flow .flow-step.active{background:#f4ebff;border-color:#b995db}
+.arrow-down{text-align:center;color:var(--muted);font-weight:900}
+.example-buttons,.usage-grid,.feature-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:.6rem;
+}
+.example-buttons button,.usage-grid button,.feature-grid button{
+  text-align:left;min-height:64px
+}
+.info-box{min-height:100px}
+.peer-instructions{
+  padding:.7rem;border:1px dashed #92cabb;border-radius:12px;background:#f1fbf8;font-weight:700
+}
+.compare-table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:14px}
+table{border-collapse:collapse;width:100%;min-width:760px;background:white}
+th,td{padding:.8rem;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+th{background:#f3f6fb;position:sticky;top:0}
+.quiz-card{padding:1.1rem;border:1px solid var(--border);border-radius:16px;background:#fbfcfe}
+.quiz-question{font-size:1.25em;font-weight:900;min-height:90px}
+.answer-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem}
+.feedback{min-height:64px;margin-top:.7rem;padding:.75rem;border-radius:12px;background:#f4f6f9}
+.builder-controls{display:flex;gap:.7rem;flex-wrap:wrap;align-items:end}
+.builder-controls>label{display:grid;gap:.25rem;font-weight:800}
+.builder-controls input,.builder-controls select{padding:.65rem .75rem;background:white}
+.packet-inspector{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem
+}
+.packet-inspector .kv{padding:.75rem;border-radius:12px;border:1px solid var(--border);background:#fbfcfe}
+.packet-inspector b{display:block;font-size:.85em;color:var(--muted)}
+.teacher-panel{
+  display:flex;gap:.55rem;align-items:center;flex-wrap:wrap;
+  padding:.8rem;border:1px solid var(--border);border-radius:14px;background:#fafbfd
+}
+.switch{display:inline-flex;align-items:center;gap:.5rem;font-weight:800}
+.switch input{width:22px;height:22px}
+.summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.summary-card{padding:1.1rem;border-radius:16px;border:2px solid var(--border)}
+.summary-card.cs{border-color:#a7bfe8;background:#f5f8ff}
+.summary-card.p2p{border-color:#a3d6ca;background:#f4fbf9}
+.memory-rule{
+  margin-top:1rem;padding:1rem;text-align:center;font-size:clamp(1.25rem,2vw,2rem);
+  font-weight:950;border-radius:16px;background:#172033;color:white
+}
+.hidden{display:none!important}
+.teacher-caption{
+  padding:.7rem;border-radius:10px;background:#fff8e8;border:1px solid #efd6a5;font-weight:700
+}
+.presentation body{}
+body.presentation{--base:clamp(18px,1.35vw,26px)}
+body.presentation .nonessential{display:none}
+body.presentation button,body.presentation select{min-height:56px}
+body.presentation .node text{font-size:21px}
+body.presentation .node .small{font-size:16px}
+@media(max-width:950px){
+  .big-choice-grid,.grid-2,.grid-2.equal,.summary-grid{grid-template-columns:1fr}
+  .packet-inspector{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .topbar{align-items:flex-start}
+}
+@media(max-width:560px){
+  main{padding:.55rem}
+  section{padding:.85rem;border-radius:14px}
+  .big-choice-grid{gap:.65rem}
+  .choice-card{min-height:120px}
+  .steps,.packet-inspector,.answer-row{grid-template-columns:1fr}
+  .topbar .brand{font-size:.95em}
+  .topbar button{font-size:.8em}
+  svg.network{min-height:300px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto!important;animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<header class="topbar" aria-label="Main controls">
+  <div class="brand">🌐 Network Architecture Interactive Lab</div>
+  <div class="actions">
+    <button id="presentationBtn" class="secondary" type="button">Presentation Mode</button>
+    <button id="fullscreenBtn" type="button">Full Screen</button>
+    <button id="globalResetBtn" class="danger" type="button">Reset Simulation</button>
+  </div>
+</header>
+
+<main>
+<section class="hero" id="home">
+  <div class="pill">Interactive classroom simulation</div>
+  <h1>Network Architecture</h1>
+  <p>Network architecture describes how computers and devices in a network are organized and how they communicate and exchange data.</p>
+  <div class="big-choice-grid">
+    <button class="choice-card" data-jump="clientServer" type="button">
+      <span>🗄️</span><strong>Client–Server Architecture</strong>
+      <small>Clients request services from a central server.</small>
+    </button>
+    <button class="choice-card" data-jump="p2p" type="button">
+      <span>🖥️↔🖥️</span><strong>Peer-to-Peer (P2P)</strong>
+      <small>Peers share resources directly.</small>
+    </button>
+    <button class="choice-card" data-jump="compare" type="button">
+      <span>⚖️</span><strong>Compare Both</strong>
+      <small>See the architectures side by side.</small>
+    </button>
+  </div>
+</section>
+
+<section aria-label="Legend">
+  <div class="legend">
+    <span class="pill">💻 Client</span>
+    <span class="pill">🗄 Server</span>
+    <span class="pill">🖥 Peer</span>
+    <span class="pill">→ Request</span>
+    <span class="pill">← Response</span>
+    <span class="pill">📦 Data Packet</span>
+  </div>
+</section>
+
+<section id="teacherControls">
+  <h2>Teacher Controls</h2>
+  <div class="teacher-panel">
+    <button id="playBtn" class="primary" type="button">▶ Play Animation</button>
+    <button id="pauseBtn" type="button">⏸ Pause</button>
+    <button id="prevBtn" type="button">◀ Previous Step</button>
+    <button id="nextBtn" type="button">Next Step ▶</button>
+    <button id="replayBtn" type="button">↻ Replay</button>
+    <button id="resetBtn" class="danger" type="button">Reset</button>
+    <label>Speed
+      <select id="speedSelect" aria-label="Animation speed">
+        <option value="0.5">0.5× Slow</option>
+        <option value="1" selected>1× Normal</option>
+        <option value="1.5">1.5×</option>
+        <option value="2">2× Fast</option>
+      </select>
+    </label>
+    <label class="switch"><input type="checkbox" id="teacherMode"> Teacher Explanation Mode</label>
+  </div>
+  <div id="teacherCaption" class="teacher-caption hidden" aria-live="polite"></div>
+</section>
+
+<section id="clientServer">
+  <h2>Part A — Client–Server Architecture</h2>
+  <p><strong>Clients → Server → Clients</strong></p>
+  <div class="grid-2">
+    <div>
+      <div class="sim-wrap">
+        <div class="sim-title">Interactive Client–Server Diagram</div>
+        <svg id="csSvg" class="network" viewBox="0 0 900 520" role="img" aria-label="Client server network diagram">
+          <defs>
+            <marker id="arrowReq" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L9,3 z" fill="#d97706"></path>
+            </marker>
+            <marker id="arrowRes" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L9,3 z" fill="#0f8f4e"></path>
+            </marker>
+          </defs>
+          <g id="csEdges"></g>
+          <g id="csNodes"></g>
+          <g id="csPacketLayer"></g>
+        </svg>
+      </div>
+      <div class="toolbar" style="margin-top:.7rem">
+        <button id="sendRequestBtn" class="primary" type="button">▶ Send Request</button>
+        <button id="inspectBtn" type="button">📦 Inspect Packet</button>
+      </div>
+      <div id="csStatus" class="status" aria-live="polite">Ready. Choose an example and press “Send Request”.</div>
+      <div id="csSteps" class="steps" style="margin-top:.7rem"></div>
+    </div>
+    <aside class="stack">
+      <div class="card">
+        <h3>Live Example Selector</h3>
+        <div id="csExampleButtons" class="example-buttons"></div>
+      </div>
+      <div class="card">
+        <h3>Current Example</h3>
+        <div id="csExampleInfo" class="info-box"></div>
+      </div>
+      <div class="card">
+        <h3>What happens inside the server?</h3>
+        <div id="serverFlow" class="server-flow"></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="grid-2 equal" style="margin-top:1rem">
+    <div class="card">
+      <h3>Client–Server Characteristics</h3>
+      <div id="csFeatureGrid" class="feature-grid"></div>
+      <div id="csFeatureInfo" class="status">Tap a characteristic to explain it.</div>
+    </div>
+    <div class="card">
+      <h3>Where Client–Server Networks Are Used</h3>
+      <div id="usageGrid" class="usage-grid"></div>
+      <div id="usageInfo" class="status">Tap an example to see how client–server communication is used.</div>
+    </div>
+  </div>
+</section>
+
+<section id="p2p">
+  <h2>Part B — Peer-to-Peer (P2P) Architecture</h2>
+  <p><strong>Peer ↔ Peer</strong> — Every computer can act as both a client and a server.</p>
+  <div class="grid-2">
+    <div>
+      <div class="sim-wrap">
+        <div class="sim-title">Interactive Peer-to-Peer Diagram</div>
+        <svg id="p2pSvg" class="network" viewBox="0 0 900 520" role="img" aria-label="Peer to peer network diagram">
+          <defs>
+            <marker id="arrowP2P" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L9,3 z" fill="#008a74"></path>
+            </marker>
+          </defs>
+          <g id="p2pEdges"></g>
+          <g id="p2pNodes"></g>
+          <g id="p2pPacketLayer"></g>
+        </svg>
+      </div>
+      <div class="peer-instructions" id="peerInstructions">Tap a source peer, then tap a destination peer. Or press “Share File”.</div>
+      <div class="toolbar" style="margin-top:.7rem">
+        <button id="shareFileBtn" class="primary" type="button">▶ Share File</button>
+        <button id="clearPeerSelectionBtn" type="button">Clear Selection</button>
+      </div>
+      <div id="p2pStatus" class="status" aria-live="polite">Ready for direct device-to-device communication.</div>
+    </div>
+    <aside class="stack">
+      <div class="card">
+        <h3>P2P Real-Life Examples</h3>
+        <div id="p2pExampleButtons" class="example-buttons"></div>
+        <div id="p2pExampleInfo" class="status"></div>
+      </div>
+      <div class="card">
+        <h3>P2P Characteristics</h3>
+        <div id="p2pFeatureGrid" class="feature-grid"></div>
+        <div id="p2pFeatureInfo" class="status">Tap a characteristic to explain it.</div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section id="compare">
+  <h2>Part C — Client–Server vs Peer-to-Peer</h2>
+  <div class="compare-table-wrap">
+    <table>
+      <thead><tr><th>Feature</th><th>Client–Server</th><th>Peer-to-Peer</th></tr></thead>
+      <tbody id="comparisonBody"></tbody>
+    </table>
+  </div>
+
+  <div class="grid-2 equal" style="margin-top:1rem">
+    <div class="card">
+      <h3>Client–Server</h3>
+      <div class="sim-wrap" style="min-height:260px">
+        <svg id="compareCsSvg" class="network" viewBox="0 0 600 300" aria-label="Small client server comparison diagram"></svg>
+      </div>
+      <p><strong>Data/services are coordinated through a central server.</strong></p>
+    </div>
+    <div class="card">
+      <h3>Peer-to-Peer</h3>
+      <div class="sim-wrap" style="min-height:260px">
+        <svg id="compareP2PSvg" class="network" viewBox="0 0 600 300" aria-label="Small peer to peer comparison diagram"></svg>
+      </div>
+      <p><strong>Peers can exchange resources directly with other peers.</strong></p>
+    </div>
+  </div>
+  <button id="compareFlowBtn" class="primary" type="button">▶ Compare Data Flow</button>
+  <div id="compareStatus" class="status">Press the button to animate both data-flow patterns.</div>
+</section>
+
+<section id="challenge">
+  <h2>Part D — Classroom Challenge</h2>
+  <div class="grid-2 equal">
+    <div class="quiz-card">
+      <div class="toolbar" style="justify-content:space-between">
+        <strong id="quizProgress">Question 1 / 10</strong>
+        <strong id="quizScore">Score: 0 / 0</strong>
+      </div>
+      <div id="quizQuestion" class="quiz-question"></div>
+      <div class="answer-row">
+        <button id="answerCS" class="secondary" type="button">Client–Server</button>
+        <button id="answerP2P" class="success" type="button">Peer-to-Peer</button>
+      </div>
+      <div id="quizFeedback" class="feedback" aria-live="polite">Choose an answer.</div>
+      <div class="toolbar" style="margin-top:.7rem">
+        <button id="nextQuizBtn" type="button">Next Question</button>
+        <button id="restartQuizBtn" type="button">Restart Quiz</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Build Your Own Network</h3>
+      <div class="builder-controls">
+        <label>Computers
+          <input id="builderCount" type="number" min="2" max="8" value="5" />
+        </label>
+        <label>Architecture
+          <select id="builderType">
+            <option value="cs">Client–Server</option>
+            <option value="p2p">Peer-to-Peer</option>
+          </select>
+        </label>
+        <button id="buildBtn" class="primary" type="button">Build Network</button>
+        <button id="builderSendBtn" type="button">Send Test Data</button>
+      </div>
+      <div class="sim-wrap" style="margin-top:.7rem;min-height:300px">
+        <svg id="builderSvg" class="network" viewBox="0 0 800 440" aria-label="Build your own network"></svg>
+      </div>
+      <div id="builderStatus" class="status">Build a network to see its topology.</div>
+    </div>
+  </div>
+</section>
+
+<section id="packetSection">
+  <h2>Part E — Data Packet Inspector</h2>
+  <p>Large information is usually divided into smaller units called <strong>packets</strong> before travelling across a network.</p>
+  <div class="packet-inspector">
+    <div class="kv"><b>Source</b><span id="packetSource">—</span></div>
+    <div class="kv"><b>Destination</b><span id="packetDestination">—</span></div>
+    <div class="kv"><b>Type</b><span id="packetType">—</span></div>
+    <div class="kv"><b>Data</b><span id="packetData">—</span></div>
+  </div>
+</section>
+
+<section id="summary">
+  <h2>Part H — Visual Summary</h2>
+  <div class="summary-grid">
+    <article class="summary-card cs">
+      <h3>CLIENT–SERVER</h3>
+      <p><strong>Central server provides services to clients.</strong></p>
+      <p>Example: Browser → Web Server → Browser</p>
+      <p>Best suited for schools, businesses, banks, websites, and large organizations.</p>
+    </article>
+    <article class="summary-card p2p">
+      <h3>PEER-TO-PEER</h3>
+      <p><strong>Devices communicate and share resources directly.</strong></p>
+      <p>Example: Peer A ↔ Peer B</p>
+      <p>Best suited for small networks, direct file sharing, and distributed file-sharing systems.</p>
+    </article>
+  </div>
+  <div class="memory-rule">
+    CLIENT–SERVER = CENTRAL SERVER<br/>
+    P2P = PEERS COMMUNICATE DIRECTLY
+  </div>
+</section>
+</main>
+
+<script>
+(() => {
+"use strict";
+
+const $ = (s, root=document) => root.querySelector(s);
+const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+let speed = 1;
+let teacherMode = false;
+let activeTimers = [];
+let paused = false;
+let currentCSExample = 0;
+let csStepIndex = 0;
+let currentAnimation = "cs";
+let lastPacket = {source:"—",destination:"—",type:"—",data:"—"};
+let peerSelection = [];
+let quizIndex = 0, quizScore = 0, quizAnswered = 0, quizLocked = false;
+let builderState = {count:5,type:"cs"};
+
+const csExamples = [
+  {name:"🌐 Website",client:"Web Browser",request:"GET www.example.com",server:"Web Server",response:"HTML + CSS + Images",result:"Website appears on the user's screen.",clientIndex:0},
+  {name:"▶️ Video Streaming",client:"Smartphone",request:"Play Video",server:"Streaming Server",response:"Video Data",result:"The video starts playing and more video data continues to arrive.",clientIndex:1},
+  {name:"🔒 Online Banking",client:"Banking App",request:"Check Account Balance",server:"Bank Server",response:"Account Information",result:"The secure banking app displays the account information.",clientIndex:1},
+  {name:"🛒 Online Shopping",client:"Customer Browser",request:"Search for Laptop",server:"E-commerce Server",response:"Product Information",result:"Matching laptop products appear on the customer's screen.",clientIndex:2},
+  {name:"🏫 School System",client:"Teacher Computer",request:"View Student Result",server:"School Database Server",response:"Student Record",result:"The teacher sees the requested student record.",clientIndex:2}
+];
+const csClients = [
+  {label:"Student Laptop",icon:"💻",x:140,y:100},
+  {label:"Smartphone",icon:"📱",x:760,y:100},
+  {label:"Desktop Computer",icon:"🖥️",x:120,y:410},
+  {label:"Tablet",icon:"▣",x:760,y:410},
+  {label:"Smart TV",icon:"📺",x:450,y:455}
+];
+const server = {label:"SERVER",icon:"🗄️",x:450,y:255};
+
+const csSteps = [
+  "Client sends request",
+  "Request travels through network",
+  "Server receives request",
+  "Server processes request",
+  "Server sends response",
+  "Client receives data"
+];
+const serverSteps = [
+  "Request received",
+  "Application processes request",
+  "Database searched",
+  "Information found",
+  "Response created",
+  "Response sent to client"
+];
+const teacherCaptions = [
+  "Here the client requests a service from the server.",
+  "The request is travelling across the network.",
+  "The server receives the client's request.",
+  "The server processes the request and may check application logic or a database.",
+  "The server creates and sends a response.",
+  "The client receives the response and can display or use the returned data."
+];
+
+const csFeatures = {
+  "Centralized management":"Important resources and controls are managed from one central system.",
+  "Dedicated server":"A server is specifically responsible for providing services or resources to clients.",
+  "Clients request services":"Client devices ask the server for data or a service.",
+  "Server controls resources":"The server controls access to shared data, applications, files, or services.",
+  "Easier security management":"Security policies can be managed centrally instead of separately on every client.",
+  "Easier backup":"Important server data can be backed up centrally.",
+  "Can support many users":"Well-designed servers can serve many clients at the same time.",
+  "Server failure may affect many clients":"If the central server is unavailable, dependent clients may lose access to its services."
+};
+
+const usage = {
+  "🏫 Schools":"Teacher and student computers can request records, files, learning systems, or authentication from school servers.",
+  "🏦 Banks":"Banking apps and ATMs communicate with secure central banking systems.",
+  "🏥 Hospitals":"Staff devices can request patient information from authorized hospital systems.",
+  "🏢 Offices":"Employees access shared files, applications, printers, and databases hosted by servers.",
+  "🎓 Universities":"Students and staff use central portals, databases, email, and learning platforms.",
+  "🌐 Websites":"Browsers request webpages and other resources from web servers.",
+  "✉️ Email systems":"Email apps communicate with mail servers to send, store, and receive messages.",
+  "☁️ Cloud services":"Devices request storage, applications, or processing from cloud servers.",
+  "👥 Social media":"Apps request posts, profiles, messages, and media from platform servers.",
+  "🛍️ E-commerce":"Shopping websites use servers for products, accounts, orders, and payments.",
+  "🎮 Online games":"Game clients often connect to servers for matchmaking, game state, or accounts.",
+  "🎬 Streaming services":"Streaming apps request audio or video data from content servers."
+};
+
+const p2pFeatures = {
+  "No dedicated central server required":"Peers can exchange resources without relying on one dedicated central server for every transfer.",
+  "Every device can share resources":"A peer can provide files or resources to another peer.",
+  "Devices act as client and server":"A peer may request data at one moment and provide data at another.",
+  "Easy for small networks":"Simple peer sharing can be practical for a small number of computers.",
+  "Lower setup cost":"A dedicated central server may not be needed for simple peer sharing.",
+  "Direct resource sharing":"Resources can move directly from one peer to another.",
+  "Harder to manage at scale":"As the number of peers grows, centralized administration becomes more difficult.",
+  "Security and backup are harder centrally":"Files and permissions may be distributed across many peer devices."
+};
+const p2pExamples = [
+  {name:"📁 File Sharing",text:"Peer B requests photo.jpg from Peer A. The request goes directly to Peer A, and the file returns directly to Peer B."},
+  {name:"🏢 Local Office Sharing",text:"Two office computers on the same network share a document directly without a dedicated file server for that exchange."},
+  {name:"📲 Nearby Sharing Concept",text:"Two nearby devices exchange a file directly. This is a simplified peer-style illustration; not every Bluetooth or nearby-sharing implementation is a classic P2P network."},
+  {name:"🧩 BitTorrent-Style",text:"Different peers can hold different pieces of a large file. A peer can download pieces from several peers while also uploading pieces it already has."}
+];
+
+const comparison = [
+  ["Central Server","✓ Yes","✕ No dedicated central server required"],
+  ["Dedicated Server","Usually yes","Usually no"],
+  ["Cost","Often higher","Often lower for small setups"],
+  ["Management","Centralized","Distributed"],
+  ["Security","Easier to control centrally","Harder to control centrally"],
+  ["Backup","Central backup is easier","Backups may be distributed"],
+  ["Scalability","Strong for medium/large systems","Best for smaller/simple sharing or distributed systems"],
+  ["Performance","Can be optimized with powerful servers","Depends on peer devices and connections"],
+  ["Best Network Size","Medium to large networks","Small networks / distributed sharing"],
+  ["Resource Sharing","Through server-managed services","Direct peer sharing"],
+  ["Failure Impact","Central server failure can affect many clients","One peer failing may not stop other peers"],
+  ["Examples","Websites, banking, school systems","Direct file sharing, BitTorrent-style systems"]
+];
+
+const quiz = [
+  ["A student opens YouTube and requests a video from YouTube's servers.","cs","Client–Server: the app requests video data from streaming servers."],
+  ["A group of computers directly shares files without a dedicated server.","p2p","P2P: peers share resources directly."],
+  ["A customer accesses an online banking system.","cs","Client–Server: the banking app communicates with central bank servers."],
+  ["Five home computers share files directly with one another.","p2p","P2P: each computer can provide files directly to another."],
+  ["A school database provides student records to teacher computers.","cs","Client–Server: teacher computers request records from a central school system."],
+  ["A BitTorrent-style network exchanges pieces of a file among users.","p2p","P2P: peers exchange file pieces directly."],
+  ["A web browser requests a news homepage from a web server.","cs","Client–Server: the browser is the client and the web server provides the page."],
+  ["Two laptops directly exchange a project file over a local network.","p2p","P2P: the devices are sharing directly."],
+  ["An email app requests new messages from a mail server.","cs","Client–Server: the app communicates with a mail server."],
+  ["Several peers upload and download parts of the same large file.","p2p","P2P: peers can receive and provide pieces at the same time."]
+];
+
+function clearTimers(){
+  activeTimers.forEach(t => clearTimeout(t));
+  activeTimers = [];
+}
+function later(fn, ms){
+  const id = setTimeout(() => { if(!paused) fn(); else later(fn,120); }, ms / speed);
+  activeTimers.push(id);
+}
+function svgEl(tag, attrs={}){
+  const el = document.createElementNS(SVG_NS, tag);
+  Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k,v));
+  return el;
+}
+function setPacketInfo(source,destination,type,data){
+  lastPacket = {source,destination,type,data};
+  $("#packetSource").textContent = source;
+  $("#packetDestination").textContent = destination;
+  $("#packetType").textContent = type;
+  $("#packetData").textContent = data;
+}
+function showTeacherCaption(indexOrText){
+  if(!teacherMode) return;
+  const text = typeof indexOrText === "number" ? teacherCaptions[indexOrText] : indexOrText;
+  $("#teacherCaption").textContent = text;
+  $("#teacherCaption").classList.remove("hidden");
+}
+function hideTeacherCaption(){
+  $("#teacherCaption").classList.add("hidden");
+}
+function scrollToId(id){ document.getElementById(id)?.scrollIntoView({behavior:"smooth",block:"start"}); }
+
+$$("[data-jump]").forEach(btn => btn.addEventListener("click", () => scrollToId(btn.dataset.jump)));
+
+function drawNode(layer, node, type, labelOverride=null){
+  const g = svgEl("g",{class:`node ${type}`,"data-label":labelOverride || node.label,tabindex:"0",role:"button"});
+  const w = type==="server" ? 170 : 155;
+  const h = type==="server" ? 105 : 90;
+  const rect = svgEl("rect",{class:"nodebox",x:node.x-w/2,y:node.y-h/2,width:w,height:h,rx:18,ry:18});
+  const icon = svgEl("text",{x:node.x,y:node.y-7});
+  icon.textContent = node.icon;
+  icon.setAttribute("font-size", type==="server" ? "34" : "28");
+  const label = svgEl("text",{x:node.x,y:node.y+22});
+  label.textContent = labelOverride || node.label;
+  const role = svgEl("text",{x:node.x,y:node.y+42,class:"small"});
+  role.textContent = type==="server" ? "CENTRAL SERVER" : type==="client" ? "CLIENT" : "PEER";
+  g.append(rect,icon,label,role);
+  layer.appendChild(g);
+  return g;
+}
+function createEdge(layer,a,b,id,className="edge"){
+  const line = svgEl("line",{id,x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:className});
+  layer.appendChild(line);
+  return line;
+}
+function pointAlong(a,b,t){ return {x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t}; }
+
+function animatePacket(layer,a,b,label,kind,duration,onDone){
+  const g = svgEl("g",{class:`packet ${kind}`});
+  const rect = svgEl("rect",{x:-47,y:-18,width:94,height:36});
+  const txt = svgEl("text",{x:0,y:5});
+  txt.textContent = label;
+  g.append(rect,txt);
+  layer.appendChild(g);
+
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const start = performance.now();
+  let stopped = false;
+  const run = now => {
+    if(stopped) return;
+    if(paused){ requestAnimationFrame(run); return; }
+    const d = reduced ? 1 : duration / speed;
+    const t = Math.min(1,(now-start)/d);
+    const p = pointAlong(a,b,t);
+    g.setAttribute("transform",`translate(${p.x} ${p.y})`);
+    if(t<1) requestAnimationFrame(run);
+    else { setTimeout(() => g.remove(), reduced?0:180); onDone?.(); }
+  };
+  requestAnimationFrame(run);
+  return () => { stopped=true; g.remove(); };
+}
+
+function renderCSSteps(){
+  $("#csSteps").innerHTML = "";
+  csSteps.forEach((s,i)=>{
+    const d=document.createElement("div");
+    d.className="step"; d.dataset.i=i; d.textContent=`Step ${i+1}: ${s}`;
+    $("#csSteps").appendChild(d);
+  });
+}
+function setCSStep(i){
+  csStepIndex = Math.max(0,Math.min(5,i));
+  $$("#csSteps .step").forEach((el,idx)=>el.classList.toggle("active",idx===csStepIndex));
+  $$("#serverFlow .flow-step").forEach((el,idx)=>el.classList.toggle("active",csStepIndex>=2 && idx===Math.min(5,csStepIndex)));
+  showTeacherCaption(csStepIndex);
+}
+function renderServerFlow(){
+  const root=$("#serverFlow"); root.innerHTML="";
+  serverSteps.forEach((s,i)=>{
+    const d=document.createElement("div"); d.className="flow-step"; d.textContent=s; root.appendChild(d);
+    if(i<serverSteps.length-1){const a=document.createElement("div");a.className="arrow-down";a.textContent="↓";root.appendChild(a);}
+  });
+}
+function renderCS(){
+  const edges=$("#csEdges"), nodes=$("#csNodes");
+  edges.innerHTML=""; nodes.innerHTML="";
+  csClients.forEach((c,i)=>createEdge(edges,c,server,`cs-edge-${i}`));
+  csClients.forEach(c=>drawNode(nodes,c,"client"));
+  drawNode(nodes,server,"server",csExamples[currentCSExample].server);
+}
+function updateCSExample(){
+  const ex=csExamples[currentCSExample];
+  renderCS();
+  $("#csExampleInfo").innerHTML = `
+    <p><strong>Client:</strong> ${ex.client}</p>
+    <p><strong>Request:</strong> ${ex.request}</p>
+    <p><strong>Server:</strong> ${ex.server}</p>
+    <p><strong>Response:</strong> ${ex.response}</p>
+    <p><strong>Result:</strong> ${ex.result}</p>`;
+  $$("#csExampleButtons button").forEach((b,i)=>b.classList.toggle("primary",i===currentCSExample));
+  resetCS();
+}
+function resetCS(){
+  clearTimers(); paused=false; $("#csPacketLayer").innerHTML="";
+  csStepIndex=0; setCSStep(0);
+  $("#csStatus").textContent="Ready. Choose an example and press “Send Request”.";
+  $$("#csNodes .node").forEach(n=>n.classList.remove("active"));
+  $$("#csEdges .edge").forEach(e=>e.classList.remove("active"));
+}
+function runCSAnimation(){
+  currentAnimation="cs"; clearTimers(); paused=false;
+  const ex=csExamples[currentCSExample];
+  const client=csClients[ex.clientIndex];
+  const clientNode=$$("#csNodes .node.client")[ex.clientIndex];
+  const serverNode=$("#csNodes .node.server");
+  const edge=$(`#cs-edge-${ex.clientIndex}`);
+  const layer=$("#csPacketLayer");
+  resetCS();
+  setPacketInfo(ex.client,ex.server,"Request",ex.request);
+  clientNode?.classList.add("active");
+  edge?.classList.add("active");
+
+  setCSStep(0);
+  $("#csStatus").textContent=`${ex.client} sends: “${ex.request}”`;
+  later(()=>{setCSStep(1); $("#csStatus").textContent="REQUEST is travelling to the server.";
+    animatePacket(layer,client,server,"REQUEST","request",1100,()=>{});
+  },450);
+  later(()=>{setCSStep(2); serverNode?.classList.add("active"); $("#csStatus").textContent=`${ex.server} receives the request.`;},1750);
+  later(()=>{setCSStep(3); $("#csStatus").textContent="Server Processing Request...";},2450);
+  later(()=>{setCSStep(4); setPacketInfo(ex.server,ex.client,"Response",ex.response); $("#csStatus").textContent=`${ex.server} sends: “${ex.response}”`;
+    animatePacket(layer,server,client,"RESPONSE","response",1100,()=>{});
+  },3400);
+  later(()=>{setCSStep(5); $("#csStatus").textContent=`${ex.result}`; clientNode?.classList.add("active"); edge?.classList.remove("active");},4700);
+
+  if(currentCSExample===1){
+    for(let i=0;i<3;i++){
+      later(()=>animatePacket(layer,server,client,"VIDEO","response",850,()=>{}),5200+i*700);
+    }
+  }
+}
+function nextCSStep(){
+  clearTimers(); paused=false;
+  setCSStep(Math.min(5,csStepIndex+1));
+  $("#csStatus").textContent = `Manual step: ${csSteps[csStepIndex]}.`;
+}
+function prevCSStep(){
+  clearTimers(); paused=false;
+  setCSStep(Math.max(0,csStepIndex-1));
+  $("#csStatus").textContent = `Manual step: ${csSteps[csStepIndex]}.`;
+}
+
+function setupCSLists(){
+  const exRoot=$("#csExampleButtons");
+  csExamples.forEach((ex,i)=>{
+    const b=document.createElement("button"); b.type="button"; b.textContent=ex.name;
+    b.addEventListener("click",()=>{currentCSExample=i;updateCSExample();});
+    exRoot.appendChild(b);
+  });
+  Object.entries(csFeatures).forEach(([name,desc])=>{
+    const b=document.createElement("button");b.type="button";b.textContent=name;
+    b.addEventListener("click",()=>$("#csFeatureInfo").textContent=desc);
+    $("#csFeatureGrid").appendChild(b);
+  });
+  Object.entries(usage).forEach(([name,desc])=>{
+    const b=document.createElement("button");b.type="button";b.textContent=name;
+    b.addEventListener("click",()=>$("#usageInfo").textContent=desc);
+    $("#usageGrid").appendChild(b);
+  });
+}
+
+const peers = [
+  {label:"Peer A",icon:"🖥️",x:450,y:75},
+  {label:"Peer B",icon:"💻",x:735,y:180},
+  {label:"Peer C",icon:"🖥️",x:625,y:425},
+  {label:"Peer D",icon:"💻",x:275,y:425},
+  {label:"Peer E",icon:"🖥️",x:165,y:180}
+];
+function renderP2P(){
+  const edges=$("#p2pEdges"),nodes=$("#p2pNodes"); edges.innerHTML="";nodes.innerHTML="";
+  const pairs=[[0,1],[1,2],[2,3],[3,4],[4,0],[0,2],[1,3],[2,4]];
+  pairs.forEach(([a,b],i)=>createEdge(edges,peers[a],peers[b],`p2p-edge-${i}`));
+  peers.forEach((p,i)=>{
+    const g=drawNode(nodes,p,"peer");
+    g.dataset.index=i;
+    const choose=()=>selectPeer(i);
+    g.addEventListener("click",choose);
+    g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();choose();}});
+  });
+}
+function clearPeerSelection(){
+  peerSelection=[];
+  $$("#p2pNodes .node").forEach(n=>n.classList.remove("sender","receiver","active"));
+  $("#peerInstructions").textContent="Tap a source peer, then tap a destination peer. Or press “Share File”.";
+}
+function selectPeer(i){
+  if(peerSelection.length===0){
+    peerSelection=[i];
+    $$("#p2pNodes .node")[i]?.classList.add("sender");
+    $("#peerInstructions").textContent=`${peers[i].label} selected as Sender. Now choose a Receiver.`;
+  } else if(peerSelection.length===1 && i!==peerSelection[0]){
+    peerSelection.push(i);
+    $$("#p2pNodes .node")[i]?.classList.add("receiver");
+    $("#peerInstructions").textContent=`Sender: ${peers[peerSelection[0]].label} → Receiver: ${peers[i].label}`;
+    shareBetween(peerSelection[0],i,"Science_Project.pdf");
+  } else {
+    clearPeerSelection(); selectPeer(i);
+  }
+}
+function shareBetween(a,b,file){
+  currentAnimation="p2p"; clearTimers(); paused=false;
+  const layer=$("#p2pPacketLayer");
+  setPacketInfo(peers[a].label,peers[b].label,"Direct P2P transfer",file);
+  $("#p2pStatus").textContent=`${peers[a].label} sends ${file} directly to ${peers[b].label}.`;
+  showTeacherCaption("In P2P architecture, peers can exchange resources directly without a dedicated central server controlling every exchange.");
+  animatePacket(layer,peers[a],peers[b],"FILE","response",1200,()=>{
+    $("#p2pStatus").textContent=`Transfer complete: ${file} reached ${peers[b].label}.`;
+  });
+}
+function demoShare(){
+  clearPeerSelection();
+  $$("#p2pNodes .node")[0]?.classList.add("sender");
+  $$("#p2pNodes .node")[1]?.classList.add("receiver");
+  shareBetween(0,1,"Science_Project.pdf");
+  later(()=>{
+    clearPeerSelection();
+    $$("#p2pNodes .node")[2]?.classList.add("sender");
+    $$("#p2pNodes .node")[3]?.classList.add("receiver");
+    shareBetween(2,3,"Science_Project.pdf");
+  },2200);
+}
+function setupP2PLists(){
+  p2pExamples.forEach((ex,i)=>{
+    const b=document.createElement("button");b.type="button";b.textContent=ex.name;
+    b.addEventListener("click",()=>{
+      $("#p2pExampleInfo").textContent=ex.text;
+      if(i===0){clearPeerSelection(); shareBetween(1,0,"REQUEST: photo.jpg"); later(()=>shareBetween(0,1,"photo.jpg"),1500);}
+      if(i===1){clearPeerSelection(); shareBetween(0,3,"Office_Document.docx");}
+      if(i===2){clearPeerSelection(); shareBetween(1,2,"Nearby_Photo.jpg");}
+      if(i===3){
+        clearPeerSelection();
+        $("#p2pStatus").textContent="BitTorrent-style demo: Peer C receives different pieces from several peers.";
+        const target=2;
+        [[0,"Part 1"],[1,"Part 2"],[3,"Part 3"],[4,"Part 4"]].forEach(([src,label],idx)=>{
+          later(()=>animatePacket($("#p2pPacketLayer"),peers[src],peers[target],label,"response",900,()=>{}),idx*700);
+        });
+        later(()=>$("#p2pStatus").textContent="Peer C now has the complete file. Peers can receive and provide data at the same time.",3300);
+      }
+    });
+    $("#p2pExampleButtons").appendChild(b);
+  });
+  $("#p2pExampleInfo").textContent=p2pExamples[0].text;
+  Object.entries(p2pFeatures).forEach(([name,desc])=>{
+    const b=document.createElement("button");b.type="button";b.textContent=name;
+    b.addEventListener("click",()=>$("#p2pFeatureInfo").textContent=desc);
+    $("#p2pFeatureGrid").appendChild(b);
+  });
+}
+
+function renderComparison(){
+  comparison.forEach(row=>{
+    const tr=document.createElement("tr");
+    row.forEach(v=>{const td=document.createElement("td");td.textContent=v;tr.appendChild(td);});
+    $("#comparisonBody").appendChild(tr);
+  });
+
+  const cs=$("#compareCsSvg");
+  cs.innerHTML="";
+  const a={x:100,y:150}, s={x:300,y:150}, b={x:500,y:150};
+  [createEdge(cs,a,s,""),createEdge(cs,b,s,"")];
+  drawNode(cs,a,"client","Client A");drawNode(cs,s,"server","Server");drawNode(cs,b,"client","Client B");
+
+  const p=$("#compareP2PSvg");
+  p.innerHTML="";
+  const p1={x:100,y:150},p2={x:300,y:150},p3={x:500,y:150};
+  createEdge(p,p1,p2,"");createEdge(p,p2,p3,"");
+  drawNode(p,p1,"peer","Peer A");drawNode(p,p2,"peer","Peer B");drawNode(p,p3,"peer","Peer C");
+}
+function compareFlow(){
+  clearTimers(); paused=false;
+  const cs=$("#compareCsSvg"),p=$("#compareP2PSvg");
+  $$(".packet",cs).forEach(x=>x.remove()); $$(".packet",p).forEach(x=>x.remove());
+  const a={x:100,y:150}, s={x:300,y:150}, b={x:500,y:150};
+  const p1={x:100,y:150},p2={x:300,y:150},p3={x:500,y:150};
+  animatePacket(cs,a,s,"REQ","request",900,()=>animatePacket(cs,s,a,"RES","response",900));
+  animatePacket(p,p1,p2,"FILE","response",900,()=>animatePacket(p,p2,p3,"FILE","response",900));
+  $("#compareStatus").textContent="Client–Server routes service requests through the server, while P2P allows direct peer-to-peer exchange.";
+}
+
+function renderQuiz(){
+  const [q]=quiz[quizIndex];
+  $("#quizQuestion").textContent=q;
+  $("#quizProgress").textContent=`Question ${quizIndex+1} / ${quiz.length}`;
+  $("#quizScore").textContent=`Score: ${quizScore} / ${quizAnswered}`;
+  $("#quizFeedback").textContent="Choose an answer.";
+  quizLocked=false;
+  $("#answerCS").disabled=false;$("#answerP2P").disabled=false;
+}
+function answerQuiz(ans){
+  if(quizLocked)return;
+  quizLocked=true; quizAnswered++;
+  const [,correct,why]=quiz[quizIndex];
+  if(ans===correct){quizScore++;$("#quizFeedback").textContent=`✅ Correct! ${why}`;}
+  else $("#quizFeedback").textContent=`❌ Not quite. ${why}`;
+  $("#quizScore").textContent=`Score: ${quizScore} / ${quizAnswered}`;
+  $("#answerCS").disabled=true;$("#answerP2P").disabled=true;
+}
+function nextQuiz(){quizIndex=(quizIndex+1)%quiz.length;renderQuiz();}
+function restartQuiz(){quizIndex=0;quizScore=0;quizAnswered=0;renderQuiz();}
+
+function renderBuilder(){
+  const count=Math.max(2,Math.min(8,Number($("#builderCount").value)||2));
+  const type=$("#builderType").value;
+  builderState={count,type};
+  const svg=$("#builderSvg"); svg.innerHTML="";
+  const cx=400,cy=220,r=155;
+  const nodes=[];
+  for(let i=0;i<count;i++){
+    const ang=-Math.PI/2+(i*2*Math.PI/count);
+    nodes.push({x:cx+r*Math.cos(ang),y:cy+r*Math.sin(ang),label:type==="cs"?`Client ${i+1}`:`Peer ${i+1}`,icon:type==="cs"?"💻":"🖥️"});
+  }
+  if(type==="cs"){
+    const srv={x:cx,y:cy,label:"SERVER",icon:"🗄️"};
+    nodes.forEach((n,i)=>createEdge(svg,n,srv,`build-edge-${i}`));
+    nodes.forEach(n=>drawNode(svg,n,"client"));
+    drawNode(svg,srv,"server","SERVER");
+    $("#builderStatus").textContent=`Built a client–server network with ${count} clients connected to one central server.`;
+  }else{
+    for(let i=0;i<count;i++){
+      createEdge(svg,nodes[i],nodes[(i+1)%count],`build-edge-${i}`);
+      if(count<=6 && i+2<count) createEdge(svg,nodes[i],nodes[i+2],`build-edge-x-${i}`);
+    }
+    nodes.forEach(n=>drawNode(svg,n,"peer"));
+    $("#builderStatus").textContent=`Built a P2P network with ${count} peers sharing through direct peer connections.`;
+  }
+  svg.dataset.nodes=JSON.stringify(nodes);
+}
+function builderSend(){
+  const svg=$("#builderSvg");
+  const nodes=JSON.parse(svg.dataset.nodes||"[]");
+  if(nodes.length<2){renderBuilder();return;}
+  $$(".packet",svg).forEach(x=>x.remove());
+  if(builderState.type==="cs"){
+    const srv={x:400,y:220,label:"SERVER"};
+    setPacketInfo(nodes[0].label,"SERVER","Test Request","Hello Server");
+    animatePacket(svg,nodes[0],srv,"REQ","request",900,()=>animatePacket(svg,srv,nodes[0],"RES","response",900));
+    $("#builderStatus").textContent="Test data: Client 1 sends a request to the central server, which responds.";
+  }else{
+    setPacketInfo(nodes[0].label,nodes[1].label,"Direct Test Data","Hello Peer");
+    animatePacket(svg,nodes[0],nodes[1],"DATA","response",1000);
+    $("#builderStatus").textContent=`Test data: ${nodes[0].label} sends directly to ${nodes[1].label}.`;
+  }
+}
+
+function resetAll(){
+  clearTimers(); paused=false; hideTeacherCaption();
+  currentCSExample=0; updateCSExample();
+  clearPeerSelection(); $("#p2pPacketLayer").innerHTML="";
+  $("#p2pStatus").textContent="Ready for direct device-to-device communication.";
+  restartQuiz(); renderBuilder();
+  $("#compareStatus").textContent="Press the button to animate both data-flow patterns.";
+  $$(".packet").forEach(p=>p.remove());
+  setPacketInfo("—","—","—","—");
+}
+
+$("#sendRequestBtn").addEventListener("click",runCSAnimation);
+$("#playBtn").addEventListener("click",()=> currentAnimation==="p2p" ? demoShare() : runCSAnimation());
+$("#pauseBtn").addEventListener("click",()=>{paused=!paused;$("#pauseBtn").textContent=paused?"▶ Resume":"⏸ Pause";});
+$("#nextBtn").addEventListener("click",nextCSStep);
+$("#prevBtn").addEventListener("click",prevCSStep);
+$("#replayBtn").addEventListener("click",()=> currentAnimation==="p2p" ? demoShare() : runCSAnimation());
+$("#resetBtn").addEventListener("click",resetAll);
+$("#globalResetBtn").addEventListener("click",resetAll);
+$("#speedSelect").addEventListener("change",e=>speed=Number(e.target.value)||1);
+$("#teacherMode").addEventListener("change",e=>{teacherMode=e.target.checked;if(!teacherMode)hideTeacherCaption();else showTeacherCaption(csStepIndex);});
+$("#inspectBtn").addEventListener("click",()=>scrollToId("packetSection"));
+$("#shareFileBtn").addEventListener("click",()=>{currentAnimation="p2p";demoShare();});
+$("#clearPeerSelectionBtn").addEventListener("click",clearPeerSelection);
+$("#compareFlowBtn").addEventListener("click",compareFlow);
+$("#answerCS").addEventListener("click",()=>answerQuiz("cs"));
+$("#answerP2P").addEventListener("click",()=>answerQuiz("p2p"));
+$("#nextQuizBtn").addEventListener("click",nextQuiz);
+$("#restartQuizBtn").addEventListener("click",restartQuiz);
+$("#buildBtn").addEventListener("click",renderBuilder);
+$("#builderSendBtn").addEventListener("click",builderSend);
+$("#builderCount").addEventListener("change",renderBuilder);
+$("#builderType").addEventListener("change",renderBuilder);
+
+$("#presentationBtn").addEventListener("click",()=>{
+  document.body.classList.toggle("presentation");
+  $("#presentationBtn").textContent=document.body.classList.contains("presentation")?"Normal Mode":"Presentation Mode";
+});
+$("#fullscreenBtn").addEventListener("click",async()=>{
+  try{
+    if(!document.fullscreenElement && document.documentElement.requestFullscreen){
+      await document.documentElement.requestFullscreen();
+    }else if(document.exitFullscreen){
+      await document.exitFullscreen();
+    }
+  }catch(e){
+    $("#fullscreenBtn").textContent="Full Screen Unavailable";
+  }
+});
+document.addEventListener("fullscreenchange",()=>{
+  $("#fullscreenBtn").textContent=document.fullscreenElement?"Exit Full Screen":"Full Screen";
+});
+
+renderCSSteps();
+renderServerFlow();
+setupCSLists();
+setupP2PLists();
+renderP2P();
+renderComparison();
+renderQuiz();
+renderBuilder();
+updateCSExample();
+
+})();
+</script>
+</body>
+</html>

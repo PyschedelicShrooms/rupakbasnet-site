@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Class 10 Telecommunication and Broadband Simulation</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(135deg,#dbeafe,#f5f3ff,#fff7ed);color:#1e293b}
+header{background:linear-gradient(90deg,#2563eb,#7c3aed);color:white;text-align:center;padding:24px 14px}
+header h1{margin:0;font-size:clamp(26px,5vw,46px)}
+header p{font-size:18px}
+.wrap{max-width:1150px;margin:auto;padding:16px}
+.card{background:white;border-radius:22px;padding:22px;margin:16px 0;box-shadow:0 10px 28px rgba(0,0,0,.12)}
+.step{display:none}
+.step.active{display:block}
+h2{color:#1d4ed8;font-size:clamp(25px,4vw,36px)}
+p,li{font-size:18px;line-height:1.55}
+.definition{background:#ecfdf5;border-left:8px solid #16a34a;padding:15px;border-radius:16px;font-size:20px;font-weight:bold}
+.copybox{background:#f8fafc;border:3px solid #bfdbfe;border-radius:18px;padding:16px;margin:14px 0}
+.note{background:#eff6ff;border-left:6px solid #2563eb;padding:13px;border-radius:14px}
+button{border:0;border-radius:14px;padding:12px 16px;font-size:16px;font-weight:800;cursor:pointer;background:#2563eb;color:white;margin:5px}
+button:hover{transform:scale(1.03)}
+.green{background:#16a34a}.orange{background:#f97316}.gray{background:#475569}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.pic-card{background:#f8fafc;border:3px solid #dbeafe;border-radius:18px;padding:14px;text-align:center;min-height:140px}
+.pic-card.active-card{background:#dcfce7;border-color:#16a34a;transform:scale(1.03)}
+.icon{font-size:44px}
+.nav{display:flex;justify-content:space-between;gap:8px;position:sticky;bottom:0;background:rgba(255,255,255,.95);padding:12px;border-radius:18px;box-shadow:0 -5px 20px rgba(0,0,0,.1)}
+.progress{height:24px;background:#dbeafe;border-radius:20px;overflow:hidden}
+.fill{height:100%;width:0;background:linear-gradient(90deg,#16a34a,#2563eb,#7c3aed);transition:.3s}
+.timeline{display:flex;gap:12px;overflow:auto;padding:10px}
+.titem{min-width:150px;background:#fff7ed;border:3px solid #fed7aa;border-radius:18px;padding:12px;text-align:center}
+.hidden{display:none}
+.quiz button,.choice button{display:block;width:100%;text-align:left;background:#eef2ff;color:#1e293b;border:2px solid #c7d2fe}
+.feedback{font-size:20px;font-weight:800}
+.signalBoard{background:#0f172a;color:#22c55e;border-radius:18px;padding:18px;text-align:center;font-size:26px;font-family:monospace;min-height:70px}
+.wave{font-size:34px;animation:waveMove 1s infinite alternate}
+@keyframes waveMove{from{letter-spacing:0}to{letter-spacing:8px}}
+.arrowLine{height:12px;background:linear-gradient(90deg,#60a5fa,#7c3aed);border-radius:20px;position:relative;margin:22px 0}
+.dot{width:28px;height:28px;border-radius:50%;background:#f97316;position:absolute;top:-8px;left:0;transition:left .6s}
+.race{background:#f8fafc;border-radius:18px;padding:16px}
+.track{height:58px;border-bottom:4px dashed #94a3b8;position:relative;margin-bottom:16px}
+.vehicle{position:absolute;left:0;top:6px;font-size:32px}
+.slow{animation:slowRace 7s linear infinite}.fast{animation:fastRace 2s linear infinite}
+@keyframes slowRace{to{left:86%}}@keyframes fastRace{to{left:86%}}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.compareBox{padding:18px;border-radius:20px;text-align:center}
+.broad{background:#dcfce7;border:3px solid #16a34a}.wifi{background:#fef3c7;border:3px solid #f59e0b}
+.speedbar{height:30px;background:#dbeafe;border-radius:20px;overflow:hidden;margin:12px 0}
+.speedfill{height:100%;width:10%;background:linear-gradient(90deg,#60a5fa,#7c3aed);border-radius:20px;transition:.3s}
+input[type=range]{width:100%}
+@media(max-width:760px){.compare{grid-template-columns:1fr}.nav button{font-size:13px;padding:10px}}
+</style>
+</head>
+<body>
+<header>
+<h1>📡 Telecommunication and Broadband</h1>
+<p>Class 10 Interactive Smart Board Simulation</p>
+</header>
+
+<div class="wrap">
+<div class="card">
+<b id="progressText">Step 1</b>
+<div class="progress"><div class="fill" id="progressFill"></div></div>
+</div>
+
+<section class="card step active">
+<h2>1. Learning Objectives 🎯</h2>
+<p>Students will learn telecommunication, broadband, examples, broadband types, and how messages are converted into electronic signals.</p>
+<div class="definition">Telecommunication means the exchange of information over long distances through electronic means such as telephone, radio, television, satellite and the Internet.</div>
+<div class="copybox"><b>Write in copy:</b> Telecommunication is the process of sending and receiving information such as voice, text, image, audio and video over long distances using electronic or wireless systems.</div>
+</section>
+
+<section class="card step">
+<h2>2. History of Telecommunication 🕰️</h2>
+<div class="timeline">
+<div class="titem"><div class="icon">📜</div><b>Telegraph</b><p>Text signal</p></div>
+<div class="titem"><div class="icon">☎️</div><b>Telephone</b><p>Voice call</p></div>
+<div class="titem"><div class="icon">📻</div><b>Radio</b><p>Audio broadcast</p></div>
+<div class="titem"><div class="icon">📺</div><b>Television</b><p>Audio + video</p></div>
+<div class="titem"><div class="icon">🛰️</div><b>Satellite</b><p>Long distance</p></div>
+<div class="titem"><div class="icon">🌐</div><b>Internet</b><p>Global network</p></div>
+</div>
+<div class="copybox"><b>Write in copy:</b> The history of telecommunication began with telegraphy. Later, telephone, radio, television, satellites and Internet made communication faster and easier.</div>
+</section>
+
+<section class="card step">
+<h2>3. How a Message Converts into Electronic Signals ⚡</h2>
+<p>Click each button. The explanation, card highlight, moving dot, sound wave and binary data will change.</p>
+
+<div class="definition">Main process: Voice Message → Microphone → Electrical Signal → Digital Signal (0 and 1) → Network → Receiver → Speaker → Sound</div>
+
+<div class="copybox">
+<h3 id="teleTitle">Step 1: Voice Message</h3>
+<p id="teleText">The sender speaks a message, for example “Hello”. This creates sound waves in the air.</p>
+</div>
+
+<div class="grid" id="teleCards">
+<div class="pic-card active-card"><div class="icon">👧</div><b>Voice Message</b><p>“Hello”</p></div>
+<div class="pic-card"><div class="icon">🎤</div><b>Microphone</b><p>Receives sound</p></div>
+<div class="pic-card"><div class="icon">⚡</div><b>Electrical Signal</b><p>Varying current</p></div>
+<div class="pic-card"><div class="icon">💻</div><b>Digital Signal</b><p>0s and 1s</p></div>
+<div class="pic-card"><div class="icon">📡</div><b>Network</b><p>Cable / tower</p></div>
+<div class="pic-card"><div class="icon">📱</div><b>Receiver Phone</b><p>Gets data</p></div>
+<div class="pic-card"><div class="icon">🔊</div><b>Speaker</b><p>Back to sound</p></div>
+<div class="pic-card"><div class="icon">👦</div><b>Listener</b><p>Hears message</p></div>
+</div>
+
+<div class="arrowLine"><div class="dot" id="movingDot"></div></div>
+
+<div class="signalBoard" id="signalBoard">
+<span class="wave">〰️ 〰️ 〰️</span> SOUND WAVES
+</div>
+
+<div class="grid">
+<button onclick="teleStep(0)">1️⃣ Voice</button>
+<button onclick="teleStep(1)">2️⃣ Microphone</button>
+<button onclick="teleStep(2)">3️⃣ Electrical Signal</button>
+<button onclick="teleStep(3)">4️⃣ Digital Signal</button>
+<button onclick="teleStep(4)">5️⃣ Network</button>
+<button onclick="teleStep(5)">6️⃣ Receiver</button>
+<button onclick="teleStep(6)">7️⃣ Speaker</button>
+<button onclick="teleStep(7)">8️⃣ Listener</button>
+</div>
+
+<button class="green" onclick="autoTeleDemo()">▶ Auto Play Full Simulation</button>
+<button class="orange" onclick="speakHelloDemo()">🎙️ Speak “Hello” Demo</button>
+<button class="gray" onclick="signalQuiz()">🧠 Quick Question</button>
+<p id="teleFeedback" class="feedback"></p>
+
+<div class="copybox">
+<h3>Write in Copy</h3>
+<p>When a person speaks into a phone, the microphone receives the sound waves. The microphone converts the sound waves into electrical signals. The phone converts these electrical signals into digital signals made of 0s and 1s. These digital signals travel through a communication medium such as cable, radio wave, optical fiber or satellite. At the receiving end, the phone converts the signals back into sound, and the receiver hears the original message.</p>
+</div>
+</section>
+
+<section class="card step">
+<h2>4. Examples of Telecommunication 🖼️</h2>
+<div class="grid">
+<div class="pic-card"><div class="icon">☎️</div><b>Telephone</b><p>Voice communication</p></div>
+<div class="pic-card"><div class="icon">📱</div><b>Mobile</b><p>Calls, SMS, data</p></div>
+<div class="pic-card"><div class="icon">📻</div><b>Radio</b><p>Audio broadcast</p></div>
+<div class="pic-card"><div class="icon">📺</div><b>Television</b><p>Audio and video</p></div>
+<div class="pic-card"><div class="icon">🛰️</div><b>Satellite</b><p>Long distance signal</p></div>
+<div class="pic-card"><div class="icon">🌐</div><b>Internet</b><p>Email and browsing</p></div>
+<div class="pic-card"><div class="icon">📠</div><b>Fax</b><p>Document sending</p></div>
+</div>
+</section>
+
+<section class="card step">
+<h2>5. Broadband: Fast Internet Connection 🚀</h2>
+
+<div class="definition">
+Broadband is a high-speed, always-on Internet connection that can send and receive large amounts of data at the same time.
+</div>
+
+<div class="copybox">
+<h3>Write in Copy</h3>
+<p><b>Broadband</b> is a fast Internet connection that remains continuously connected and allows users to upload and download data quickly. It is used for online classes, video calls, browsing, streaming, gaming and file sharing.</p>
+</div>
+
+<h3>Why is broadband faster than dial-up? 🐢 vs 🚀</h3>
+<div class="grid">
+  <div class="pic-card">
+    <div class="icon">🐢</div>
+    <b>Dial-up Internet</b>
+    <p>Uses a telephone line in a slow way. It usually sends less data at one time and cannot use phone and Internet easily together.</p>
+  </div>
+  <div class="pic-card">
+    <div class="icon">🚀</div>
+    <b>Broadband Internet</b>
+    <p>Uses a wider data path. It can carry more data at the same time and stays connected continuously.</p>
+  </div>
+</div>
+
+<div class="copybox">
+<h3>Write in Copy: Why Broadband is Faster</h3>
+<p>Broadband is faster than dial-up because it has a wider bandwidth. Bandwidth means the capacity of a connection to carry data. A wider bandwidth can carry more data at the same time, so web pages, videos and files load faster.</p>
+</div>
+
+<h3>How Broadband Works: Step-by-Step ⚙️</h3>
+<p>Click the buttons to learn how broadband brings Internet to your device.</p>
+
+<div class="copybox">
+<h3 id="broadTitle">Step 1: Internet Service Provider</h3>
+<p id="broadText">An Internet Service Provider, also called ISP, gives Internet service to your home, school or office.</p>
+</div>
+
+<div class="grid" id="broadCards">
+  <div class="pic-card active-card"><div class="icon">🏢</div><b>ISP</b><p>Provides Internet</p></div>
+  <div class="pic-card"><div class="icon">🧵</div><b>Broadband Line</b><p>Fiber / cable / DSL</p></div>
+  <div class="pic-card"><div class="icon">📟</div><b>Modem</b><p>Receives signal</p></div>
+  <div class="pic-card"><div class="icon">📡</div><b>Router</b><p>Shares connection</p></div>
+  <div class="pic-card"><div class="icon">📱💻</div><b>Devices</b><p>Use Internet</p></div>
+</div>
+
+<div class="arrowLine"><div class="dot" id="broadDot"></div></div>
+
+<div class="signalBoard" id="broadBoard">🏢 ISP sends Internet data</div>
+
+<div class="grid">
+<button onclick="broadStep(0)">1️⃣ ISP</button>
+<button onclick="broadStep(1)">2️⃣ Broadband Line</button>
+<button onclick="broadStep(2)">3️⃣ Modem</button>
+<button onclick="broadStep(3)">4️⃣ Router</button>
+<button onclick="broadStep(4)">5️⃣ Device</button>
+</div>
+
+<button class="green" onclick="autoBroadDemo()">▶ Auto Play Broadband</button>
+<button class="orange" onclick="downloadDemo()">📥 Download Demo</button>
+<button class="gray" onclick="broadQuiz()">🧠 Quick Question</button>
+<p id="broadFeedback" class="feedback"></p>
+
+<h3>Speed Race Animation</h3>
+<div class="race">
+<div class="track"><span class="vehicle slow">🐢 Dial-up: small data path</span></div>
+<div class="track"><span class="vehicle fast">🚀 Broadband: wider data path</span></div>
+</div>
+
+<h3>Bandwidth Visualizer 🎚️</h3>
+<p>Move the slider to see how more bandwidth carries more data.</p>
+<input type="range" min="1" max="10" value="3" id="bandSlider" oninput="updateBandwidth()">
+<div class="speedbar"><div class="speedfill" id="bandFill"></div></div>
+<p id="bandText" class="note">Bandwidth level: 3 — It can carry a moderate amount of data.</p>
+
+<div class="copybox">
+<h3>Write in Copy: How Broadband Works</h3>
+<p>Broadband works by sending Internet data from the ISP through a broadband line such as fiber, cable, DSL or wireless connection. The modem receives the Internet signal and the router shares it to devices using Wi‑Fi or cable. Because broadband has high bandwidth, it can send and receive more data quickly.</p>
+</div>
+</section>
+
+<section class="card step">
+<h2>6. Broadband vs Wi‑Fi 🏠</h2>
+<div class="compare">
+<div class="compareBox broad"><div class="icon">🌍➡️🏠</div><h3>Broadband</h3><p>Internet connection from ISP to home, school or office.</p></div>
+<div class="compareBox wifi"><div class="icon">📡➡️📱💻</div><h3>Wi‑Fi</h3><p>Wireless connection from router to devices inside a small area.</p></div>
+</div>
+<div class="copybox"><b>Write in copy:</b> Broadband brings Internet to the building, while Wi‑Fi shares that Internet wirelessly to devices.</div>
+</section>
+
+<section class="card step">
+<h2>7. Types of Broadband 📚</h2>
+<div class="grid">
+<div class="pic-card"><div class="icon">☎️</div><b>DSL</b><p>Uses telephone lines.</p></div>
+<div class="pic-card"><div class="icon">📺</div><b>Cable Internet</b><p>Uses coaxial TV cables.</p></div>
+<div class="pic-card"><div class="icon">💡</div><b>Fiber-optic</b><p>Uses light through glass fiber.</p></div>
+<div class="pic-card"><div class="icon">📶</div><b>Wireless</b><p>Uses radio signals.</p></div>
+<div class="pic-card"><div class="icon">📱</div><b>Mobile Broadband</b><p>Uses 3G, 4G and 5G.</p></div>
+<div class="pic-card"><div class="icon">🛰️</div><b>Satellite</b><p>Useful in remote areas.</p></div>
+</div>
+</section>
+
+<section class="card step">
+<h2>8. Interactive Speed Explorer 📊🚀</h2>
+
+<div class="definition">
+Internet speed means how fast data can be uploaded or downloaded through a network connection. Higher speed means web pages, videos, online classes and downloads load faster.
+</div>
+
+<div class="copybox">
+<h3>Write in Copy</h3>
+<p><b>Bandwidth</b> is the amount of data that can pass through a network connection in a given time. A connection with higher bandwidth can carry more data at the same time, so the Internet works faster.</p>
+</div>
+
+<h3>1. Choose an Internet Type</h3>
+<p>Click a connection type and see its speed, real-life comparison and best use.</p>
+
+<div class="grid" id="speedCards">
+  <div class="pic-card active-card" onclick="selectSpeed(0)"><div class="icon">🚶</div><b>DSL</b><p>Moderate speed</p></div>
+  <div class="pic-card" onclick="selectSpeed(1)"><div class="icon">🚲</div><b>Cable</b><p>Good speed</p></div>
+  <div class="pic-card" onclick="selectSpeed(2)"><div class="icon">🏍️</div><b>Wireless</b><p>Medium-fast</p></div>
+  <div class="pic-card" onclick="selectSpeed(3)"><div class="icon">🚗</div><b>Mobile</b><p>Fast</p></div>
+  <div class="pic-card" onclick="selectSpeed(4)"><div class="icon">✈️</div><b>Satellite</b><p>Fast but delayed</p></div>
+  <div class="pic-card" onclick="selectSpeed(5)"><div class="icon">🚀</div><b>Fiber</b><p>Very fast</p></div>
+</div>
+
+<div class="copybox">
+  <h3 id="speedTypeName">DSL Internet</h3>
+  <p id="speedExplain">DSL uses telephone lines and gives moderate speed. It is useful for basic browsing and email.</p>
+</div>
+
+<div class="speedbar"><div class="speedfill" id="speedFill"></div></div>
+<p id="speedText" class="note">Speed level: 25%</p>
+
+<h3>2. Data Packet Race 📦</h3>
+<p>Same data file, different speed. Faster connections move data packets more quickly.</p>
+<div class="race">
+  <div class="track"><span class="vehicle slow">🐢 Dial-up: 📦</span></div>
+  <div class="track"><span class="vehicle fast">🚀 Broadband/Fiber: 📦📦📦📦📦</span></div>
+</div>
+
+<h3>3. Bandwidth Pipe Visualization 🚰</h3>
+<p>Think of bandwidth like a water pipe. A wider pipe carries more water. In the same way, higher bandwidth carries more data.</p>
+<input type="range" min="1" max="10" value="3" id="bandSpeedSlider" oninput="updateSpeedBandwidth()">
+<div class="signalBoard" id="pipeBoard">🚰 Small pipe: 📦 📦 📦</div>
+<div class="speedbar"><div class="speedfill" id="bandSpeedFill"></div></div>
+<p id="bandSpeedText" class="note">Bandwidth level 3: It carries a moderate amount of data.</p>
+
+<h3>4. Download Time Simulator ⏱️</h3>
+<p>Select a file and connection. The simulation estimates how long downloading may take.</p>
+
+<div class="grid">
+  <div>
+    <h3>Choose File</h3>
+    <select id="fileSize" onchange="calculateDownload()" style="width:100%;padding:12px;border-radius:12px;font-size:17px">
+      <option value="10">📄 Homework PDF - 10 MB</option>
+      <option value="50">🎵 Song - 50 MB</option>
+      <option value="500">🎮 Game File - 500 MB</option>
+      <option value="1000">🎬 Movie - 1000 MB</option>
+    </select>
+  </div>
+  <div>
+    <h3>Choose Connection</h3>
+    <select id="downloadSpeed" onchange="calculateDownload()" style="width:100%;padding:12px;border-radius:12px;font-size:17px">
+      <option value="2">DSL - slower</option>
+      <option value="8">Cable - medium</option>
+      <option value="12">Mobile Broadband - fast</option>
+      <option value="25">Fiber - very fast</option>
+    </select>
+  </div>
+</div>
+
+<div class="signalBoard" id="downloadResult">Estimated download time will appear here.</div>
+
+<h3>5. Speed Meter Dashboard 🎚️</h3>
+<p>Move the slider or click the cards above. The needle and speed bar will change immediately.</p>
+
+<svg viewBox="0 0 520 270" style="width:100%;max-width:650px;display:block;margin:auto">
+  <path d="M80 225 A180 180 0 0 1 440 225" stroke="#dbeafe" stroke-width="36" fill="none"/>
+  <path d="M80 225 A180 180 0 0 1 440 225" stroke="#93c5fd" stroke-width="8" fill="none"/>
+  <line id="speedNeedle" x1="260" y1="225" x2="125" y2="185" stroke="#dc2626" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="260" cy="225" r="15" fill="#1e293b"/>
+  <text id="speedMeterName" x="260" y="70" text-anchor="middle" font-size="32" font-weight="bold">DSL</text>
+  <text id="speedMeterValue" x="260" y="115" text-anchor="middle" font-size="23">25% speed level</text>
+  <text x="85" y="250" font-size="15">Slow</text>
+  <text x="405" y="250" font-size="15">Fast</text>
+</svg>
+
+<input type="range" min="0" max="5" value="0" id="speedSlider" oninput="selectSpeed(Number(this.value))">
+<p class="small">DSL → Cable → Wireless → Mobile → Satellite → Fiber. The needle shows relative speed, not exact Mbps.</p>
+
+<button class="green" onclick="autoSpeedDemo()">▶ Auto Compare Speeds</button>
+<button class="orange" onclick="speedQuiz()">🧠 Speed Quiz</button>
+<p id="speedFeedback" class="feedback"></p>
+
+<div class="copybox">
+<h3>Write in Copy: Speed of Broadband Types</h3>
+<ol>
+<li><b>DSL:</b> Uses telephone lines and provides moderate speed.</li>
+<li><b>Cable Internet:</b> Uses cable TV lines and is usually faster than DSL.</li>
+<li><b>Wireless Broadband:</b> Uses radio signals without cables.</li>
+<li><b>Mobile Broadband:</b> Uses 3G, 4G and 5G mobile networks.</li>
+<li><b>Satellite Internet:</b> Useful in remote areas but may have more delay.</li>
+<li><b>Fiber-optic Internet:</b> Uses light signals through glass fiber and is usually the fastest.</li>
+</ol>
+<p><b>Why speed differs:</b> Internet speed depends on bandwidth, technology, signal quality, distance, number of users and network traffic.</p>
+</div>
+</section>
+
+<section class="card step">
+<h2>9. Quiz ✅</h2>
+<div id="quizBox" class="quiz"></div>
+<p id="quizFeedback" class="feedback"></p>
+</section>
+
+<section class="card step">
+<h2>10. Summary and Practice Questions 📝</h2>
+<div class="copybox">
+<p>Telecommunication is the exchange of information over long distances using electronic or wireless systems. A message is converted into electrical and digital signals before it travels through a network. Broadband is fast, always-on Internet. Wi‑Fi shares Internet wirelessly inside a small area.</p>
+</div>
+<ol>
+<li>Define telecommunication.</li>
+<li>Write examples of telecommunication.</li>
+<li>Explain how voice is converted into electronic signals.</li>
+<li>What is broadband?</li>
+<li>Differentiate between broadband and Wi‑Fi.</li>
+<li>What is DSL?</li>
+<li>Why is fiber-optic Internet fast?</li>
+<li>Which broadband is useful in remote areas?</li>
+<li>What is mobile broadband?</li>
+<li>Draw the process of voice → signal → receiver.</li>
+</ol>
+<h2>Final Score: <span id="score">0</span> 🎉</h2>
+<button class="green" onclick="restart()">Restart Lesson</button>
+</section>
+
+<div class="nav">
+<button class="gray" onclick="prevStep()">⬅ Back</button>
+<button class="orange" onclick="readCurrent()">🔊 Read Step</button>
+<button onclick="nextStep()">Next ➡</button>
+</div>
+</div>
+
+<script>
+let current=0, score=0, quizIndex=0;
+const steps=document.querySelectorAll('.step');
+
+function updateProgress(){
+  steps.forEach((s,i)=>s.classList.toggle('active',i===current));
+  document.getElementById('progressText').innerText='Step '+(current+1)+' of '+steps.length;
+  document.getElementById('progressFill').style.width=((current+1)/steps.length*100)+'%';
+  document.getElementById('score').innerText=score;
+}
+function nextStep(){if(current<steps.length-1){current++;updateProgress();window.scrollTo(0,0)}}
+function prevStep(){if(current>0){current--;updateProgress();window.scrollTo(0,0)}}
+
+const teleSteps=[
+  ['Step 1: Voice Message','The sender speaks a message, for example “Hello”. This creates sound waves in the air.','〰️ 〰️ 〰️ SOUND WAVES'],
+  ['Step 2: Microphone Receives Sound','The microphone inside the phone detects the sound waves and vibrates according to the sound.','🎤 SOUND ENTERS MICROPHONE'],
+  ['Step 3: Electrical Signal Created','The microphone changes sound vibrations into tiny electrical signals. The electrical signal changes in the same pattern as the voice.','⚡ ⚡ ELECTRICAL SIGNAL'],
+  ['Step 4: Digital Signal Made','The phone changes the electrical signal into digital data. Digital data is written as 0s and 1s.','1010100011101010'],
+  ['Step 5: Network Transmission','The digital signals travel through mobile towers, cables, optical fiber, radio waves or satellites.','📡 101010 → NETWORK → 101010'],
+  ['Step 6: Receiver Gets Signal','The receiver phone receives the digital signals from the network.','📱 RECEIVED: 101010'],
+  ['Step 7: Speaker Converts Back','The speaker changes the electrical signals back into sound waves.','🔊 〰️ 〰️ SOUND OUTPUT'],
+  ['Step 8: Listener Hears Message','The receiver hears the original message clearly, such as “Hello”.','👦 HEARS: HELLO']
+];
+
+function teleStep(n){
+  document.getElementById('teleTitle').innerText=teleSteps[n][0];
+  document.getElementById('teleText').innerText=teleSteps[n][1];
+  document.getElementById('signalBoard').innerHTML=teleSteps[n][2];
+  const cards=document.querySelectorAll('#teleCards .pic-card');
+  cards.forEach(c=>c.classList.remove('active-card'));
+  cards[n].classList.add('active-card');
+  document.getElementById('movingDot').style.left=(n*12.5)+'%';
+}
+function autoTeleDemo(){
+  let i=0; teleStep(0);
+  clearInterval(window.teleTimer);
+  window.teleTimer=setInterval(()=>{i++; if(i>=teleSteps.length){clearInterval(window.teleTimer)} else teleStep(i)},1400);
+}
+function speakHelloDemo(){
+  document.getElementById('teleFeedback').innerText='Demo started: Hello → sound waves → electrical signal → 101010 → network → sound again.';
+  autoTeleDemo();
+}
+function signalQuiz(){
+  const ans=prompt('Which device converts sound waves into electrical signals?');
+  const fb=document.getElementById('teleFeedback');
+  if(ans && ans.toLowerCase().includes('microphone')){
+    fb.innerText='Correct! The microphone converts sound into electrical signals. ✅'; fb.style.color='#16a34a'; score+=5;
+  }else{
+    fb.innerText='Answer: The microphone converts sound waves into electrical signals.'; fb.style.color='#dc2626';
+  }
+  updateProgress();
+}
+function readCurrent(){
+  if('speechSynthesis' in window){
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(steps[current].innerText.replace(/\s+/g,' '));
+    u.rate=.85; speechSynthesis.speak(u);
+  }
+}
+
+const speeds=[
+ ['DSL',25,'DSL uses telephone lines and is good for basic browsing.'],
+ ['Cable Internet',55,'Cable Internet is good for streaming and home use.'],
+ ['Wireless Broadband',50,'Wireless broadband uses radio signals.'],
+ ['Mobile Broadband',65,'Mobile broadband uses 3G, 4G and 5G.'],
+ ['Satellite Internet',40,'Satellite Internet is useful in remote areas.'],
+ ['Fiber-optic Internet',95,'Fiber-optic Internet is very fast because it uses light signals.']
+];
+function updateSpeed(){
+ const slider=document.getElementById('speedSlider');
+ if(slider && typeof selectSpeed==='function'){
+   selectSpeed(Number(slider.value));
+ }
+}
+const quiz=[
+ {q:'Which device converts sound into electrical signals?',a:'Microphone',o:['Microphone','Keyboard','Printer']},
+ {q:'Digital signals are made of:',a:'0s and 1s',o:['0s and 1s','Only pictures','Paper']},
+ {q:'What carries signals from sender to receiver?',a:'Communication medium',o:['Communication medium','Lunch box','Notebook']},
+ {q:'Broadband means:',a:'Fast always-on Internet',o:['Fast always-on Internet','Only Wi-Fi name','Offline book']}
+];
+function loadQuiz(){
+ const q=quiz[quizIndex];
+ document.getElementById('quizBox').innerHTML='<h3>'+q.q+'</h3>'+q.o.map(x=>'<button onclick="answerQuiz(\''+x+'\')">'+x+'</button>').join('');
+}
+function answerQuiz(ans){
+ const q=quiz[quizIndex], fb=document.getElementById('quizFeedback');
+ if(ans===q.a){fb.innerText='Correct! ✅';fb.style.color='#16a34a';score+=5}
+ else{fb.innerText='Correct answer: '+q.a;fb.style.color='#dc2626'}
+ quizIndex=(quizIndex+1)%quiz.length;
+ setTimeout(()=>{fb.innerText='';loadQuiz();updateProgress()},1200);
+ updateProgress();
+}
+function restart(){
+ current=0;
+ score=0;
+ quizIndex=0;
+ teleStep(0);
+ loadQuiz();
+ updateProgress();
+ if(typeof broadStep==='function') broadStep(0);
+ if(typeof updateBandwidth==='function') updateBandwidth();
+ if(typeof selectSpeed==='function') selectSpeed(0);
+ if(typeof updateSpeedBandwidth==='function') updateSpeedBandwidth();
+ if(typeof calculateDownload==='function') calculateDownload();
+ window.scrollTo(0,0);
+}
+
+const broadSteps=[
+ ['Step 1: Internet Service Provider','An Internet Service Provider, also called ISP, gives Internet service to your home, school or office.','🏢 ISP sends Internet data'],
+ ['Step 2: Broadband Line','Internet data travels through a broadband line such as fiber-optic cable, coaxial cable, DSL line or wireless link.','🧵 DATA MOVES THROUGH BROADBAND LINE'],
+ ['Step 3: Modem','The modem receives the broadband signal and changes it into a form that your home network can use.','📟 MODEM RECEIVES AND CONVERTS SIGNAL'],
+ ['Step 4: Router','The router shares the Internet connection to many devices through Wi‑Fi or network cable.','📡 ROUTER SHARES INTERNET'],
+ ['Step 5: Device Uses Internet','Your mobile, laptop or tablet receives data and shows websites, videos, messages or online classes.','📱💻 DEVICE LOADS INTERNET DATA']
+];
+
+function broadStep(n){
+ const title=document.getElementById('broadTitle');
+ if(!title) return;
+ document.getElementById('broadTitle').innerText=broadSteps[n][0];
+ document.getElementById('broadText').innerText=broadSteps[n][1];
+ document.getElementById('broadBoard').innerText=broadSteps[n][2];
+ const cards=document.querySelectorAll('#broadCards .pic-card');
+ cards.forEach(c=>c.classList.remove('active-card'));
+ if(cards[n]) cards[n].classList.add('active-card');
+ const dot=document.getElementById('broadDot');
+ if(dot) dot.style.left=(n*23)+'%';
+}
+
+function autoBroadDemo(){
+ let i=0; broadStep(0);
+ clearInterval(window.broadTimer);
+ window.broadTimer=setInterval(()=>{i++; if(i>=broadSteps.length){clearInterval(window.broadTimer)} else broadStep(i)},1400);
+}
+
+function downloadDemo(){
+ const fb=document.getElementById('broadFeedback');
+ if(fb) fb.innerText='Download demo: ISP → broadband line → modem → router → your device. Broadband is faster because it carries more data at once.';
+ autoBroadDemo();
+}
+
+function broadQuiz(){
+ const ans=prompt('Why is broadband faster than dial-up?');
+ const fb=document.getElementById('broadFeedback');
+ if(!fb) return;
+ if(ans && (ans.toLowerCase().includes('bandwidth') || ans.toLowerCase().includes('more data') || ans.toLowerCase().includes('faster') || ans.toLowerCase().includes('wide'))){
+   fb.innerText='Correct! Broadband has wider bandwidth and carries more data at the same time. ✅';
+   fb.style.color='#16a34a';
+   score+=5;
+ }else{
+   fb.innerText='Answer: Broadband is faster because it has wider bandwidth and can carry more data at the same time.';
+   fb.style.color='#dc2626';
+ }
+ updateProgress();
+}
+
+function updateBandwidth(){
+ const slider=document.getElementById('bandSlider');
+ if(!slider) return;
+ const v=Number(slider.value);
+ document.getElementById('bandFill').style.width=(v*10)+'%';
+ let msg='Bandwidth level: '+v+' — ';
+ if(v<=3) msg+='low bandwidth carries less data, so Internet feels slower.';
+ else if(v<=7) msg+='medium bandwidth carries more data and works well for normal use.';
+ else msg+='high bandwidth carries a lot of data, so videos, downloads and online classes work faster.';
+ document.getElementById('bandText').innerText=msg;
+}
+
+
+window.speedTypes=[
+ ['DSL Internet','DSL uses telephone lines and gives moderate speed. It is useful for basic browsing, email and simple online learning.',25,'🚶 DSL is like walking: steady but not very fast.'],
+ ['Cable Internet','Cable Internet uses cable TV lines and gives good speed for home use, streaming and downloads.',55,'🚲 Cable is like a bicycle: faster than walking.'],
+ ['Wireless Broadband','Wireless broadband uses radio signals without wires. It is useful where cable is difficult.',50,'🏍️ Wireless is like a motorcycle: quick and flexible.'],
+ ['Mobile Broadband','Mobile broadband uses 3G, 4G or 5G networks. It is useful while travelling.',70,'🚗 Mobile broadband is like a car: fast and movable.'],
+ ['Satellite Internet','Satellite Internet uses satellites. It is useful in remote areas but may have delay because signals travel a long distance.',45,'✈️ Satellite is fast, but delay can happen due to long distance.'],
+ ['Fiber-optic Internet','Fiber-optic Internet uses light signals through glass fiber cables. It is very fast and reliable.',95,'🚀 Fiber is like a rocket: very fast.']
+];
+const speedTypes=window.speedTypes;
+
+function selectSpeed(n){
+ n=Number(n);
+ const name=document.getElementById('speedTypeName');
+ if(!name || !window.speedTypes) return;
+
+ document.getElementById('speedTypeName').innerText=speedTypes[n][0];
+ document.getElementById('speedExplain').innerText=speedTypes[n][1];
+
+ const percent=speedTypes[n][2];
+ const fill=document.getElementById('speedFill');
+ if(fill) fill.style.width=percent+'%';
+
+ const speedText=document.getElementById('speedText');
+ if(speedText) speedText.innerText='Speed level: '+percent+'% — '+speedTypes[n][3];
+
+ const slider=document.getElementById('speedSlider');
+ if(slider) slider.value=n;
+
+ const cards=document.querySelectorAll('#speedCards .pic-card');
+ cards.forEach(c=>c.classList.remove('active-card'));
+ if(cards[n]) cards[n].classList.add('active-card');
+
+ const meterName=document.getElementById('speedMeterName');
+ const meterValue=document.getElementById('speedMeterValue');
+ const needle=document.getElementById('speedNeedle');
+ if(meterName) meterName.textContent=speedTypes[n][0].replace(' Internet','');
+ if(meterValue) meterValue.textContent=percent+'% speed level';
+ if(needle){
+   const angle=-70+(percent/100)*140;
+   needle.setAttribute('transform','rotate('+angle+' 260 225)');
+ }
+
+ calculateDownload();
+}
+
+function updateSpeedBandwidth(){
+ const slider=document.getElementById('bandSpeedSlider');
+ if(!slider) return;
+ const v=Number(slider.value);
+ document.getElementById('bandSpeedFill').style.width=(v*10)+'%';
+ let boxes='📦 '.repeat(v);
+ let pipe = v<=3 ? '🚰 Small pipe: ' : v<=7 ? '🚰🚰 Medium pipe: ' : '🚰🚰🚰 Wide pipe: ';
+ document.getElementById('pipeBoard').innerText=pipe+boxes;
+ let msg='Bandwidth level '+v+': ';
+ if(v<=3) msg+='low bandwidth carries less data, so Internet feels slower.';
+ else if(v<=7) msg+='medium bandwidth carries more data and works well for browsing and videos.';
+ else msg+='high bandwidth carries a lot of data, so downloads, videos and online classes work faster.';
+ document.getElementById('bandSpeedText').innerText=msg;
+}
+
+function calculateDownload(){
+ const file=document.getElementById('fileSize');
+ const speed=document.getElementById('downloadSpeed');
+ const result=document.getElementById('downloadResult');
+ if(!file || !speed || !result) return;
+ const size=Number(file.value);
+ const sp=Number(speed.value);
+ const seconds=(size/sp).toFixed(1);
+ result.innerText='Estimated download time: '+seconds+' seconds. Higher speed means less waiting time.';
+}
+
+function autoSpeedDemo(){
+ let i=0;
+ selectSpeed(0);
+ clearInterval(window.speedTimer);
+ window.speedTimer=setInterval(()=>{i++; if(i>=speedTypes.length){clearInterval(window.speedTimer)} else selectSpeed(i)},1200);
+}
+
+function speedQuiz(){
+ const ans=prompt('What is bandwidth?');
+ const fb=document.getElementById('speedFeedback');
+ if(!fb) return;
+ if(ans && (ans.toLowerCase().includes('data') || ans.toLowerCase().includes('capacity') || ans.toLowerCase().includes('amount'))){
+   fb.innerText='Correct! Bandwidth is the amount/capacity of data a connection can carry. ✅';
+   fb.style.color='#16a34a';
+   score+=5;
+ }else{
+   fb.innerText='Answer: Bandwidth is the amount of data that can pass through a connection in a given time.';
+   fb.style.color='#dc2626';
+ }
+ updateProgress();
+}
+
+teleStep(0);loadQuiz();updateSpeed();updateProgress();broadStep(0);updateBandwidth();selectSpeed(0);updateSpeedBandwidth();calculateDownload();
+</script>
+</body>
+</html>

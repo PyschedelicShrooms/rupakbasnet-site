@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Class 10 Interactive Network Topology Lab</title>
+<style>
+  :root{
+    --bg:#07111f; --panel:#0e1d31; --panel2:#132640; --text:#f5f8ff; --muted:#b9c7db;
+    --accent:#5ee1ff; --accent2:#8b7cff; --good:#5ce3a1; --warn:#ffd166; --bad:#ff6b7a;
+    --line:#6ea8d9; --node:#1b3354; --white:#fff; --shadow:0 12px 34px rgba(0,0,0,.28);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:linear-gradient(180deg,#06101d 0%,#0a1425 100%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.45;overflow-x:hidden}
+  button,select,input{font:inherit}
+  button,select{min-height:48px}
+  button{cursor:pointer}
+  .app{width:min(1800px,100%);margin:auto;padding:clamp(12px,2vw,28px)}
+  .hero{display:grid;grid-template-columns:1.5fr .8fr;gap:clamp(14px,2vw,28px);align-items:stretch;margin-bottom:20px}
+  .hero-card,.panel,.mini-card{background:linear-gradient(145deg,rgba(20,42,69,.96),rgba(10,26,46,.96));border:1px solid rgba(148,193,236,.2);border-radius:22px;box-shadow:var(--shadow)}
+  .hero-card{padding:clamp(22px,3vw,44px)}
+  .eyebrow{font-size:clamp(.9rem,1.1vw,1.25rem);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{font-size:clamp(2rem,4.2vw,4.7rem);line-height:1.02;margin:.2em 0 .22em}
+  h2{font-size:clamp(1.55rem,2.5vw,2.7rem);margin:.1em 0 .55em}
+  h3{font-size:clamp(1.2rem,1.7vw,1.8rem);margin:.2em 0 .55em}
+  p,li{font-size:clamp(1rem,1.25vw,1.45rem)}
+  .lead{font-size:clamp(1.1rem,1.55vw,1.7rem);color:#deebfb;max-width:72ch}
+  .flow{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}.flow span{padding:9px 14px;border-radius:999px;background:#0a3550;border:1px solid #2d8eb9;font-weight:800}
+  .hero-side{padding:22px;display:grid;gap:12px;align-content:center}
+  .metric{padding:18px;border-radius:18px;background:#0a182b;border:1px solid rgba(255,255,255,.08)}
+  .metric b{display:block;font-size:clamp(1.6rem,2.2vw,2.5rem);color:var(--accent)}
+  .topology-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0 20px;position:sticky;top:8px;z-index:10;background:rgba(7,17,31,.88);backdrop-filter:blur(10px);padding:10px;border-radius:18px}
+  .tab{border:1px solid #315479;color:var(--text);background:#0d2038;border-radius:14px;padding:12px 14px;font-weight:800;font-size:clamp(1rem,1.3vw,1.35rem)}
+  .tab.active{background:linear-gradient(135deg,#0d5f7d,#4b42a2);border-color:#71dff4}
+  .panel{padding:clamp(16px,2vw,28px);margin-bottom:20px}
+  .sim-layout{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(280px,.8fr);gap:18px}
+  .visual-wrap{background:#06101c;border:1px solid #27486d;border-radius:20px;padding:10px;min-height:520px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  #networkSvg{width:100%;height:auto;max-height:660px;min-height:460px;touch-action:manipulation}
+  .side{display:grid;gap:12px;align-content:start}
+  .card{background:#0a1829;border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:16px}
+  .card strong{color:var(--accent)}
+  .controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .btn{border:1px solid #3c6389;background:#102945;color:#fff;border-radius:14px;padding:12px 14px;font-weight:800;min-height:52px}
+  .btn.primary{background:linear-gradient(135deg,#0f7a95,#5546b6);border-color:#79e6fa}
+  .btn.good{background:#0d5a43;border-color:#47d59f}.btn.bad{background:#632b39;border-color:#ff7584}.btn.warn{background:#5b481a;border-color:#ffd166}
+  .btn:focus-visible,.tab:focus-visible,select:focus-visible,input:focus-visible{outline:4px solid rgba(94,225,255,.42);outline-offset:2px}
+  label{font-size:clamp(.95rem,1.1vw,1.2rem);font-weight:700;color:#dce8f7}
+  select,input[type=range]{width:100%;margin-top:6px}
+  select{background:#0b2038;color:#fff;border:1px solid #41698f;border-radius:12px;padding:10px 12px}
+  input[type=range]{accent-color:#6fe4ff;min-height:42px}
+  .status{border-left:6px solid var(--good);background:#09241f;padding:14px 16px;border-radius:12px;font-size:clamp(1rem,1.2vw,1.35rem)}
+  .status.warn{border-color:var(--warn);background:#2b2410}.status.bad{border-color:var(--bad);background:#2b1318}
+  .concept-grid,.apps,.mistakes,.summary-grid,.examples-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+  .mini-card{padding:18px;box-shadow:none}
+  .mini-card .icon{font-size:2.2rem}.mini-card p{color:var(--muted);margin:.4em 0}
+  .compare-wrap{overflow-x:auto;border-radius:16px;border:1px solid #294766}
+  table{border-collapse:collapse;width:100%;min-width:900px;background:#091729}
+  th,td{padding:14px;border-bottom:1px solid #223b58;text-align:left;font-size:clamp(.95rem,1.05vw,1.18rem)}
+  th{background:#112c49;color:#fff;position:sticky;top:0}td:first-child{font-weight:900;color:var(--accent)}
+  .example-btn,.app-btn,.what-btn,.qtab{width:100%;text-align:left;border:1px solid #2d5275;background:#0b1c31;color:#fff;border-radius:15px;padding:15px;min-height:58px}
+  .example-btn.active,.app-btn.active,.qtab.active{border-color:#6be4ff;background:#103b56}
+  .explain-box{margin-top:14px;padding:18px;border-radius:15px;background:#081b2d;border:1px solid #2a5278}
+  .steps{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:center}.step-display{padding:18px;border-radius:16px;background:#0a1829;min-height:150px;border:1px solid #294b6c}.step-no{color:var(--accent);font-weight:900}
+  .step-actions{display:flex;flex-direction:column;gap:10px}
+  .quiz-layout{display:grid;grid-template-columns:.7fr 1.3fr;gap:16px}.qbuttons{display:grid;gap:10px}.quiz-card{background:#09192b;border:1px solid #2c4c6c;border-radius:16px;padding:18px}
+  .option{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:12px;background:#0d2037;margin:8px 0;font-size:clamp(1rem,1.15vw,1.25rem)}.option input{width:24px;height:24px;flex:0 0 auto}
+  .feedback{margin-top:12px;padding:12px;border-radius:12px;background:#0c2337;min-height:54px}
+  .teacher{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}.teacher-question{font-size:clamp(1.25rem,1.7vw,1.8rem);font-weight:800}
+  .footer-note{text-align:center;color:#9fb1c8;padding:14px;font-size:.95rem}
+  .badge{display:inline-block;border-radius:999px;padding:5px 10px;font-size:.86rem;font-weight:800;background:#183a55;color:#dff7ff}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}.legend span{display:inline-flex;align-items:center;gap:6px;font-size:.95rem}.dot{width:14px;height:14px;border-radius:50%;display:inline-block}.dot.node{background:#5ee1ff}.dot.switch{background:#8b7cff}.dot.packet{background:#ffd166}.dot.fault{background:#ff6b7a}
+  .hidden{display:none!important}
+  .pulse{animation:pulse 1.2s infinite}@keyframes pulse{50%{filter:drop-shadow(0 0 12px #ffd166)}}
+  @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}.pulse{animation:none}}
+  @media (max-width:1100px){.hero,.sim-layout,.quiz-layout{grid-template-columns:1fr}.concept-grid,.apps,.mistakes,.summary-grid,.examples-grid{grid-template-columns:repeat(2,1fr)}.visual-wrap{min-height:440px}}
+  @media (max-width:640px){.app{padding:10px}.topology-tabs{grid-template-columns:repeat(2,1fr);position:static}.concept-grid,.apps,.mistakes,.summary-grid,.examples-grid,.two-col{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.steps,.teacher{grid-template-columns:1fr}.step-actions{flex-direction:row}.visual-wrap{min-height:360px}#networkSvg{min-height:340px}.hero-card,.panel{border-radius:16px}.hero-side{padding:16px}}
+  @media (min-width:1500px){body{font-size:18px}.btn,.tab,select{min-height:60px}.visual-wrap{min-height:610px}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <section class="hero">
+    <div class="hero-card">
+      <div class="eyebrow">Class 10 • Computer Network and Communication</div>
+      <h1>Interactive Network Topology Lab</h1>
+      <p class="lead">Learn <b>Bus, Star, Ring and Hybrid topology</b> by watching data move, changing devices, creating faults, comparing designs, and solving classroom challenges.</p>
+      <div class="flow"><span>👀 See it</span><span>🖐 Change it</span><span>🔍 Observe it</span><span>💡 Understand it</span><span>🌍 Apply it</span></div>
+    </div>
+    <div class="hero-card hero-side">
+      <div class="metric"><b>4</b> topologies compared</div>
+      <div class="metric"><b>Live</b> data-flow animation</div>
+      <div class="metric"><b>Touch-ready</b> for Smart Boards</div>
+    </div>
+  </section>
+
+  <nav class="topology-tabs" aria-label="Choose topology">
+    <button class="tab" data-topology="bus">Bus</button>
+    <button class="tab active" data-topology="star">Star</button>
+    <button class="tab" data-topology="ring">Ring</button>
+    <button class="tab" data-topology="hybrid">Hybrid</button>
+  </nav>
+
+  <section class="panel" id="conceptPanel">
+    <div class="two-col">
+      <div>
+        <span class="badge">A. What is it?</span>
+        <h2 id="conceptTitle">Star Topology</h2>
+        <p id="conceptText">Every device connects independently to one central hub or switch. Data normally passes through that central device before reaching another computer.</p>
+      </div>
+      <div class="card">
+        <h3>Connection rule</h3>
+        <p id="connectionRule">Computer → Central switch → Destination computer</p>
+        <div class="legend"><span><i class="dot node"></i>Computer</span><span><i class="dot switch"></i>Hub/Switch</span><span><i class="dot packet"></i>Data packet</span><span><i class="dot fault"></i>Fault</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <span class="badge">B + C. Visual concept & interactive simulation</span>
+    <h2>Send a Data Packet</h2>
+    <div class="sim-layout">
+      <div class="visual-wrap">
+        <svg id="networkSvg" viewBox="0 0 1000 620" role="img" aria-label="Interactive network topology diagram"></svg>
+      </div>
+      <aside class="side">
+        <div class="card">
+          <label>Source computer<select id="sourceSelect"></select></label>
+          <label style="display:block;margin-top:10px">Destination computer<select id="destSelect"></select></label>
+        </div>
+        <div class="controls">
+          <button class="btn primary" id="startBtn">▶ Start</button>
+          <button class="btn" id="pauseBtn">⏸ Pause</button>
+          <button class="btn" id="resetBtn">↻ Reset</button>
+          <button class="btn" id="labelsBtn">🏷 Hide Labels</button>
+        </div>
+        <div class="card">
+          <label>Animation speed <b id="speedText">1×</b>
+            <input id="speedRange" type="range" min="0.5" max="2" step="0.5" value="1" />
+          </label>
+        </div>
+        <div class="controls">
+          <button class="btn good" id="addBtn">＋ Add Device</button>
+          <button class="btn" id="removeBtn">− Remove Device</button>
+          <button class="btn bad" id="faultBtn">⚠ Create Fault</button>
+          <button class="btn good" id="repairBtn">🛠 Repair</button>
+        </div>
+        <div class="card">
+          <h3>Live measurements</h3>
+          <p>Devices: <strong id="deviceCount">6</strong></p>
+          <p>Packet path: <strong id="hopCount">0 hops</strong></p>
+          <p>Critical device: <strong id="criticalText">Central switch</strong></p>
+        </div>
+        <div id="simStatus" class="status" aria-live="polite">Ready. Choose source and destination, then press Start.</div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="panel">
+    <span class="badge">Comparison</span>
+    <h2>How the Four Topologies Differ</h2>
+    <div class="compare-wrap">
+      <table>
+        <thead><tr><th>Topology</th><th>Connection structure</th><th>Central device</th><th>Main advantage</th><th>Main disadvantage</th></tr></thead>
+        <tbody>
+          <tr><td>Bus</td><td>All devices share one backbone cable</td><td>None</td><td>Simple and inexpensive</td><td>Backbone failure can stop the network</td></tr>
+          <tr><td>Star</td><td>All devices connect to a hub/switch</td><td>Hub or switch</td><td>Easy to manage and troubleshoot</td><td>Central device failure stops communication</td></tr>
+          <tr><td>Ring</td><td>Devices form a closed circular loop</td><td>Usually none in the basic logical diagram</td><td>Predictable, organized data flow</td><td>A single break can disrupt a basic ring</td></tr>
+          <tr><td>Hybrid</td><td>Combination of two or more topologies</td><td>Depends on design</td><td>Flexible and scalable</td><td>More complex and costly</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <span class="badge">4. Live examples</span>
+    <h2>Try Real Classroom Examples</h2>
+    <div class="examples-grid" id="examplesGrid"></div>
+    <div class="explain-box" id="exampleExplain">Select an example to load it into the simulation.</div>
+  </section>
+
+  <section class="panel">
+    <span class="badge">5. Real-life applications</span>
+    <h2>Where Do We Use This in Real Life?</h2>
+    <div class="apps" id="appsGrid"></div>
+    <div class="explain-box" id="appExplain">Tap an application to connect the topology to real life.</div>
+  </section>
+
+  <section class="panel">
+    <span class="badge">6. Experiment</span>
+    <h2>What Happens If...?</h2>
+    <div class="concept-grid">
+      <button class="what-btn" data-action="more">➕ ...we add more computers?</button>
+      <button class="what-btn" data-action="fault">⚠ ...a critical cable/device fails?</button>
+      <button class="what-btn" data-action="speed">⚡ ...we send data faster?</button>
+      <button class="what-btn" data-action="repair">🛠 ...we repair the fault?</button>
+    </div>
+    <div class="explain-box" id="whatExplain">Choose one experiment. The diagram will update immediately.</div>
+  </section>
+
+  <section class="panel">
+    <span class="badge">7. Step-by-step teaching mode</span>
+    <h2>Teach It One Step at a Time</h2>
+    <div class="steps">
+      <div class="step-display" id="stepDisplay"></div>
+      <div class="step-actions"><button class="btn" id="prevStep">← Previous</button><button class="btn primary" id="nextStep">Next →</button></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <span class="badge">8. Concept rule instead of formula</span>
+    <h2>How Data Moves</h2>
+    <div class="concept-grid" id="ruleCards"></div>
+  </section>
+
+  <section class="panel">
+    <span class="badge">9. Student challenge</span>
+    <h2>Now You Try</h2>
+    <div class="quiz-layout">
+      <div class="qbuttons">
+        <button class="qtab active" data-q="easy">Easy</button>
+        <button class="qtab" data-q="medium">Medium</button>
+        <button class="qtab" data-q="challenge">Challenge</button>
+      </div>
+      <div class="quiz-card">
+        <h3 id="quizQuestion"></h3>
+        <div id="quizOptions"></div>
+        <div class="controls" style="margin-top:12px"><button class="btn primary" id="checkQuiz">Check Answer</button><button class="btn" id="showSolution">Show Solution</button></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose an answer, then press Check Answer.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <span class="badge">10. Common mistakes</span>
+    <h2>Common Mistakes to Avoid</h2>
+    <div class="mistakes">
+      <div class="mini-card"><div class="icon">❌</div><h3>“Star has no central device.”</h3><p>Wrong. A star depends on a central hub or switch.</p></div>
+      <div class="mini-card"><div class="icon">❌</div><h3>“Ring sends everywhere at once.”</h3><p>In the basic model, data follows the ring path, commonly one direction.</p></div>
+      <div class="mini-card"><div class="icon">❌</div><h3>“Hybrid means wireless.”</h3><p>Hybrid means a combination of two or more topology types.</p></div>
+      <div class="mini-card"><div class="icon">✅</div><h3>Remember the weak point</h3><p>Bus: backbone. Star: center. Ring: loop break. Hybrid: depends on its design.</p></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <span class="badge">12. Classroom interaction</span>
+    <h2>Teacher Question</h2>
+    <div class="teacher">
+      <div><div class="teacher-question" id="teacherQuestion">Press “New Question” to ask the class for a prediction.</div><div id="teacherAnswer" class="explain-box hidden"></div></div>
+      <div class="controls"><button class="btn primary" id="newTeacherQ">🎤 New Question</button><button class="btn" id="showTeacherA">Show Result</button></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <span class="badge">11. Quick revision</span>
+    <h2>One-Screen Summary</h2>
+    <div class="summary-grid">
+      <div class="mini-card"><h3>Bus</h3><p>One shared backbone. Cheap and simple, but the backbone is critical.</p></div>
+      <div class="mini-card"><h3>Star</h3><p>All devices connect to a hub/switch. Easy to manage; center is critical.</p></div>
+      <div class="mini-card"><h3>Ring</h3><p>Devices form a loop. Organized flow; a break can disrupt a basic ring.</p></div>
+      <div class="mini-card"><h3>Hybrid</h3><p>Mixes topology types. Flexible and scalable, but more complex and costly.</p></div>
+    </div>
+  </section>
+
+  <div class="footer-note">Designed for Class 10 teaching • Responsive for mobile, laptop and large Smart Boards • Works offline in a modern browser</div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const app = document.getElementById('app');
+  const svg = document.getElementById('networkSvg');
+  const NS = 'http://www.w3.org/2000/svg';
+  const els = {
+    tabs:[...document.querySelectorAll('.tab')], source:document.getElementById('sourceSelect'), dest:document.getElementById('destSelect'),
+    start:document.getElementById('startBtn'), pause:document.getElementById('pauseBtn'), reset:document.getElementById('resetBtn'), labels:document.getElementById('labelsBtn'),
+    speed:document.getElementById('speedRange'), speedText:document.getElementById('speedText'), add:document.getElementById('addBtn'), remove:document.getElementById('removeBtn'),
+    fault:document.getElementById('faultBtn'), repair:document.getElementById('repairBtn'), status:document.getElementById('simStatus'), deviceCount:document.getElementById('deviceCount'),
+    hopCount:document.getElementById('hopCount'), criticalText:document.getElementById('criticalText'), conceptTitle:document.getElementById('conceptTitle'), conceptText:document.getElementById('conceptText'), connectionRule:document.getElementById('connectionRule'),
+    exampleExplain:document.getElementById('exampleExplain'), appExplain:document.getElementById('appExplain'), whatExplain:document.getElementById('whatExplain'), stepDisplay:document.getElementById('stepDisplay'),
+    prevStep:document.getElementById('prevStep'), nextStep:document.getElementById('nextStep'), ruleCards:document.getElementById('ruleCards'), quizQuestion:document.getElementById('quizQuestion'), quizOptions:document.getElementById('quizOptions'),
+    checkQuiz:document.getElementById('checkQuiz'), showSolution:document.getElementById('showSolution'), quizFeedback:document.getElementById('quizFeedback'), teacherQuestion:document.getElementById('teacherQuestion'), teacherAnswer:document.getElementById('teacherAnswer'),
+    newTeacherQ:document.getElementById('newTeacherQ'), showTeacherA:document.getElementById('showTeacherA')
+  };
+
+  const info = {
+    bus:{title:'Bus Topology',text:'All computers share one main cable called a backbone. Data travels along this shared cable, and terminators are placed at both ends in traditional bus networks.',rule:'Computer → Shared backbone → Destination',critical:'Backbone cable',adv:'Simple and inexpensive',dis:'A backbone failure can stop communication'},
+    star:{title:'Star Topology',text:'Every device connects independently to one central hub or switch. Data normally passes through that central device before reaching another computer.',rule:'Computer → Central switch → Destination computer',critical:'Central switch',adv:'Easy to manage and troubleshoot',dis:'Central device failure can stop communication'},
+    ring:{title:'Ring Topology',text:'Each computer connects to two neighbours, forming a closed loop. In the basic model, data moves around the ring from one device to the next.',rule:'Computer → Next neighbour → ... → Destination',critical:'Continuous ring path',adv:'Predictable, organized data flow',dis:'One break can disrupt a basic ring'},
+    hybrid:{title:'Hybrid Topology',text:'A hybrid topology combines two or more different network topologies. For example, departments may use star networks that connect through a larger backbone or another topology.',rule:'Different topology segments → Connected as one larger network',critical:'Depends on the design',adv:'Flexible and scalable',dis:'More complex and costly'}
+  };
+
+  const state = {topology:'star',devices:6,showLabels:true,fault:false,speed:1,playing:false,progress:0,path:[],raf:null,last:null,step:0,quiz:'easy'};
+
+  function sEl(name,attrs={}){const e=document.createElementNS(NS,name);for(const [k,v] of Object.entries(attrs))e.setAttribute(k,String(v));return e}
+  function clearSvg(){while(svg.firstChild)svg.removeChild(svg.firstChild)}
+  function line(x1,y1,x2,y2,extra={}){const e=sEl('line',{x1,y1,x2,y2,stroke:'var(--line)','stroke-width':8,'stroke-linecap':'round',...extra});svg.appendChild(e);return e}
+  function text(x,y,txt,opts={}){if(!state.showLabels)return;const e=sEl('text',{x,y,fill:'#eaf5ff','font-size':opts.size||22,'font-weight':opts.weight||700,'text-anchor':opts.anchor||'middle'});e.textContent=txt;svg.appendChild(e)}
+  function computer(x,y,label,failed=false){const g=sEl('g');const screen=sEl('rect',{x:x-45,y:y-35,width:90,height:58,rx:8,fill:failed?'#6d2430':'#173a60',stroke:failed?'#ff6b7a':'#5ee1ff','stroke-width':4});const stand=sEl('rect',{x:x-8,y:y+23,width:16,height:15,fill:'#91aac6'});const foot=sEl('rect',{x:x-26,y:y+38,width:52,height:8,rx:4,fill:'#91aac6'});g.append(screen,stand,foot);svg.appendChild(g);text(x,y-47,label,{size:20});return g}
+  function switchNode(x,y,label='Switch',failed=false){const r=sEl('rect',{x:x-62,y:y-32,width:124,height:64,rx:16,fill:failed?'#6d2430':'#3b2e7c',stroke:failed?'#ff6b7a':'#a99eff','stroke-width':4});svg.appendChild(r);for(let i=0;i<6;i++){svg.appendChild(sEl('circle',{cx:x-40+i*16,cy:y+10,r:4,fill:'#7ce4ff'}))}text(x,y-44,label,{size:21});}
+  function terminator(x,y){svg.appendChild(sEl('rect',{x:x-7,y:y-22,width:14,height:44,rx:4,fill:'#ffd166'}));}
+  function packet(x,y){const c=sEl('circle',{id:'packet',cx:x,cy:y,r:14,fill:'#ffd166',stroke:'#fff3bb','stroke-width':4,class:'pulse'});svg.appendChild(c);return c}
+  function polylinePath(points){return points}
+  function positions(n){const pts=[];const cx=500,cy=300,r=225;for(let i=0;i<n;i++){const a=(-Math.PI/2)+(Math.PI*2*i/n);pts.push({x:cx+Math.cos(a)*r,y:cy+Math.sin(a)*r})}return pts}
+
+  function topologyNodes(){return Array.from({length:state.devices},(_,i)=>`PC ${i+1}`)}
+  function updateSelects(){const list=topologyNodes();const oldS=els.source.value, oldD=els.dest.value;els.source.innerHTML='';els.dest.innerHTML='';list.forEach((name,i)=>{const a=document.createElement('option');a.value=i;a.textContent=name;els.source.appendChild(a);const b=document.createElement('option');b.value=i;b.textContent=name;els.dest.appendChild(b)});els.source.value = list[+oldS]?oldS:'0';els.dest.value = list[+oldD]?oldD:String(Math.min(1,list.length-1));if(els.source.value===els.dest.value && list.length>1)els.dest.value=String((+els.source.value+1)%list.length)}
+
+  function draw(){clearSvg();const n=state.devices;let path=[];let hops=0;const s=+els.source.value||0,d=+els.dest.value||0;
+    const bg=sEl('rect',{x:10,y:10,width:980,height:600,rx:28,fill:'#071421',stroke:'#173a5d','stroke-width':2});svg.appendChild(bg);
+    if(state.topology==='star'){
+      const pts=positions(n),c={x:500,y:310};pts.forEach(p=>line(c.x,c.y,p.x,p.y,{stroke:state.fault?'#7b4050':'#6ea8d9'}));pts.forEach((p,i)=>computer(p.x,p.y,`PC ${i+1}`));switchNode(c.x,c.y,'Switch',state.fault);
+      path=polylinePath([pts[s],c,pts[d]]);hops=s===d?0:2;
+    } else if(state.topology==='ring'){
+      const pts=positions(n);for(let i=0;i<n;i++){const j=(i+1)%n;line(pts[i].x,pts[i].y,pts[j].x,pts[j].y,{stroke:(state.fault&&i===Math.floor(n/3))?'#ff6b7a':'#6ea8d9'});}pts.forEach((p,i)=>computer(p.x,p.y,`PC ${i+1}`));
+      const seq=[pts[s]];let cur=s;let guard=0;while(cur!==d&&guard<n+1){cur=(cur+1)%n;seq.push(pts[cur]);guard++;}path=seq;hops=Math.max(0,seq.length-1);
+    } else if(state.topology==='bus'){
+      const y=330,x1=130,x2=870;line(x1,y,x2,y,{stroke:state.fault?'#ff6b7a':'#6ea8d9'});terminator(x1,y);terminator(x2,y);text(500,375,'Shared backbone cable',{size:22});
+      const xs=Array.from({length:n},(_,i)=>160+i*(680/Math.max(1,n-1)));const pts=xs.map((x,i)=>({x,y:i%2===0?160:505}));pts.forEach((p,i)=>{line(p.x,p.y+(p.y<y?45:-45),p.x,y,{stroke:state.fault?'#7b4050':'#6ea8d9'});computer(p.x,p.y,`PC ${i+1}`)});
+      path=[pts[s],{x:pts[s].x,y},{x:pts[d].x,y},pts[d]];hops=s===d?0:3;
+    } else {
+      const left=[{x:170,y:160},{x:170,y:310},{x:170,y:460}], sw={x:360,y:310}, join={x:520,y:310}, ringC={x:760,y:310}, rr=150;
+      const ringPts=[0,1,2].map(i=>{const a=-Math.PI/2+i*2*Math.PI/3;return{x:ringC.x+Math.cos(a)*rr,y:ringC.y+Math.sin(a)*rr}});
+      const all=[...left,...ringPts];line(sw.x,sw.y,join.x,join.y,{stroke:state.fault?'#ff6b7a':'#6ea8d9'});line(join.x,join.y,ringPts[0].x,ringPts[0].y,{stroke:state.fault?'#7b4050':'#6ea8d9'});left.forEach(p=>line(p.x,p.y,sw.x,sw.y,{stroke:'#6ea8d9'}));for(let i=0;i<ringPts.length;i++)line(ringPts[i].x,ringPts[i].y,ringPts[(i+1)%ringPts.length].x,ringPts[(i+1)%ringPts.length].y,{stroke:'#6ea8d9'});
+      left.forEach((p,i)=>computer(p.x,p.y,`PC ${i+1}`));switchNode(sw.x,sw.y,'Switch A',false);ringPts.forEach((p,i)=>computer(p.x,p.y,`PC ${i+4}`));text(515,285,'Backbone link',{size:20});
+      const sp=all[s%all.length],dp=all[d%all.length];const sLeft=(s%all.length)<3,dLeft=(d%all.length)<3;
+      if(sLeft&&dLeft)path=[sp,sw,dp];else if(sLeft&&!dLeft)path=[sp,sw,join,ringPts[0],dp];else if(!sLeft&&dLeft)path=[sp,ringPts[0],join,sw,dp];else path=[sp,dp];hops=Math.max(1,path.length-1);
+    }
+    state.path=path;els.hopCount.textContent=`${hops} ${hops===1?'hop':'hops'}`;els.deviceCount.textContent=n;els.criticalText.textContent=info[state.topology].critical;
+    if(path.length)packet(path[0].x,path[0].y);
+  }
+
+  function updateConcept(){const x=info[state.topology];els.conceptTitle.textContent=x.title;els.conceptText.textContent=x.text;els.connectionRule.textContent=x.rule;els.tabs.forEach(t=>t.classList.toggle('active',t.dataset.topology===state.topology));renderRules();draw();}
+  function setStatus(msg,type='good'){els.status.className='status'+(type==='warn'?' warn':type==='bad'?' bad':'');els.status.textContent=msg}
+  function pointAt(progress){const p=state.path;if(p.length<2)return p[0]||{x:0,y:0};const segs=[];let total=0;for(let i=0;i<p.length-1;i++){const len=Math.hypot(p[i+1].x-p[i].x,p[i+1].y-p[i].y);segs.push(len);total+=len}let dist=Math.max(0,Math.min(1,progress))*total;for(let i=0;i<segs.length;i++){if(dist<=segs[i]){const t=segs[i]===0?0:dist/segs[i];return{x:p[i].x+(p[i+1].x-p[i].x)*t,y:p[i].y+(p[i+1].y-p[i].y)*t}}dist-=segs[i]}return p[p.length-1]}
+  function tick(ts){if(!state.playing)return;if(state.last==null)state.last=ts;const dt=(ts-state.last)/1000;state.last=ts;state.progress+=dt*0.22*state.speed;if(state.progress>=1){state.progress=1;state.playing=false;setStatus('✅ Packet arrived at the destination. Follow the highlighted route to see how this topology carries data.');}
+    const p=pointAt(state.progress),c=document.getElementById('packet');if(c){c.setAttribute('cx',p.x);c.setAttribute('cy',p.y)}if(state.playing)state.raf=requestAnimationFrame(tick)}
+  function start(){if(+els.source.value===+els.dest.value){setStatus('Choose two different computers so the packet has somewhere to travel.','warn');return}if(state.fault){const t=state.topology;if(t==='hybrid')setStatus('⚠ The connecting segment has a fault. One part may still work locally, but cross-segment communication is interrupted.','bad');else setStatus(`⚠ ${info[t].critical} has failed, so this transmission cannot complete. Repair the fault first.`,'bad');return}if(state.progress>=1)state.progress=0;state.playing=true;state.last=null;setStatus('Packet is moving. Watch the route carefully.');cancelAnimationFrame(state.raf);state.raf=requestAnimationFrame(tick)}
+  function pause(){state.playing=false;cancelAnimationFrame(state.raf);setStatus('Paused. You can discuss what the class sees, then continue.','warn')}
+  function reset(){state.playing=false;cancelAnimationFrame(state.raf);state.progress=0;state.last=null;draw();setStatus('Reset complete. Ready for another demonstration.')}
+  function fault(){state.fault=true;state.playing=false;draw();const msg=state.topology==='hybrid'?'A connecting segment has failed. Some local segments may still work, but communication between segments can be disrupted.':`${info[state.topology].critical} has failed. This shows the main weak point of this topology.`;setStatus('⚠ '+msg,'bad')}
+  function repair(){state.fault=false;draw();setStatus('🛠 Fault repaired. The network can communicate again.')}
+
+  els.tabs.forEach(t=>t.addEventListener('click',()=>{state.topology=t.dataset.topology;state.fault=false;state.devices=state.topology==='hybrid'?6:6;updateSelects();updateConcept();reset();state.step=0;renderStep()}));
+  els.source.addEventListener('change',()=>{if(els.source.value===els.dest.value)els.dest.value=String((+els.source.value+1)%state.devices);reset()});
+  els.dest.addEventListener('change',()=>{if(els.source.value===els.dest.value)setStatus('Choose a different destination.','warn');reset()});
+  els.start.addEventListener('click',start);els.pause.addEventListener('click',pause);els.reset.addEventListener('click',reset);
+  els.labels.addEventListener('click',()=>{state.showLabels=!state.showLabels;els.labels.textContent=state.showLabels?'🏷 Hide Labels':'🏷 Show Labels';draw()});
+  els.speed.addEventListener('input',()=>{state.speed=Number(els.speed.value)||1;els.speedText.textContent=`${state.speed}×`});
+  els.add.addEventListener('click',()=>{if(state.topology==='hybrid'){setStatus('Hybrid demo uses a fixed 6-device layout so both star and ring segments remain clear.','warn');return}state.devices=Math.min(10,state.devices+1);updateSelects();reset();setStatus(`Device added. There are now ${state.devices} computers.`)});
+  els.remove.addEventListener('click',()=>{if(state.topology==='hybrid'){setStatus('Hybrid demo uses a fixed 6-device layout so both segments stay clear.','warn');return}state.devices=Math.max(3,state.devices-1);updateSelects();reset();setStatus(`Device removed. There are now ${state.devices} computers.`)});
+  els.fault.addEventListener('click',fault);els.repair.addEventListener('click',repair);
+
+  const examples=[
+    {title:'🏫 School Computer Lab',top:'star',s:0,d:4,desc:'Most modern LANs commonly use a star-like layout with devices connected to a switch. Send data from PC 1 to PC 5 and watch it pass through the switch.'},
+    {title:'🧵 Shared Backbone Demo',top:'bus',s:1,d:4,desc:'In a traditional bus network, all computers share the backbone cable. The packet reaches the backbone, travels along it, and then reaches the destination.'},
+    {title:'🔄 Token-Ring Idea',top:'ring',s:0,d:3,desc:'The packet follows the circular path from one neighbour to the next. This visual represents the basic one-direction ring idea used in older token-ring systems.'},
+    {title:'🏛 University Departments',top:'hybrid',s:0,d:4,desc:'A university can combine star networks in departments and connect them through a larger backbone or other topology. That combination is a hybrid network.'},
+    {title:'⚠ Central Failure',top:'star',s:2,d:5,desc:'Load a star network, then create a fault. If the central switch fails, devices lose the path through the center.'}
+  ];
+  const exGrid=document.getElementById('examplesGrid');examples.forEach((e,i)=>{const b=document.createElement('button');b.className='example-btn';b.textContent=e.title;b.addEventListener('click',()=>{[...exGrid.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');state.topology=e.top;state.fault=false;state.devices=6;updateSelects();els.source.value=String(e.s);els.dest.value=String(e.d);updateConcept();reset();els.exampleExplain.innerHTML=`<b>${e.title}</b><br>${e.desc}<br><br><b>Step-by-step:</b> 1) Identify the connection shape. 2) Choose source and destination. 3) Press Start. 4) Observe the route. 5) Explain why this route matches the topology.`;if(i===4){fault()}});exGrid.appendChild(b)});
+
+  const apps=[
+    {t:'💻 School / Office LAN',top:'star',d:'Computers usually connect to one or more switches. This makes adding devices and finding cable faults easier.'},
+    {t:'🏠 Home Router Network',top:'star',d:'Phones, TVs and laptops often connect around a central router/access point, which resembles a star structure logically.'},
+    {t:'🏛 Campus / Organization',top:'hybrid',d:'Different buildings or departments may use their own local topology and then connect together. This is a common reason to use hybrid designs.'},
+    {t:'🕰 Legacy Token Ring / FDDI',top:'ring',d:'Ring ideas are important historically and help students understand token passing and organized circular data paths.'}
+  ];
+  const ag=document.getElementById('appsGrid');apps.forEach(a=>{const b=document.createElement('button');b.className='app-btn';b.textContent=a.t;b.addEventListener('click',()=>{[...ag.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');state.topology=a.top;state.fault=false;updateSelects();updateConcept();reset();els.appExplain.innerHTML=`<b>${a.t}</b><br>${a.d}<br><br><b>Topology connection:</b> ${info[a.top].rule}`});ag.appendChild(b)});
+
+  document.querySelectorAll('.what-btn').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.action;if(a==='more'){if(state.topology==='hybrid'){els.whatExplain.textContent='Hybrid networks are especially useful when an organization grows because new segments can be added using the most suitable topology.'}else{state.devices=Math.min(10,state.devices+1);updateSelects();reset();els.whatExplain.textContent=`A new computer was added. Notice how the ${state.topology} layout changes. Think about how much new cabling or reconfiguration is needed.`}}if(a==='fault'){fault();els.whatExplain.textContent=`Fault created. Main lesson: ${info[state.topology].dis}.`}if(a==='speed'){state.speed=2;els.speed.value='2';els.speedText.textContent='2×';els.whatExplain.textContent='Animation speed is now 2×. The route stays the same; only how fast we observe the packet changes.'}if(a==='repair'){repair();els.whatExplain.textContent='The fault is repaired. Compare the working network with the failed state and identify the critical component.'}}));
+
+  const steps=[
+    {h:'Basic idea',p:'A network topology is the physical or logical arrangement of devices and connections in a network.'},
+    {h:'Visual observation',p:'Look at the shape of the selected topology. Ask: Is there one backbone, one center, a loop, or a combination?'},
+    {h:'Rule / principle',p:'Follow the data path. Each topology gives the packet a different route from source to destination.'},
+    {h:'Example',p:'Choose two computers in the simulator and press Start. Watch every point the packet must pass through.'},
+    {h:'Failure test',p:'Press Create Fault. Observe whether one device, one segment, or the whole network is affected.'},
+    {h:'Application',p:'Connect the idea to a school lab, home router, older ring system, or a large campus network.'}
+  ];
+  function renderStep(){const st=steps[state.step];els.stepDisplay.innerHTML=`<div class="step-no">Step ${state.step+1} of ${steps.length}</div><h3>${st.h}</h3><p>${st.p}</p><p><b>For ${info[state.topology].title}:</b> ${state.step===2?info[state.topology].rule:state.step===4?info[state.topology].dis:state.step===5?'Think of a real place where this design would make sense.':''}</p>`;els.prevStep.disabled=state.step===0;els.nextStep.disabled=state.step===steps.length-1}
+  els.prevStep.addEventListener('click',()=>{state.step=Math.max(0,state.step-1);renderStep()});els.nextStep.addEventListener('click',()=>{state.step=Math.min(steps.length-1,state.step+1);renderStep()});
+
+  function renderRules(){const data={
+    bus:[['1. Shared path','Every device uses the same backbone cable.'],['2. Terminators','Traditional bus topology uses terminators at both ends of the backbone.'],['3. Fault effect','A backbone problem can affect the whole network.'],['4. Best memory clue','BUS = one main line.']],
+    star:[['1. Central path','Each device has its own connection to the hub/switch.'],['2. Data route','Data from one PC normally passes through the center.'],['3. Fault effect','One device cable can fail alone, but center failure is serious.'],['4. Best memory clue','STAR = spokes around a center.']],
+    ring:[['1. Closed loop','Each device connects to two neighbours.'],['2. Data route','Data follows the ring from node to node in the basic model.'],['3. Fault effect','A single break can stop a basic ring unless protection exists.'],['4. Best memory clue','RING = one circular path.']],
+    hybrid:[['1. Combination','Two or more topology types are joined.'],['2. Flexible design','Different departments can use different structures.'],['3. Fault effect','A problem may remain inside one segment, depending on design.'],['4. Best memory clue','HYBRID = mixture of topologies.']]
+  }[state.topology];els.ruleCards.innerHTML=data.map(x=>`<div class="mini-card"><h3>${x[0]}</h3><p>${x[1]}</p></div>`).join('')}
+
+  const quizzes={
+    easy:{q:'Which topology connects every computer to a central hub or switch?',opts:['Bus','Star','Ring','Hybrid'],a:1,h:'Think of a wheel with spokes meeting at one center.',s:'Star topology. Every device has an independent connection to a central hub or switch.'},
+    medium:{q:'In a traditional bus topology, what is used at both ends of the main backbone cable?',opts:['Routers','Terminators','MAUs','Repeaters'],a:1,h:'The devices at the ends stop signals from reflecting back along the cable.',s:'Terminators are placed at both ends of the backbone in a traditional bus topology.'},
+    challenge:{q:'A university uses a star topology inside each department, and those departments are connected through a larger backbone. What topology describes the whole network?',opts:['Only star','Only bus','Ring','Hybrid'],a:3,h:'The complete design combines more than one topology type.',s:'Hybrid topology, because the larger network combines star segments with another connecting topology.'}
+  };
+  function renderQuiz(){const q=quizzes[state.quiz];els.quizQuestion.textContent=q.q;els.quizOptions.innerHTML=q.opts.map((o,i)=>`<label class="option"><input type="radio" name="quiz" value="${i}"><span>${o}</span></label>`).join('');els.quizFeedback.textContent='Choose an answer, then press Check Answer.'}
+  document.querySelectorAll('.qtab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.qtab').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.quiz=b.dataset.q;renderQuiz()}));
+  els.checkQuiz.addEventListener('click',()=>{const c=document.querySelector('input[name="quiz"]:checked');const q=quizzes[state.quiz];if(!c){els.quizFeedback.textContent='Please choose an answer first.';return}if(+c.value===q.a)els.quizFeedback.textContent='✅ Correct! '+q.s;else els.quizFeedback.textContent='❌ Try again. Hint: '+q.h});
+  els.showSolution.addEventListener('click',()=>{els.quizFeedback.textContent='Solution: '+quizzes[state.quiz].s});
+
+  const teacherQs=[
+    {q:'What do you predict will happen if the central switch in a star topology fails?',a:'Communication through the star stops because all devices depend on the central switch. Individual computers may still work, but the network path is lost.'},
+    {q:'What do you predict will happen if the backbone cable in a bus topology is broken?',a:'A traditional bus network can lose communication because every device depends on the same backbone cable.'},
+    {q:'If one cable between two neighbours in a basic single ring breaks, what happens?',a:'The continuous loop is broken, so the basic ring can be disrupted unless a protection or bypass mechanism exists.'},
+    {q:'Why might a large university choose a hybrid topology?',a:'Different departments can use the topology that suits them best, while all departments are still connected in one larger network.'}
+  ];let teacherIndex=0;
+  els.newTeacherQ.addEventListener('click',()=>{teacherIndex=(teacherIndex+1)%teacherQs.length;els.teacherQuestion.textContent=teacherQs[teacherIndex].q;els.teacherAnswer.classList.add('hidden');els.teacherAnswer.textContent=''});
+  els.showTeacherA.addEventListener('click',()=>{els.teacherAnswer.textContent=teacherQs[teacherIndex].a;els.teacherAnswer.classList.remove('hidden')});
+
+  updateSelects();updateConcept();renderStep();renderQuiz();els.teacherQuestion.textContent=teacherQs[0].q;
+})();
+</script>
+</body>
+</html>

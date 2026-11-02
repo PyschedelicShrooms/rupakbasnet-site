@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Computer Network and Communication - Interactive Simulation</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f3f7ff;color:#123;line-height:1.5}
+header{background:linear-gradient(135deg,#1565c0,#00acc1);color:white;text-align:center;padding:28px 15px}
+header h1{margin:0;font-size:2rem}
+nav{position:sticky;top:0;background:white;z-index:10;padding:10px;box-shadow:0 3px 12px #0002;text-align:center}
+nav a{display:inline-block;margin:4px;padding:8px 12px;background:#e3f2fd;border-radius:20px;color:#0d47a1;text-decoration:none;font-weight:bold}
+section{max-width:1100px;margin:22px auto;padding:20px;background:white;border-radius:18px;box-shadow:0 4px 18px #0001}
+h2{color:#0d47a1;border-left:7px solid #00acc1;padding-left:10px}
+.definition{background:#fff8e1;border-left:6px solid #ffb300;padding:12px;border-radius:10px;font-weight:bold}
+.simbox{background:#eef7ff;border:2px dashed #64b5f6;border-radius:15px;padding:15px;margin-top:15px;min-height:180px;position:relative;overflow:hidden}
+.devices{display:flex;justify-content:space-around;align-items:center;gap:12px;flex-wrap:wrap;margin:15px 0}
+.device{background:white;border:3px solid #90caf9;border-radius:14px;padding:14px;min-width:100px;text-align:center;font-size:2.2rem;box-shadow:0 2px 8px #0001}
+.device span{display:block;font-size:.9rem;font-weight:bold;color:#1565c0}
+button{border:0;border-radius:22px;background:#1565c0;color:white;padding:10px 15px;margin:6px;cursor:pointer;font-weight:bold}
+button:hover{background:#00acc1}
+.packet{position:absolute;background:#ff7043;color:white;padding:6px 10px;border-radius:20px;font-weight:bold;box-shadow:0 2px 8px #0003;animation:move 2s linear forwards;left:8%;top:50%}
+@keyframes move{to{left:82%}}
+.packet2{animation:moveBack 2s linear forwards}
+@keyframes moveBack{from{left:82%;top:35%}to{left:8%;top:35%}}
+.line{height:5px;background:repeating-linear-gradient(90deg,#1976d2,#1976d2 12px,#bbdefb 12px,#bbdefb 24px);border-radius:10px;margin:10px 7%}
+.status{font-weight:bold;margin-top:10px;color:#1b5e20}
+.fail{color:#b71c1c}
+.checks label{display:block;background:white;margin:8px;padding:10px;border-radius:10px}
+.timeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.timeitem{background:#e0f2f1;border:2px solid #26a69a;border-radius:12px;padding:12px;text-align:center;cursor:pointer;font-weight:bold}
+.timeitem:hover{transform:scale(1.03)}
+#historyStage{font-size:1.2rem;text-align:center;min-height:85px;padding:18px;background:#fff;border-radius:12px}
+.wave{display:inline-block;width:24px;height:24px;border:3px solid #00acc1;border-radius:50%;animation:wave 1s infinite;margin:5px}
+@keyframes wave{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.8);opacity:0}}
+.globe{width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,#4dd0e1,#00695c);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:1.2rem;margin:auto;box-shadow:0 0 20px #00acc1}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.card{background:#f1f8e9;border-radius:13px;padding:12px;text-align:center;border:2px solid #aed581}
+input[type=text]{padding:12px;border:2px solid #90caf9;border-radius:10px;max-width:320px;width:90%}
+.quiz .q{background:#f5f5f5;border-radius:12px;padding:12px;margin:10px 0}
+.answer{display:none;font-weight:bold;margin-top:8px}
+.match{display:flex;gap:15px;flex-wrap:wrap}
+.drag,.drop{padding:12px;border-radius:10px;margin:8px;background:#e3f2fd;border:2px solid #64b5f6;min-width:150px}
+.drop{background:#fff3e0;min-height:52px}
+.summary{background:#e8f5e9}
+@media(max-width:650px){header h1{font-size:1.45rem}.device{min-width:80px;font-size:1.7rem}}
+
+.dailyPath{position:relative;height:55px;margin:18px 4%}
+.pathLine{position:absolute;top:25px;left:4%;right:4%;height:7px;background:linear-gradient(90deg,#42a5f5,#26a69a,#ffca28,#ef5350);border-radius:20px}
+.node{position:absolute;top:13px;background:#0d47a1;color:white;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;transform:translateX(-50%)}
+.stepPanel{text-align:center;margin:12px}
+.packetTable{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;background:#ffffff;border-radius:12px;padding:12px;margin:10px 0;border:2px solid #bbdefb}
+.miniPacket{position:absolute;background:#ff7043;color:white;border-radius:18px;padding:6px 10px;font-size:.85rem;font-weight:bold;top:210px;left:6%;box-shadow:0 3px 8px #0003;transition:left 1s, top 1s, transform 1s}
+.device.active{border-color:#ff7043;background:#fff3e0;transform:scale(1.04)}
+
+
+/* MOBILE DISPLAY FIX */
+.simbox{overflow:visible}
+.devices{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(82px,1fr));
+  align-items:stretch;
+}
+.device{
+  min-width:0;
+  width:100%;
+  font-size:1.8rem;
+  padding:10px 6px;
+}
+.device span{font-size:.78rem}
+.stepPanel button{display:inline-block;min-width:120px}
+#miniPackets,#netPackets{
+  position:relative;
+  min-height:160px;
+  margin-top:10px;
+  background:#ffffff;
+  border:2px solid #bbdefb;
+  border-radius:12px;
+  overflow:hidden;
+}
+#miniPackets .miniPacket,#netPackets .miniPacket{
+  top:auto!important;
+  margin-top:12px;
+}
+.miniPacket{
+  position:absolute;
+  top:20px!important;
+  left:6%;
+  max-width:120px;
+  white-space:normal;
+  text-align:center;
+}
+#miniPackets .miniPacket:nth-child(1),#netPackets .miniPacket:nth-child(1){top:18px!important}
+#miniPackets .miniPacket:nth-child(2),#netPackets .miniPacket:nth-child(2){top:58px!important}
+#miniPackets .miniPacket:nth-child(3),#netPackets .miniPacket:nth-child(3){top:98px!important}
+#miniPackets .miniPacket:nth-child(4),#netPackets .miniPacket:nth-child(4){top:138px!important}
+.dailyPath{height:45px;margin:10px 0}
+.node{width:26px;height:26px;font-size:.8rem}
+@media(max-width:650px){
+  body{font-size:15px}
+  section{margin:12px 8px;padding:14px;border-radius:14px}
+  nav{position:static;white-space:normal}
+  nav a{font-size:.8rem;padding:7px 9px}
+  h2{font-size:1.15rem}
+  h3{font-size:1rem}
+  .packetTable{grid-template-columns:1fr;font-size:.9rem}
+  .stepPanel button, button{width:100%;margin:5px 0}
+  .dailyPath{display:none}
+  #dailySim .devices, #netSim .devices{grid-template-columns:repeat(2,1fr)}
+  #dailySim .devices .device:nth-child(5), #netSim .devices .device:nth-child(5){grid-column:1 / -1}
+  .miniPacket{font-size:.75rem;padding:5px 7px;max-width:92px}
+  .pathLine{display:none}
+}
+
+
+/* ROBUST PACKET FLOW FIX */
+.flowArea{
+  position:relative;
+  height:170px;
+  margin:14px 0;
+  background:#ffffff;
+  border:2px solid #bbdefb;
+  border-radius:14px;
+  overflow:hidden;
+}
+.flowTrack{
+  position:absolute;
+  left:8%;
+  right:8%;
+  height:6px;
+  background:repeating-linear-gradient(90deg,#90caf9,#90caf9 12px,#e3f2fd 12px,#e3f2fd 24px);
+  border-radius:10px;
+}
+.flowTrack.t1{top:42px}
+.flowTrack.t2{top:82px}
+.flowTrack.t3{top:122px}
+.flowTrack.t4{top:150px}
+.flowPacket{
+  position:absolute;
+  left:8%;
+  width:86px;
+  padding:5px 7px;
+  background:#ff7043;
+  color:#fff;
+  border-radius:18px;
+  font-size:.75rem;
+  font-weight:bold;
+  text-align:center;
+  box-shadow:0 3px 8px #0003;
+  transition:left 1s ease, transform 1s ease;
+  z-index:3;
+}
+.flowPacket.p1{top:24px}
+.flowPacket.p2{top:64px}
+.flowPacket.p3{top:104px}
+.flowPacket.p4{top:132px}
+.flowLegend{
+  display:flex;
+  justify-content:space-between;
+  gap:4px;
+  font-size:.72rem;
+  font-weight:bold;
+  color:#0d47a1;
+  padding:5px 6%;
+}
+@media(max-width:650px){
+  .flowArea{height:185px}
+  .flowPacket{width:74px;font-size:.68rem;padding:4px}
+  .flowLegend{font-size:.62rem;padding:4px 2%}
+  .flowTrack{left:5%;right:5%}
+  .flowPacket{left:5%}
+}
+
+
+/* PERFECT INTERNET PICTURE SIMULATION */
+.internetPicture{
+  position:relative;
+  height:390px;
+  background:linear-gradient(180deg,#f8fbff,#e3f2fd);
+  border:3px solid #90caf9;
+  border-radius:18px;
+  overflow:hidden;
+  margin:15px 0;
+}
+.netLine{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+.netLine path{fill:none;stroke-width:8;stroke-linecap:round;stroke-dasharray:14 12}
+#requestPath{stroke:#1565c0}
+#responsePath{stroke:#2e7d32}
+.picNode{
+  position:absolute;
+  z-index:3;
+  width:150px;
+  min-height:118px;
+  background:white;
+  border:3px solid #64b5f6;
+  border-radius:16px;
+  text-align:center;
+  padding:10px 6px;
+  box-shadow:0 4px 14px #0002;
+  transition:.3s;
+}
+.picNode b{display:block;color:#0d47a1;font-size:.92rem}
+.picNode small{display:block;font-size:.75rem;color:#333}
+.picIcon{font-size:2.4rem}
+.laptopPic{left:3%;top:130px}
+.routerPic{left:23%;top:45px}
+.ispPic{left:42%;top:170px}
+.internetCloud{left:58%;top:45px;border-radius:40px;background:#e8f5e9;border-color:#43a047}
+.serverPic{right:3%;top:120px;border-color:#ff9800}
+.picNode.active{border-color:#e53935;background:#fff3e0;transform:scale(1.06)}
+.movingDot{
+  position:absolute;
+  z-index:5;
+  left:7%;
+  top:190px;
+  background:#e53935;
+  color:white;
+  font-weight:bold;
+  padding:8px 10px;
+  border-radius:20px;
+  box-shadow:0 4px 12px #0004;
+  transition:left 1s ease, top 1s ease, background .3s;
+}
+.internetSteps{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+  gap:10px;
+  margin:12px 0;
+}
+.internetStepCard{
+  background:#fff;
+  border:2px solid #bbdefb;
+  border-radius:12px;
+  padding:10px;
+  font-size:.9rem;
+}
+.internetStepCard.active{
+  background:#fff3e0;
+  border-color:#e53935;
+}
+@media(max-width:650px){
+  .internetPicture{height:620px}
+  .picNode{width:44%;min-height:105px}
+  .laptopPic{left:3%;top:25px}
+  .routerPic{right:3%;left:auto;top:25px}
+  .ispPic{left:3%;top:185px}
+  .internetCloud{right:3%;left:auto;top:185px}
+  .serverPic{left:28%;right:auto;top:350px}
+  .netLine{display:none}
+  .movingDot{left:8%;top:145px}
+  .internetSteps{grid-template-columns:1fr}
+}
+
+
+/* FIXED SIMPLE INTERNET PICTURE SIMULATION */
+.internet-diagram{
+  display:grid;
+  grid-template-columns:1fr auto 1fr auto 1fr auto 1fr auto 1fr;
+  gap:8px;
+  align-items:center;
+  margin:15px 0;
+}
+.internet-stage{
+  background:white;
+  border:3px solid #90caf9;
+  border-radius:16px;
+  padding:12px 8px;
+  text-align:center;
+  min-height:135px;
+  box-shadow:0 3px 10px #0001;
+  transition:.3s;
+}
+.internet-stage.active{
+  border-color:#e53935;
+  background:#fff3e0;
+  transform:scale(1.04);
+}
+.big-pic{font-size:3rem;line-height:1}
+.internet-stage b{display:block;color:#0d47a1;margin-top:6px}
+.internet-stage small{display:block;font-size:.78rem;color:#444}
+.arrow{font-size:1.8rem;color:#1565c0;font-weight:bold}
+.internet-road{
+  position:relative;
+  height:95px;
+  background:#fff;
+  border:2px solid #bbdefb;
+  border-radius:14px;
+  overflow:hidden;
+  margin:15px 0;
+}
+.road-line{
+  position:absolute;
+  left:6%;
+  right:6%;
+  top:45px;
+  height:8px;
+  border-radius:10px;
+  background:repeating-linear-gradient(90deg,#1565c0,#1565c0 18px,#bbdefb 18px,#bbdefb 34px);
+}
+.data-car{
+  position:absolute;
+  left:6%;
+  top:28px;
+  background:#e53935;
+  color:white;
+  padding:8px 12px;
+  border-radius:20px;
+  font-weight:bold;
+  box-shadow:0 3px 10px #0003;
+  transition:left 1s ease, background .3s;
+}
+.internet-card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:10px;
+  margin:12px 0;
+}
+.internet-info-card{
+  background:#fff;
+  border:2px solid #bbdefb;
+  border-radius:12px;
+  padding:10px;
+  font-size:.9rem;
+}
+.internet-info-card.active{
+  border-color:#e53935;
+  background:#fff3e0;
+}
+@media(max-width:700px){
+  .internet-diagram{
+    grid-template-columns:1fr;
+  }
+  .arrow{
+    transform:rotate(90deg);
+    text-align:center;
+  }
+  .internet-stage{min-height:105px}
+  .big-pic{font-size:2.4rem}
+  .internet-road{height:80px}
+  .data-car{font-size:.75rem;max-width:90px;text-align:center}
+}
+
+
+/* FIXED LIVE EXAMPLES SIMULATION */
+.live-diagram{
+  display:grid;
+  grid-template-columns:1fr auto 1fr auto 1fr auto 1fr auto 1fr;
+  gap:8px;
+  align-items:center;
+  margin:15px 0;
+}
+.live-stage{
+  background:white;
+  border:3px solid #90caf9;
+  border-radius:16px;
+  padding:12px 8px;
+  text-align:center;
+  min-height:135px;
+  box-shadow:0 3px 10px #0001;
+  transition:.3s;
+}
+.live-stage.active{
+  border-color:#e53935;
+  background:#fff3e0;
+  transform:scale(1.04);
+}
+.live-stage b{display:block;color:#0d47a1;margin-top:6px}
+.live-stage small{display:block;font-size:.78rem;color:#444}
+@media(max-width:700px){
+  .live-diagram{grid-template-columns:1fr}
+  .live-stage{min-height:105px}
+}
+
+</style>
+</head>
+<body>
+<header>
+<h1>Computer Network and Communication</h1>
+<p>Class 10 Interactive HTML Simulation</p>
+</header>
+
+<nav>
+<a href="#daily">Daily</a><a href="#network">Network</a><a href="#requirements">Requirements</a><a href="#history">History</a><a href="#communication">Communication</a><a href="#telecom">Telecommunication</a><a href="#internet">Internet</a><a href="#live">Live Examples</a><a href="#quiz">Quiz</a>
+</nav>
+
+<section id="daily">
+<h2>1. Daily Communication: Step-by-Step Data Passing</h2>
+<p class="definition">Daily communication means sending digital data from one source device to another destination device through a network. Data is broken into small packets, given addresses, sent through Internet devices, and then joined again at the receiver.</p>
+
+<div class="simbox" id="dailySim">
+  <h3>Choose a real-life example</h3>
+  <button onclick="setupDaily('whatsapp')">WhatsApp Message</button>
+  <button onclick="setupDaily('youtube')">YouTube Video</button>
+  <button onclick="setupDaily('call')">Video Call</button>
+  <button onclick="setupDaily('payment')">Online Payment</button>
+
+  <div class="devices">
+    <div class="device" id="dSource">📱<span>Source</span></div>
+    <div class="device" id="dRouter">📡<span>Wi-Fi / Mobile Tower</span></div>
+    <div class="device" id="dInternet">🌐<span>Internet</span></div>
+    <div class="device" id="dServer">🖥️<span>Server</span></div>
+    <div class="device" id="dDest">📱<span>Destination</span></div>
+  </div>
+
+  <div class="dailyPath">
+    <div class="pathLine"></div>
+    <span class="node" style="left:6%">1</span>
+    <span class="node" style="left:28%">2</span>
+    <span class="node" style="left:50%">3</span>
+    <span class="node" style="left:72%">4</span>
+    <span class="node" style="left:94%">5</span>
+  </div>
+
+  <div class="stepPanel">
+    <button onclick="prevDailyStep()">◀ Previous Step</button>
+    <button onclick="nextDailyStep()">Next Step ▶</button>
+    <button onclick="autoDaily()">Auto Run</button>
+  </div>
+
+  <div class="packetTable">
+    <div><b>Source Address:</b> <span id="srcAddr">-</span></div>
+    <div><b>Destination Address:</b> <span id="dstAddr">-</span></div>
+    <div><b>Data Type:</b> <span id="dataType">-</span></div>
+    <div><b>Current Step:</b> <span id="dailyStepNo">0</span></div>
+  </div>
+
+  <div id="dailyExplain" class="definition">Click one example first, then press Next Step.</div>
+  
+<div class="flowLegend"><span>Source</span><span>Medium</span><span>Internet/Router</span><span>Server/Switch</span><span>Destination</span></div>
+<div id="miniPackets" class="flowArea"></div>
+</div>
+</section>
+
+<section id="network">
+<h2>2. Computer Network: One-by-One Interactive Explanation</h2>
+<p class="definition">A computer network is a group of computers and digital devices connected together so they can share data, files, printers, Internet and other resources.</p>
+
+<div class="simbox" id="netSim">
+  <h3>Network Simulation: Computer A sends a file to Computer B</h3>
+
+  <div class="devices">
+    <div class="device" id="netA">💻<span>Computer A<br>Sender</span></div>
+    <div class="device" id="netCable">🔌<span>Medium<br>Wire / Wi-Fi</span></div>
+    <div class="device" id="netRouter">📡<span>Router<br>Path Finder</span></div>
+    <div class="device" id="netSwitch">🔀<span>Switch<br>Device Selector</span></div>
+    <div class="device" id="netB">🖥️<span>Computer B<br>Receiver</span></div>
+  </div>
+
+  <div class="dailyPath">
+    <div class="pathLine"></div>
+    <span class="node" style="left:6%">A</span>
+    <span class="node" style="left:28%">M</span>
+    <span class="node" style="left:50%">R</span>
+    <span class="node" style="left:72%">S</span>
+    <span class="node" style="left:94%">B</span>
+  </div>
+
+  <div class="stepPanel">
+    <button onclick="netSetup()">Start Network</button>
+    <button onclick="netNext()">Next Explanation ▶</button>
+    <button onclick="netAuto()">Auto Run</button>
+    <button onclick="netReset()">Reset</button>
+  </div>
+
+  <div class="packetTable">
+    <div><b>Sender IP:</b> 192.168.1.2</div>
+    <div><b>Receiver IP:</b> 192.168.1.3</div>
+    <div><b>Data:</b> Homework file</div>
+    <div><b>Network Type:</b> LAN example</div>
+  </div>
+
+  <div id="netExplain" class="definition">Click Start Network, then Next Explanation.</div>
+  
+<div class="flowLegend"><span>Computer A</span><span>Medium</span><span>Router</span><span>Switch</span><span>Computer B</span></div>
+<div id="netPackets" class="flowArea"></div>
+
+  <h3>Try it yourself: Build a working network</h3>
+  <p>Select all required parts. If one part is missing, the network will not work.</p>
+  <div class="checks">
+    <label><input type="checkbox" id="nDev" checked> Two or more devices</label>
+    <label><input type="checkbox" id="nMed" checked> Communication medium: wire or Wi-Fi</label>
+    <label><input type="checkbox" id="nAddr" checked> Address/IP to identify each device</label>
+    <label><input type="checkbox" id="nRule" checked> Rules/protocols for sending data</label>
+  </div>
+  <button onclick="testNetworkBuild()">Test My Network</button>
+  <p id="netBuildStatus" class="status"></p>
+</div>
+</section>
+
+<section id="requirements">
+<h2>3. Requirements of Communication</h2>
+<p class="definition">Successful communication needs connection, medium, rules/protocols, and reliable technology.</p>
+<div class="simbox">
+<div class="checks">
+<label><input type="checkbox" id="c1" checked> Connection between devices</label>
+<label><input type="checkbox" id="c2" checked> Medium to carry data, like wire or Wi-Fi</label>
+<label><input type="checkbox" id="c3" checked> Rules/protocols to control data transfer</label>
+<label><input type="checkbox" id="c4" checked> Speed, capacity and reliability</label>
+</div>
+<button onclick="testReq()">Test Communication</button>
+<p id="reqStatus" class="status"></p>
+</div>
+</section>
+
+<section id="history">
+<h2>4. History of Communication</h2>
+<p>Click each method to see a small simulation.</p>
+<div class="timeline">
+<div class="timeitem" onclick="historySim('🔥 Smoke signal rises to show a message from far away.')">Fire Smoke</div>
+<div class="timeitem" onclick="historySim('🥁 Drum beats send warning or news to nearby people.')">Drum Beats</div>
+<div class="timeitem" onclick="historySim('📯 Horn sound travels through air to call people.')">Horn</div>
+<div class="timeitem" onclick="historySim('🕊️ Pigeon carries a written message.')">Pigeon</div>
+<div class="timeitem" onclick="historySim('🐎 Horse rider carries letters from place to place.')">Horse</div>
+<div class="timeitem" onclick="historySim('⚡ Telegraph sends coded electrical signals.')">Telegraph</div>
+<div class="timeitem" onclick="historySim('☎️ Telephone sends voice over distance.')">Telephone</div>
+<div class="timeitem" onclick="historySim('💻 Computers share electronic data in networks.')">Computer Network</div>
+<div class="timeitem" onclick="historySim('🌐 Internet connects the world for fast information sharing.')">Internet</div>
+</div>
+<div class="simbox"><div id="historyStage">Select a timeline item.</div></div>
+</section>
+
+<section id="communication">
+<h2>5. Communication Definition: Where Data Flows</h2>
+<p class="definition">Communication is the process of sending or receiving information between two or more points. In digital communication, the message flows from Sender → Medium/Channel → Receiver.</p>
+
+<div class="simbox" id="commSim">
+  <h3>Type a message and watch the data flow</h3>
+
+  <div class="devices">
+    <div class="device" id="commSender">👨‍🎓<span>Sender<br>Point 1</span></div>
+    <div class="device" id="commEncode">🔢<span>Encoding<br>Text to 0s and 1s</span></div>
+    <div class="device" id="commChannel">〰️<span>Channel<br>Wire/Wi-Fi/Air</span></div>
+    <div class="device" id="commDecode">🔤<span>Decoding<br>Data to text</span></div>
+    <div class="device" id="commReceiver">👩‍🎓<span>Receiver<br>Point 2</span></div>
+  </div>
+
+  <input id="msg" type="text" placeholder="Type message, e.g. Hello">
+  <button onclick="startCommFlow()">Start Communication</button>
+  <button onclick="nextCommFlow()">Next Step ▶</button>
+  <button onclick="autoCommFlow()">Auto Run</button>
+
+  <div class="flowLegend"><span>Sender</span><span>Encode</span><span>Channel</span><span>Decode</span><span>Receiver</span></div>
+  <div id="commPackets" class="flowArea"></div>
+
+  <div class="packetTable">
+    <div><b>Original Message:</b> <span id="originalMsg">-</span></div>
+    <div><b>Digital Data:</b> <span id="binaryMsg">-</span></div>
+    <div><b>Direction:</b> <span id="commDirection">Sender → Receiver</span></div>
+    <div><b>Current Position:</b> <span id="commPosition">Not started</span></div>
+  </div>
+
+  <div id="commStatus" class="definition">Enter a message and click Start Communication.</div>
+</div>
+</section>
+
+<section id="telecom">
+<h2>6. Telecommunication: Step-wise Long Distance Signal</h2>
+<p class="definition">Telecommunication means sending and receiving information over a long distance using electronic devices and electromagnetic signals.</p>
+
+<div class="simbox" id="teleSim">
+  <h3>Example: Mobile phone sends voice to another city</h3>
+  <div class="devices">
+    <div class="device" id="tele1">📱<span>Sender Phone</span></div>
+    <div class="device" id="tele2">🗼<span>Nearby Tower</span></div>
+    <div class="device" id="tele3">🌐<span>Telecom Network</span></div>
+    <div class="device" id="tele4">🗼<span>Remote Tower</span></div>
+    <div class="device" id="tele5">📱<span>Receiver Phone</span></div>
+  </div>
+
+  <button onclick="teleStart()">Start</button>
+  <button onclick="teleNext()">Next Step ▶</button>
+  <button onclick="teleAuto()">Auto Run</button>
+
+  <div class="flowLegend"><span>Phone</span><span>Tower</span><span>Network</span><span>Tower</span><span>Receiver</span></div>
+  <div id="telePackets" class="flowArea"></div>
+
+  <div class="packetTable">
+    <div><b>Data:</b> Voice / text / video</div>
+    <div><b>Signal:</b> Electromagnetic wave</div>
+    <div><b>Distance:</b> Long distance</div>
+    <div><b>Current step:</b> <span id="teleStepText">Not started</span></div>
+  </div>
+
+  <div id="teleExplain" class="definition">Click Start, then Next Step.</div>
+</div>
+</section>
+
+
+<section id="internet">
+<h2>7. Internet: Clear Picture Simulation</h2>
+<p class="definition">
+The Internet is a global network that connects your device to web servers. When you open a website,
+your device sends a <b>request</b> and the web server sends a <b>response</b> back.
+</p>
+
+<div class="simbox" id="internetSim">
+  <h3>How a website opens: Device → Router/Tower → ISP → Internet → Web Server → Back to Device</h3>
+
+  <div class="internet-diagram">
+    <div class="internet-stage active" id="intDevice">
+      <div class="big-pic">💻📱</div>
+      <b>Your Device</b>
+      <small>Laptop or phone</small>
+    </div>
+
+    <div class="arrow">➡</div>
+
+    <div class="internet-stage" id="intRouter">
+      <div class="big-pic">📡</div>
+      <b>Router / Tower</b>
+      <small>Connects you to network</small>
+    </div>
+
+    <div class="arrow">➡</div>
+
+    <div class="internet-stage" id="intISP">
+      <div class="big-pic">🏢</div>
+      <b>ISP</b>
+      <small>Internet Service Provider</small>
+    </div>
+
+    <div class="arrow">➡</div>
+
+    <div class="internet-stage" id="intCloud">
+      <div class="big-pic">🌐</div>
+      <b>Internet</b>
+      <small>Many networks connected</small>
+    </div>
+
+    <div class="arrow">➡</div>
+
+    <div class="internet-stage" id="intServer">
+      <div class="big-pic">🖥️</div>
+      <b>Web Server</b>
+      <small>Stores website files</small>
+    </div>
+  </div>
+
+  <div class="internet-road" id="internetRoad">
+    <div class="road-line"></div>
+    <div class="data-car" id="internetPacket">REQUEST</div>
+  </div>
+
+  <div class="stepPanel">
+    <input id="websiteInput" type="text" value="www.school.com" placeholder="Type website name">
+    <button onclick="internetStart()">Start</button>
+    <button onclick="internetNextStep()">Next Step ▶</button>
+    <button onclick="internetAutoRun()">Auto Run</button>
+    <button onclick="internetReset()">Reset</button>
+  </div>
+
+  <div class="packetTable">
+    <div><b>Request:</b> Your device asks for a webpage.</div>
+    <div><b>Web Server:</b> A computer that stores website files.</div>
+    <div><b>Response:</b> Website data returns to your device.</div>
+    <div><b>Current position:</b> <span id="internetPosition">Your Device</span></div>
+  </div>
+
+  <div id="internetExplain" class="definition">
+    Press Start, then Next Step. Watch the REQUEST go to the web server and the RESPONSE come back.
+  </div>
+
+  <h3>Step-by-step cards</h3>
+  <div class="internet-card-grid">
+    <div class="internet-info-card" id="intCard1"><b>1. Type website</b><br>You type a website name in browser.</div>
+    <div class="internet-info-card" id="intCard2"><b>2. Router/Tower</b><br>Your request leaves your device.</div>
+    <div class="internet-info-card" id="intCard3"><b>3. ISP</b><br>Your Internet provider forwards it.</div>
+    <div class="internet-info-card" id="intCard4"><b>4. Internet</b><br>Many routers find the right path.</div>
+    <div class="internet-info-card" id="intCard5"><b>5. Web Server</b><br>Server finds HTML, images and files.</div>
+    <div class="internet-info-card" id="intCard6"><b>6. Response</b><br>Webpage data comes back.</div>
+    <div class="internet-info-card" id="intCard7"><b>7. Browser shows page</b><br>You see the webpage.</div>
+  </div>
+
+  <h3>Click pictures to learn</h3>
+  <div class="grid">
+    <div class="card" onclick="internetExplainRole('device')">💻📱 Device</div>
+    <div class="card" onclick="internetExplainRole('router')">📡 Router/Tower</div>
+    <div class="card" onclick="internetExplainRole('isp')">🏢 ISP</div>
+    <div class="card" onclick="internetExplainRole('internet')">🌐 Internet</div>
+    <div class="card" onclick="internetExplainRole('server')">🖥️ Web Server</div>
+  </div>
+  <p id="internetRoleText" class="status">Click any picture above to learn its role.</p>
+</div>
+</section>
+
+
+<section id="live">
+<h2>8. Live Examples: Clear Picture Simulations</h2>
+<p class="definition">
+These examples show how common Internet services work. Choose one example, then press Next Step to see exactly where the data flows.
+</p>
+
+<div class="grid">
+  <div class="card" onclick="liveSelect('whatsapp')">📱 WhatsApp Message<br><small>Phone → Server → Phone</small></div>
+  <div class="card" onclick="liveSelect('youtube')">▶️ YouTube Video<br><small>Server → Device</small></div>
+  <div class="card" onclick="liveSelect('video')">📹 Video Call<br><small>Two-way data flow</small></div>
+  <div class="card" onclick="liveSelect('payment')">💳 Online Payment<br><small>Phone → Bank Server</small></div>
+  <div class="card" onclick="liveSelect('web')">🌐 Website Browsing<br><small>Browser → Web Server</small></div>
+</div>
+
+<div class="simbox" id="liveBox">
+  <h3 id="liveTitle">Choose one live example above</h3>
+
+  <div class="live-diagram">
+    <div class="live-stage active" id="liveStage1">
+      <div class="big-pic" id="liveIcon1">📱</div>
+      <b id="liveLabel1">Source</b>
+      <small id="liveSmall1">Starting device</small>
+    </div>
+
+    <div class="arrow">➡</div>
+
+    <div class="live-stage" id="liveStage2">
+      <div class="big-pic" id="liveIcon2">📡</div>
+      <b id="liveLabel2">Network</b>
+      <small id="liveSmall2">Router or tower</small>
+    </div>
+
+    <div class="arrow">➡</div>
+
+    <div class="live-stage" id="liveStage3">
+      <div class="big-pic" id="liveIcon3">🌐</div>
+      <b id="liveLabel3">Internet</b>
+      <small id="liveSmall3">Data path</small>
+    </div>
+
+    <div class="arrow">➡</div>
+
+    <div class="live-stage" id="liveStage4">
+      <div class="big-pic" id="liveIcon4">🖥️</div>
+      <b id="liveLabel4">Server</b>
+      <small id="liveSmall4">Processes data</small>
+    </div>
+
+    <div class="arrow">➡</div>
+
+    <div class="live-stage" id="liveStage5">
+      <div class="big-pic" id="liveIcon5">✅</div>
+      <b id="liveLabel5">Result</b>
+      <small id="liveSmall5">User receives data</small>
+    </div>
+  </div>
+
+  <div class="internet-road" id="liveRoad">
+    <div class="road-line"></div>
+    <div class="data-car" id="livePacketCar">DATA</div>
+  </div>
+
+  <div class="stepPanel">
+    <button onclick="liveStart()">Start</button>
+    <button onclick="liveNextStep()">Next Step ▶</button>
+    <button onclick="liveAutoRun()">Auto Run</button>
+    <button onclick="liveReset()">Reset</button>
+  </div>
+
+  <div class="packetTable">
+    <div><b>Example:</b> <span id="liveExample">None selected</span></div>
+    <div><b>Data type:</b> <span id="liveDataType">-</span></div>
+    <div><b>Direction:</b> <span id="liveDirection">-</span></div>
+    <div><b>Current position:</b> <span id="livePosition">Not started</span></div>
+  </div>
+
+  <div id="liveExplain" class="definition">
+    Choose an example above. The moving packet will show the live data flow step by step.
+  </div>
+
+  <h3>Step cards</h3>
+  <div class="internet-card-grid">
+    <div class="internet-info-card" id="liveCard1"><b>1. Create data</b><br>User creates request/message.</div>
+    <div class="internet-info-card" id="liveCard2"><b>2. Network</b><br>Data goes to router/tower.</div>
+    <div class="internet-info-card" id="liveCard3"><b>3. Internet</b><br>Packets travel through Internet.</div>
+    <div class="internet-info-card" id="liveCard4"><b>4. Server</b><br>Server processes request.</div>
+    <div class="internet-info-card" id="liveCard5"><b>5. Response</b><br>Result comes back or reaches receiver.</div>
+  </div>
+</div>
+</section>
+
+<section id="quiz" class="quiz">
+<h2>Quiz and Activities</h2>
+<div class="q">1. What is needed to carry data?<br><button onclick="showAns('a1',true)">Medium</button><button onclick="showAns('a1',false)">Only noise</button><p id="a1" class="answer"></p></div>
+<div class="q">2. Which device connects local devices to Internet?<br><button onclick="showAns('a2',true)">Router</button><button onclick="showAns('a2',false)">Drum</button><p id="a2" class="answer"></p></div>
+<div class="q">3. Telecommunication uses electronic devices to communicate over distance.<br><button onclick="showAns('a3',true)">True</button><button onclick="showAns('a3',false)">False</button><p id="a3" class="answer"></p></div>
+
+<h3>Drag and Drop Matching</h3>
+<p>Drag the example to the correct meaning.</p>
+<div class="match">
+<div>
+<div class="drag" draggable="true" ondragstart="drag(event)" id="drag1">WhatsApp</div>
+<div class="drag" draggable="true" ondragstart="drag(event)" id="drag2">YouTube</div>
+<div class="drag" draggable="true" ondragstart="drag(event)" id="drag3">Telegraph</div>
+</div>
+<div>
+<div class="drop" ondrop="drop(event,'drag1')" ondragover="allowDrop(event)">Text message</div>
+<div class="drop" ondrop="drop(event,'drag2')" ondragover="allowDrop(event)">Video from server</div>
+<div class="drop" ondrop="drop(event,'drag3')" ondragover="allowDrop(event)">Coded electrical signal</div>
+</div>
+</div>
+<p id="matchStatus" class="status"></p>
+</section>
+
+<section class="summary">
+<h2>Summary</h2>
+<p>Computer network and communication help devices connect and share information. Communication needs connection, medium, rules and reliable technology. Telecommunication allows long-distance communication using electronic devices and signals. The Internet connects the world through computers, phones, servers, routers and towers.</p>
+<h3>Practice Questions</h3>
+<ol>
+<li>Define computer network.</li>
+<li>Write four requirements of communication.</li>
+<li>What is telecommunication?</li>
+<li>Give three examples of modern communication.</li>
+<li>How does website browsing work?</li>
+</ol>
+</section>
+
+<script>
+
+let dailyMode = null;
+let dailyStep = 0;
+let dailyTimer = null;
+
+const dailyData = {
+  whatsapp: {
+    src:'Phone A: 192.168.1.10',
+    dst:'Phone B: 103.55.22.18',
+    type:'Text message',
+    labels:['Hi','How','are','you?'],
+    devices:['📱<span>Sender Phone</span>','📡<span>Wi-Fi Router</span>','🌐<span>Internet</span>','🖥️<span>WhatsApp Server</span>','📱<span>Receiver Phone</span>'],
+    steps:[
+      'Step 1: You type a message on the sender phone. The phone changes your text into digital data using 0s and 1s.',
+      'Step 2: The message is divided into small data packets. Each packet gets source and destination addresses.',
+      'Step 3: Packets travel from the phone to Wi-Fi router or mobile tower using wireless signals.',
+      'Step 4: The router sends packets through the Internet to the WhatsApp server.',
+      'Step 5: The server finds the receiver and forwards packets to the receiver phone.',
+      'Step 6: Receiver phone joins the packets again and shows the original message.'
+    ],
+    positions:['6%','6%','28%','50%','72%','94%']
+  },
+  youtube: {
+    src:'YouTube Server: 142.250.0.1',
+    dst:'Student Laptop: 192.168.1.15',
+    type:'Video + audio data',
+    labels:['video','audio','image','buffer'],
+    devices:['💻<span>Your Laptop</span>','📡<span>Wi-Fi Router</span>','🌐<span>Internet</span>','🖥️<span>YouTube Server</span>','🎬<span>Screen Playback</span>'],
+    steps:[
+      'Step 1: You click a YouTube video. Your laptop sends a request for that video.',
+      'Step 2: The request goes to Wi-Fi router, then to the Internet.',
+      'Step 3: The Internet carries the request to the YouTube server.',
+      'Step 4: YouTube server breaks video into many small video packets.',
+      'Step 5: Packets return through Internet and router to your laptop.',
+      'Step 6: Laptop joins packets, buffers them, and plays video smoothly.'
+    ],
+    positions:['6%','28%','50%','72%','94%','94%']
+  },
+  call: {
+    src:'Phone A: 192.168.1.20',
+    dst:'Phone B: 192.168.1.30',
+    type:'Two-way audio and video',
+    labels:['voice','face','voice','face'],
+    devices:['📱<span>Caller</span>','🗼<span>Tower</span>','🌐<span>Internet</span>','🗼<span>Tower</span>','📱<span>Receiver</span>'],
+    steps:[
+      'Step 1: Camera and microphone capture your face and voice.',
+      'Step 2: Phone converts voice and video into digital packets.',
+      'Step 3: Packets travel through tower, Internet, and another tower.',
+      'Step 4: Receiver phone changes packets back into sound and video.',
+      'Step 5: At the same time, receiver also sends packets back to you.',
+      'Step 6: This fast two-way data flow creates a live video call.'
+    ],
+    positions:['6%','28%','50%','72%','94%','50%']
+  },
+  payment: {
+    src:'Mobile Wallet: 192.168.1.25',
+    dst:'Bank Server: 10.10.10.5',
+    type:'Secure payment data',
+    labels:['amount','PIN','OTP','confirm'],
+    devices:['📱<span>Your Phone</span>','📡<span>Network</span>','🌐<span>Internet</span>','🏦<span>Bank Server</span>','✅<span>Confirmation</span>'],
+    steps:[
+      'Step 1: You enter amount and confirm payment on your phone.',
+      'Step 2: Phone encrypts the payment data for safety.',
+      'Step 3: Secure packets travel through network and Internet.',
+      'Step 4: Bank server checks balance, PIN/OTP and account details.',
+      'Step 5: Bank server sends approval or failure response.',
+      'Step 6: Your phone receives confirmation and shows payment successful.'
+    ],
+    positions:['6%','28%','50%','72%','94%','94%']
+  }
+};
+
+function setupDaily(mode){
+  dailyMode = mode;
+  dailyStep = 0;
+  clearInterval(dailyTimer);
+  const d = dailyData[mode];
+  document.getElementById('dSource').innerHTML = d.devices[0];
+  document.getElementById('dRouter').innerHTML = d.devices[1];
+  document.getElementById('dInternet').innerHTML = d.devices[2];
+  document.getElementById('dServer').innerHTML = d.devices[3];
+  document.getElementById('dDest').innerHTML = d.devices[4];
+  document.getElementById('srcAddr').textContent = d.src;
+  document.getElementById('dstAddr').textContent = d.dst;
+  document.getElementById('dataType').textContent = d.type;
+  document.getElementById('dailyStepNo').textContent = '0';
+  document.getElementById('dailyExplain').textContent = 'Ready. Press Next Step to see exactly how data passes.';
+  makeMiniPackets(d.labels);
+  highlightDaily(0);
+}
+function makeMiniPackets(labels){
+  const box = document.getElementById('miniPackets');
+  box.innerHTML = '';
+  labels.forEach((l,i)=>{
+    const p = document.createElement('div');
+    p.className = 'miniPacket';
+    p.textContent = 'Packet '+(i+1)+': '+l;
+    p.style.top = (18 + i*40) + 'px';
+    p.style.left = '6%';
+    box.appendChild(p);
+  });
+}
+function highlightDaily(index){
+  ['dSource','dRouter','dInternet','dServer','dDest'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  const ids=['dSource','dRouter','dInternet','dServer','dDest'];
+  if(ids[index]) document.getElementById(ids[index]).classList.add('active');
+}
+function nextDailyStep(){
+  if(!dailyMode){document.getElementById('dailyExplain').textContent='Please choose WhatsApp, YouTube, Video Call or Online Payment first.';return;}
+  const d = dailyData[dailyMode];
+  if(dailyStep >= d.steps.length) dailyStep = 0;
+  document.getElementById('dailyExplain').textContent = d.steps[dailyStep];
+  document.getElementById('dailyStepNo').textContent = dailyStep + 1;
+  const packets = document.querySelectorAll('#miniPackets .miniPacket');
+  packets.forEach((p,i)=>{
+    p.style.left = d.positions[dailyStep];
+    p.style.transform = 'translateY(' + (Math.sin((dailyStep+i)*1.2)*8) + 'px)';
+  });
+  highlightDaily(Math.min(4, Math.floor((parseInt(d.positions[dailyStep]) || 6)/23)));
+  dailyStep++;
+}
+function prevDailyStep(){
+  if(!dailyMode)return;
+  dailyStep = Math.max(0, dailyStep-2);
+  nextDailyStep();
+}
+function autoDaily(){
+  if(!dailyMode){document.getElementById('dailyExplain').textContent='Please choose an example first.';return;}
+  clearInterval(dailyTimer);
+  dailyStep = 0;
+  nextDailyStep();
+  dailyTimer = setInterval(()=>{
+    if(dailyStep >= dailyData[dailyMode].steps.length){clearInterval(dailyTimer);return;}
+    nextDailyStep();
+  },1800);
+}
+
+function clearPackets(box){box.querySelectorAll('.packet').forEach(p=>p.remove())}
+function animatePacket(boxId,text,back=false){
+ const box=document.getElementById(boxId); clearPackets(box);
+ const p=document.createElement('div'); p.className='packet'+(back?' packet2':''); p.textContent=text; box.appendChild(p);
+}
+function sendNetwork(){animatePacket('netSim','DATA');document.getElementById('netStatus').textContent='Packet sent from Computer A to another device through the network.'}
+function testReq(){
+ let ok=c1.checked&&c2.checked&&c3.checked&&c4.checked;
+ reqStatus.textContent=ok?'Success: All requirements are present. Communication works!':'Failed: One or more requirements are missing.';
+ reqStatus.className=ok?'status':'status fail';
+}
+function historySim(text){historyStage.innerHTML='<b>'+text+'</b><br><span class="wave"></span><span class="wave"></span><span class="wave"></span>'}
+function sendMsg(){
+ let m=document.getElementById('msg').value || 'Hello';
+ animatePacket('commSim',m);
+ commStatus.textContent='Sender sends "'+m+'" and receiver receives it.';
+}
+function telecom(){animatePacket('teleSim','Signal waves');teleStatus.textContent='Electromagnetic signal travels through tower/Wi-Fi/WiMAX over distance.'}
+function internetInfo(text){internetStatus.textContent=text}
+function liveEx(text){animatePacket('liveBox','DATA');liveStatus.textContent=text}
+function showAns(id,correct){
+ let e=document.getElementById(id); e.style.display='block'; e.textContent=correct?'Correct!':'Try again.'; e.style.color=correct?'green':'red';
+}
+function allowDrop(ev){ev.preventDefault()}
+function drag(ev){ev.dataTransfer.setData("text", ev.target.id)}
+function drop(ev,correctId){
+ ev.preventDefault();
+ let id=ev.dataTransfer.getData("text");
+ if(id===correctId){ev.target.appendChild(document.getElementById(id)); matchStatus.textContent='Correct match!'; matchStatus.style.color='green'}
+ else{matchStatus.textContent='Wrong place. Try again.'; matchStatus.style.color='red'}
+}
+
+let netStep = 0;
+let netTimer = null;
+const netSteps = [
+  {pos:'6%', active:'netA', text:'Step 1: Computer A creates data. Example: a homework file is ready to send.'},
+  {pos:'6%', active:'netA', text:'Step 2: The file is broken into small packets. Each packet gets sender and receiver address.'},
+  {pos:'28%', active:'netCable', text:'Step 3: Packets enter the communication medium. The medium can be wire, fibre cable or Wi-Fi signal.'},
+  {pos:'50%', active:'netRouter', text:'Step 4: Router checks the address and decides the best path for the packet.'},
+  {pos:'72%', active:'netSwitch', text:'Step 5: Switch sends the packet to the correct device inside the local network.'},
+  {pos:'94%', active:'netB', text:'Step 6: Computer B receives all packets.'},
+  {pos:'94%', active:'netB', text:'Step 7: Computer B joins the packets again and opens the original homework file.'}
+];
+
+function netSetup(){
+  netStep = 0;
+  clearInterval(netTimer);
+  const box = document.getElementById('netPackets');
+  box.innerHTML = '';
+  ['Part 1','Part 2','Part 3'].forEach((x,i)=>{
+    const p=document.createElement('div');
+    p.className='miniPacket';
+    p.textContent=x;
+    p.style.left='6%';
+    p.style.top=(18+i*40)+'px';
+    box.appendChild(p);
+  });
+  document.getElementById('netExplain').textContent='Network is ready. Click Next Explanation.';
+  netHighlight('netA');
+}
+function netHighlight(id){
+  ['netA','netCable','netRouter','netSwitch','netB'].forEach(x=>document.getElementById(x).classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function netNext(){
+  if(document.querySelectorAll('#netPackets .miniPacket').length===0) netSetup();
+  if(netStep >= netSteps.length) netStep = 0;
+  const s = netSteps[netStep];
+  document.getElementById('netExplain').textContent = s.text;
+  netHighlight(s.active);
+  document.querySelectorAll('#netPackets .miniPacket').forEach((p,i)=>{
+    p.style.left=s.pos;
+    p.style.transform='translateY('+(i*3)+'px)';
+  });
+  netStep++;
+}
+function netAuto(){
+  clearInterval(netTimer);
+  netSetup();
+  netNext();
+  netTimer=setInterval(()=>{
+    if(netStep>=netSteps.length){clearInterval(netTimer);return;}
+    netNext();
+  },1900);
+}
+function netReset(){
+  clearInterval(netTimer);
+  netStep=0;
+  document.getElementById('netPackets').innerHTML='';
+  document.getElementById('netExplain').textContent='Click Start Network, then Next Explanation.';
+  ['netA','netCable','netRouter','netSwitch','netB'].forEach(x=>document.getElementById(x).classList.remove('active'));
+}
+function testNetworkBuild(){
+  let ok = nDev.checked && nMed.checked && nAddr.checked && nRule.checked;
+  netBuildStatus.textContent = ok ? 'Success: Your network works. Devices can share data.' : 'Failed: Network is incomplete. Check the missing part.';
+  netBuildStatus.className = ok ? 'status' : 'status fail';
+}
+
+
+/* ROBUST PACKET FLOW JS FIX */
+function makeFlowPackets(containerId, labels){
+  const box = document.getElementById(containerId);
+  box.innerHTML = '';
+  for(let i=0;i<Math.min(labels.length,4);i++){
+    const track = document.createElement('div');
+    track.className = 'flowTrack t' + (i+1);
+    box.appendChild(track);
+
+    const p = document.createElement('div');
+    p.className = 'flowPacket p' + (i+1);
+    p.textContent = labels[i];
+    p.dataset.step = '0';
+    box.appendChild(p);
+  }
+}
+function moveFlowPackets(containerId, posPercent, reverse=false){
+  const packets = document.querySelectorAll('#'+containerId+' .flowPacket');
+  packets.forEach((p,i)=>{
+    setTimeout(()=>{
+      p.style.left = posPercent;
+      p.style.transform = reverse ? 'translateX(-10px)' : 'translateX(0)';
+    }, i*120);
+  });
+}
+function makeMiniPackets(labels){
+  makeFlowPackets('miniPackets', labels.map((x,i)=>'Packet '+(i+1)+': '+x));
+}
+function netSetup(){
+  netStep = 0;
+  clearInterval(netTimer);
+  makeFlowPackets('netPackets', ['Part 1','Part 2','Part 3']);
+  document.getElementById('netExplain').textContent='Network is ready. Click Next Explanation.';
+  netHighlight('netA');
+}
+function nextDailyStep(){
+  if(!dailyMode){document.getElementById('dailyExplain').textContent='Please choose WhatsApp, YouTube, Video Call or Online Payment first.';return;}
+  const d = dailyData[dailyMode];
+  if(dailyStep >= d.steps.length) dailyStep = 0;
+  document.getElementById('dailyExplain').textContent = d.steps[dailyStep];
+  document.getElementById('dailyStepNo').textContent = dailyStep + 1;
+  moveFlowPackets('miniPackets', d.positions[dailyStep], dailyMode==='call' && dailyStep===4);
+  highlightDaily(Math.min(4, Math.floor((parseInt(d.positions[dailyStep]) || 6)/23)));
+  dailyStep++;
+}
+function netNext(){
+  if(document.querySelectorAll('#netPackets .flowPacket').length===0) netSetup();
+  if(netStep >= netSteps.length) netStep = 0;
+  const s = netSteps[netStep];
+  document.getElementById('netExplain').textContent = s.text;
+  netHighlight(s.active);
+  moveFlowPackets('netPackets', s.pos);
+  netStep++;
+}
+
+
+let commStep = 0;
+let commTimer = null;
+let commText = 'Hello';
+
+const commSteps = [
+  {pos:'8%', active:'commSender', place:'Sender', text:'Step 1: The sender creates a message. The data starts from the sender.'},
+  {pos:'28%', active:'commEncode', place:'Encoding', text:'Step 2: The message is changed into digital form. Computers use 0s and 1s.'},
+  {pos:'50%', active:'commChannel', place:'Channel', text:'Step 3: The data flows through a channel, such as wire, Wi-Fi or air signal.'},
+  {pos:'72%', active:'commDecode', place:'Decoding', text:'Step 4: The receiver side changes the digital data back into understandable message.'},
+  {pos:'88%', active:'commReceiver', place:'Receiver', text:'Step 5: The receiver gets the message. Communication is complete.'}
+];
+
+function simpleBinary(text){
+  return text.split('').slice(0,8).map(ch=>ch.charCodeAt(0).toString(2).padStart(8,'0')).join(' ');
+}
+function commHighlight(id){
+  ['commSender','commEncode','commChannel','commDecode','commReceiver'].forEach(x=>document.getElementById(x).classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function startCommFlow(){
+  clearInterval(commTimer);
+  commStep = 0;
+  commText = document.getElementById('msg').value.trim() || 'Hello';
+  document.getElementById('originalMsg').textContent = commText;
+  document.getElementById('binaryMsg').textContent = simpleBinary(commText);
+  document.getElementById('commPosition').textContent = 'Sender';
+  makeFlowPackets('commPackets', ['Message', '0s & 1s', 'Signal']);
+  moveFlowPackets('commPackets','8%');
+  commHighlight('commSender');
+  document.getElementById('commStatus').textContent = 'Ready. Click Next Step to see where the data flows.';
+}
+function nextCommFlow(){
+  if(document.querySelectorAll('#commPackets .flowPacket').length===0) startCommFlow();
+  if(commStep >= commSteps.length) commStep = 0;
+  const s = commSteps[commStep];
+  moveFlowPackets('commPackets', s.pos);
+  commHighlight(s.active);
+  document.getElementById('commPosition').textContent = s.place;
+  document.getElementById('commStatus').textContent = s.text;
+  commStep++;
+}
+function autoCommFlow(){
+  clearInterval(commTimer);
+  startCommFlow();
+  nextCommFlow();
+  commTimer = setInterval(()=>{
+    if(commStep >= commSteps.length){clearInterval(commTimer);return;}
+    nextCommFlow();
+  },1700);
+}
+function sendMsg(){startCommFlow();autoCommFlow();}
+
+
+/* TELECOMMUNICATION STEP SIMULATION */
+let teleStep = 0, teleTimer = null;
+const teleSteps = [
+  {pos:'8%', active:'tele1', place:'Sender phone', text:'Step 1: Sender speaks or types. The phone changes voice/text into digital data.'},
+  {pos:'28%', active:'tele2', place:'Nearby tower', text:'Step 2: Phone sends data as electromagnetic waves to the nearest mobile tower.'},
+  {pos:'50%', active:'tele3', place:'Telecom network', text:'Step 3: Telecom network carries the signal over long distance using cables, towers and switching systems.'},
+  {pos:'72%', active:'tele4', place:'Remote tower', text:'Step 4: The remote tower receives the signal near the receiver.'},
+  {pos:'88%', active:'tele5', place:'Receiver phone', text:'Step 5: Receiver phone converts digital signal back into voice/text/video.'}
+];
+function teleHighlight(id){['tele1','tele2','tele3','tele4','tele5'].forEach(x=>document.getElementById(x).classList.remove('active'));document.getElementById(id).classList.add('active')}
+function teleStart(){clearInterval(teleTimer);teleStep=0;makeFlowPackets('telePackets',['Voice','Text','Signal']);moveFlowPackets('telePackets','8%');teleHighlight('tele1');teleExplain.textContent='Ready. Press Next Step.';teleStepText.textContent='Ready'}
+function teleNext(){if(document.querySelectorAll('#telePackets .flowPacket').length===0) teleStart(); if(teleStep>=teleSteps.length) teleStep=0; const s=teleSteps[teleStep]; moveFlowPackets('telePackets',s.pos); teleHighlight(s.active); teleExplain.textContent=s.text; teleStepText.textContent=s.place; teleStep++}
+function teleAuto(){clearInterval(teleTimer);teleStart();teleNext();teleTimer=setInterval(()=>{if(teleStep>=teleSteps.length){clearInterval(teleTimer);return}teleNext()},1700)}
+function telecom(){teleAuto()}
+
+/* INTERNET STEP SIMULATION */
+let internetMode=null, internetStep=0, internetTimer=null;
+const internetData = {
+ laptop:{name:'Laptop browsing website', req:'Website request', res:'Webpage response', packets:['Request','HTML','Image'], steps:[
+  ['8%','internetSim','Device','Step 1: Laptop sends a website request, for example www.school.com.'],
+  ['28%','internetSim','Router/Tower','Step 2: Wi-Fi router forwards the request outside your home/school network.'],
+  ['50%','internetSim','Internet','Step 3: Internet routers find the path to the web server.'],
+  ['72%','internetSim','Server','Step 4: Web server receives the request and prepares webpage data.'],
+  ['88%','internetSim','Response','Step 5: Webpage data returns to laptop and appears in browser.']
+ ]},
+ phone:{name:'Phone sending message', req:'Message upload', res:'Message delivered', packets:['Text','Address','Tick'], steps:[
+  ['8%','internetSim','Phone','Step 1: Phone converts message into data packets.'],
+  ['28%','internetSim','Router/Tower','Step 2: Packets travel through Wi-Fi or mobile tower.'],
+  ['50%','internetSim','Internet','Step 3: Internet carries packets to message service.'],
+  ['72%','internetSim','Server','Step 4: Server finds receiver account.'],
+  ['88%','internetSim','Response','Step 5: Delivery confirmation returns to your phone.']
+ ]},
+ tv:{name:'TV video streaming', req:'Video request', res:'Video stream', packets:['Video','Audio','Buffer'], steps:[
+  ['8%','internetSim','TV/App','Step 1: TV app requests a movie or programme.'],
+  ['28%','internetSim','Router','Step 2: Router sends request to Internet.'],
+  ['50%','internetSim','Internet','Step 3: Internet connects to content server.'],
+  ['72%','internetSim','Server','Step 4: Server sends video in small streaming packets.'],
+  ['88%','internetSim','Screen','Step 5: TV receives packets, buffers and plays video.']
+ ]},
+ router:{name:'Wi-Fi router connecting home', req:'Local device request', res:'Internet access', packets:['Local','Wi-Fi','Data'], steps:[
+  ['8%','internetSim','Device','Step 1: Mobile/laptop connects to Wi-Fi router.'],
+  ['28%','internetSim','Router','Step 2: Router gives local address and accepts data.'],
+  ['50%','internetSim','Internet','Step 3: Router sends data to Internet provider.'],
+  ['72%','internetSim','Server','Step 4: Server sends required information back.'],
+  ['88%','internetSim','Device','Step 5: Router returns Internet data to the correct device.']
+ ]},
+ tower:{name:'Tower / WiMAX wireless Internet', req:'Wireless Internet signal', res:'Data received', packets:['Radio','Data','Signal'], steps:[
+  ['8%','internetSim','Device','Step 1: Device sends wireless request.'],
+  ['28%','internetSim','Tower','Step 2: Tower receives radio signal.'],
+  ['50%','internetSim','Internet','Step 3: Tower connects the request to wider Internet.'],
+  ['72%','internetSim','Server','Step 4: Server sends requested data back.'],
+  ['88%','internetSim','Device','Step 5: Tower sends wireless response to device.']
+ ]}
+};
+function internetChoose(mode){internetMode=mode; internetStep=0; clearInterval(internetTimer); const d=internetData[mode]; internetSelected.textContent=d.name; internetRequest.textContent=d.req; internetResponse.textContent=d.res; internetPosition.textContent='Ready'; internetExplain.textContent='Ready. Click Next Step.'; makeFlowPackets('internetPackets',d.packets); moveFlowPackets('internetPackets','8%')}
+function internetNext(){if(!internetMode){internetExplain.textContent='Please click one device first.';return} const d=internetData[internetMode]; if(internetStep>=d.steps.length) internetStep=0; const s=d.steps[internetStep]; moveFlowPackets('internetPackets',s[0]); internetPosition.textContent=s[2]; internetExplain.textContent=s[3]; internetStep++}
+function internetAuto(){if(!internetMode){internetExplain.textContent='Please click one device first.';return} clearInterval(internetTimer); internetStep=0; internetNext(); internetTimer=setInterval(()=>{if(internetStep>=internetData[internetMode].steps.length){clearInterval(internetTimer);return} internetNext()},1700)}
+function internetInfo(text){internetExplain.textContent=text}
+
+/* FIXED INTERNET SIMULATION JS */
+let internetStepIndex = 0;
+let internetRunTimer = null;
+
+const internetStepsFixed = [
+  {
+    pos:'6%',
+    stage:'intDevice',
+    card:'intCard1',
+    label:'REQUEST',
+    color:'#e53935',
+    position:'Your Device',
+    text:function(){return 'Step 1: You type ' + getWebsiteName() + ' in the browser. Your laptop/phone creates a REQUEST packet.';}
+  },
+  {
+    pos:'26%',
+    stage:'intRouter',
+    card:'intCard2',
+    label:'REQUEST',
+    color:'#e53935',
+    position:'Router / Tower',
+    text:function(){return 'Step 2: The request goes from your device to the Wi‑Fi router or mobile tower.';}
+  },
+  {
+    pos:'46%',
+    stage:'intISP',
+    card:'intCard3',
+    label:'REQUEST',
+    color:'#e53935',
+    position:'ISP',
+    text:function(){return 'Step 3: ISP means Internet Service Provider. It forwards your request to the wider Internet.';}
+  },
+  {
+    pos:'66%',
+    stage:'intCloud',
+    card:'intCard4',
+    label:'REQUEST',
+    color:'#e53935',
+    position:'Internet',
+    text:function(){return 'Step 4: The request travels through many connected networks. Routers choose the correct path.';}
+  },
+  {
+    pos:'86%',
+    stage:'intServer',
+    card:'intCard5',
+    label:'REQUEST',
+    color:'#e53935',
+    position:'Web Server',
+    text:function(){return 'Step 5: The web server receives the request and finds webpage files such as HTML, text and images.';}
+  },
+  {
+    pos:'66%',
+    stage:'intCloud',
+    card:'intCard6',
+    label:'RESPONSE',
+    color:'#2e7d32',
+    position:'Internet',
+    text:function(){return 'Step 6: The web server sends RESPONSE packets back through the Internet.';}
+  },
+  {
+    pos:'6%',
+    stage:'intDevice',
+    card:'intCard7',
+    label:'WEBPAGE',
+    color:'#2e7d32',
+    position:'Your Device',
+    text:function(){return 'Step 7: Your browser joins the received packets and displays the webpage.';}
+  }
+];
+
+function getWebsiteName(){
+  const input = document.getElementById('websiteInput');
+  return input && input.value.trim() ? input.value.trim() : 'www.school.com';
+}
+function clearInternetHighlights(){
+  ['intDevice','intRouter','intISP','intCloud','intServer'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.remove('active');
+  });
+  ['intCard1','intCard2','intCard3','intCard4','intCard5','intCard6','intCard7'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.remove('active');
+  });
+}
+function internetStart(){
+  clearInterval(internetRunTimer);
+  internetStepIndex = 0;
+  const packet = document.getElementById('internetPacket');
+  if(packet){
+    packet.style.left='6%';
+    packet.style.background='#e53935';
+    packet.textContent='REQUEST';
+  }
+  clearInternetHighlights();
+  const dev=document.getElementById('intDevice');
+  const card=document.getElementById('intCard1');
+  if(dev) dev.classList.add('active');
+  if(card) card.classList.add('active');
+  const pos=document.getElementById('internetPosition');
+  if(pos) pos.textContent='Your Device';
+  const explain=document.getElementById('internetExplain');
+  if(explain) explain.textContent='Ready. Click Next Step to watch data flow from device to web server and back.';
+}
+function internetNextStep(){
+  if(!document.getElementById('internetPacket')) return;
+  if(internetStepIndex >= internetStepsFixed.length) internetStepIndex = 0;
+  const step = internetStepsFixed[internetStepIndex];
+  const packet = document.getElementById('internetPacket');
+  packet.style.left = step.pos;
+  packet.style.background = step.color;
+  packet.textContent = step.label;
+  clearInternetHighlights();
+  const stage = document.getElementById(step.stage);
+  const card = document.getElementById(step.card);
+  if(stage) stage.classList.add('active');
+  if(card) card.classList.add('active');
+  const pos=document.getElementById('internetPosition');
+  if(pos) pos.textContent = step.position;
+  const explain=document.getElementById('internetExplain');
+  if(explain) explain.textContent = step.text();
+  internetStepIndex++;
+}
+function internetAutoRun(){
+  clearInterval(internetRunTimer);
+  internetStart();
+  internetNextStep();
+  internetRunTimer = setInterval(()=>{
+    if(internetStepIndex >= internetStepsFixed.length){
+      clearInterval(internetRunTimer);
+      return;
+    }
+    internetNextStep();
+  }, 1800);
+}
+function internetReset(){
+  clearInterval(internetRunTimer);
+  internetStepIndex = 0;
+  const packet = document.getElementById('internetPacket');
+  if(packet){
+    packet.style.left='6%';
+    packet.style.background='#e53935';
+    packet.textContent='REQUEST';
+  }
+  clearInternetHighlights();
+  const dev=document.getElementById('intDevice');
+  if(dev) dev.classList.add('active');
+  const pos=document.getElementById('internetPosition');
+  if(pos) pos.textContent='Your Device';
+  const explain=document.getElementById('internetExplain');
+  if(explain) explain.textContent='Press Start, then Next Step. Watch the REQUEST go to the web server and the RESPONSE come back.';
+}
+function internetExplainRole(role){
+  const messages = {
+    device:'Device: laptop or phone. It asks for information and receives the webpage.',
+    router:'Router/Tower: connects your device to the network and sends your request forward.',
+    isp:'ISP: Internet Service Provider. It gives Internet access and forwards data to other networks.',
+    internet:'Internet: many networks connected together. It carries data from one place to another.',
+    server:'Web Server: a computer that stores website files and sends them to users when requested.'
+  };
+  const out=document.getElementById('internetRoleText');
+  if(out) out.textContent = messages[role] || '';
+}
+
+/* Compatibility with older buttons */
+function internetChoose(){ internetStart(); }
+function internetNext(){ internetNextStep(); }
+function internetAuto(){ internetAutoRun(); }
+function internetInfo(text){
+  const explain=document.getElementById('internetExplain');
+  if(explain) explain.textContent=text;
+}
+
+
+/* FIXED LIVE EXAMPLES JS */
+let liveCurrent = null;
+let liveStepIndex = 0;
+let liveRunTimer = null;
+
+const liveExamplesFixed = {
+  whatsapp:{
+    title:'WhatsApp Message',
+    data:'Text packets',
+    direction:'Sender phone → WhatsApp server → Receiver phone',
+    icons:['📱','📡','🌐','🖥️','📱'],
+    labels:['Sender Phone','Wi‑Fi / Tower','Internet','WhatsApp Server','Receiver Phone'],
+    small:['You type message','Connects phone','Carries packets','Finds receiver','Shows message'],
+    packet:['MESSAGE','MESSAGE','MESSAGE','SERVER','DELIVERED'],
+    colors:['#e53935','#e53935','#e53935','#1565c0','#2e7d32'],
+    steps:[
+      'Step 1: You type a message. The phone changes text into small data packets.',
+      'Step 2: Packets go from your phone to Wi‑Fi router or mobile tower.',
+      'Step 3: Packets travel through the Internet using addresses.',
+      'Step 4: WhatsApp server receives the packets and finds the receiver phone.',
+      'Step 5: Receiver phone gets the packets, joins them and shows the message.'
+    ]
+  },
+  youtube:{
+    title:'YouTube Video',
+    data:'Video, audio and buffer packets',
+    direction:'Device request → YouTube server → Video returns',
+    icons:['💻','📡','🌐','🖥️','🎬'],
+    labels:['Your Device','Router','Internet','YouTube Server','Video Plays'],
+    small:['Clicks video','Sends request','Finds path','Sends video','Screen displays'],
+    packet:['REQUEST','REQUEST','REQUEST','VIDEO','PLAY'],
+    colors:['#e53935','#e53935','#e53935','#2e7d32','#2e7d32'],
+    steps:[
+      'Step 1: You click a video. Your device sends a request for that video.',
+      'Step 2: Router forwards the request to the Internet.',
+      'Step 3: Internet carries the request to YouTube server.',
+      'Step 4: YouTube server sends video and audio packets back.',
+      'Step 5: Your device buffers the packets and plays the video.'
+    ]
+  },
+  video:{
+    title:'Video Call',
+    data:'Two-way voice and video packets',
+    direction:'Caller ↔ Receiver',
+    icons:['📱','🗼','🌐','🗼','📱'],
+    labels:['Caller','Tower','Internet','Remote Tower','Receiver'],
+    small:['Camera + mic','Sends signal','Fast pathway','Receives signal','Sees and hears'],
+    packet:['VOICE','VIDEO','LIVE','LIVE','RECEIVED'],
+    colors:['#e53935','#e53935','#1565c0','#2e7d32','#2e7d32'],
+    steps:[
+      'Step 1: Camera and microphone capture your face and voice.',
+      'Step 2: Phone changes audio/video into digital packets and sends them to tower.',
+      'Step 3: Internet carries packets very quickly for live communication.',
+      'Step 4: Remote tower sends packets to the receiver phone.',
+      'Step 5: Receiver sees video and hears sound. At the same time, data also flows back to you.'
+    ]
+  },
+  payment:{
+    title:'Online Payment',
+    data:'Secure encrypted payment packets',
+    direction:'Phone → Payment/Bank server → Confirmation',
+    icons:['📱','📡','🌐','🏦','✅'],
+    labels:['Wallet App','Network','Internet','Bank Server','Confirmation'],
+    small:['Enter amount','Sends safely','Secure path','Checks details','Success/fail'],
+    packet:['PAY','SECURE','SECURE','CHECK','OK'],
+    colors:['#e53935','#e53935','#e53935','#1565c0','#2e7d32'],
+    steps:[
+      'Step 1: You enter amount and confirm payment in the app.',
+      'Step 2: Phone encrypts the payment details and sends them to the network.',
+      'Step 3: Secure packets travel through the Internet.',
+      'Step 4: Bank server checks account, balance, PIN or OTP.',
+      'Step 5: Confirmation returns to your phone: payment successful or failed.'
+    ]
+  },
+  web:{
+    title:'Website Browsing',
+    data:'Website request and webpage response',
+    direction:'Browser → Web server → Browser',
+    icons:['💻','📡','🌐','🖥️','📄'],
+    labels:['Browser','Router','Internet','Web Server','Webpage'],
+    small:['Types URL','Forwards request','Finds server','Sends files','Displays page'],
+    packet:['URL','REQUEST','REQUEST','HTML','PAGE'],
+    colors:['#e53935','#e53935','#e53935','#2e7d32','#2e7d32'],
+    steps:[
+      'Step 1: You type a website address in the browser.',
+      'Step 2: The request goes to the router or tower.',
+      'Step 3: Internet carries the request to the correct web server.',
+      'Step 4: Web server sends webpage files like HTML, CSS, images and text.',
+      'Step 5: Browser receives the files and displays the webpage.'
+    ]
+  }
+};
+
+const livePositions = ['6%','26%','46%','66%','86%'];
+
+function liveClearHighlights(){
+  for(let i=1;i<=5;i++){
+    const stage=document.getElementById('liveStage'+i);
+    const card=document.getElementById('liveCard'+i);
+    if(stage) stage.classList.remove('active');
+    if(card) card.classList.remove('active');
+  }
+}
+function liveSelect(kind){
+  liveCurrent = kind;
+  liveStepIndex = 0;
+  clearInterval(liveRunTimer);
+  const d = liveExamplesFixed[kind];
+  document.getElementById('liveTitle').textContent = d.title;
+  document.getElementById('liveExample').textContent = d.title;
+  document.getElementById('liveDataType').textContent = d.data;
+  document.getElementById('liveDirection').textContent = d.direction;
+  document.getElementById('livePosition').textContent = d.labels[0];
+
+  for(let i=1;i<=5;i++){
+    document.getElementById('liveIcon'+i).textContent = d.icons[i-1];
+    document.getElementById('liveLabel'+i).textContent = d.labels[i-1];
+    document.getElementById('liveSmall'+i).textContent = d.small[i-1];
+  }
+
+  const car=document.getElementById('livePacketCar');
+  if(car){
+    car.style.left='6%';
+    car.style.background=d.colors[0];
+    car.textContent=d.packet[0];
+  }
+  liveClearHighlights();
+  document.getElementById('liveStage1').classList.add('active');
+  document.getElementById('liveCard1').classList.add('active');
+  document.getElementById('liveExplain').textContent='Ready. Press Next Step to see how '+d.title+' works.';
+}
+function liveStart(){
+  if(!liveCurrent) liveSelect('whatsapp');
+  else liveSelect(liveCurrent);
+}
+function liveNextStep(){
+  if(!liveCurrent){ liveSelect('whatsapp'); return; }
+  if(liveStepIndex >= 5) liveStepIndex = 0;
+  const d = liveExamplesFixed[liveCurrent];
+  const car=document.getElementById('livePacketCar');
+  if(car){
+    car.style.left = livePositions[liveStepIndex];
+    car.textContent = d.packet[liveStepIndex];
+    car.style.background = d.colors[liveStepIndex];
+  }
+  liveClearHighlights();
+  document.getElementById('liveStage'+(liveStepIndex+1)).classList.add('active');
+  document.getElementById('liveCard'+(liveStepIndex+1)).classList.add('active');
+  document.getElementById('livePosition').textContent = d.labels[liveStepIndex];
+  document.getElementById('liveExplain').textContent = d.steps[liveStepIndex];
+  liveStepIndex++;
+}
+function liveAutoRun(){
+  if(!liveCurrent) liveSelect('whatsapp');
+  clearInterval(liveRunTimer);
+  liveStepIndex=0;
+  liveNextStep();
+  liveRunTimer=setInterval(()=>{
+    if(liveStepIndex>=5){
+      clearInterval(liveRunTimer);
+      return;
+    }
+    liveNextStep();
+  },1800);
+}
+function liveReset(){
+  clearInterval(liveRunTimer);
+  liveStepIndex=0;
+  if(liveCurrent) liveSelect(liveCurrent);
+  else {
+    const car=document.getElementById('livePacketCar');
+    if(car){car.style.left='6%';car.textContent='DATA';car.style.background='#e53935';}
+    liveClearHighlights();
+    const st=document.getElementById('liveStage1');
+    if(st) st.classList.add('active');
+    document.getElementById('liveExplain').textContent='Choose an example above. The moving packet will show the live data flow step by step.';
+  }
+}
+
+/* Compatibility with older function names */
+function liveChoose(kind){ liveSelect(kind); }
+function liveNext(){ liveNextStep(); }
+function liveAuto(){ liveAutoRun(); }
+function liveEx(){ liveSelect('whatsapp'); liveAutoRun(); }
+
+</script>
+</body>
+</html>
